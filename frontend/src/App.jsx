@@ -46,19 +46,21 @@ function App() {
     const ctx = canvas.getContext('2d');
 
     const img = new Image();
+    img.crossOrigin = "anonymous"; // Allow CORS for image
     img.onload = () => {
-      const size = 64; // Size of the favicon
+      const size = 64;
       canvas.width = size;
       canvas.height = size;
       ctx.beginPath();
-      ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
+      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
       ctx.clip();
       ctx.drawImage(img, 0, 0, size, size);
 
-      // Set the favicon to the circular image
-      link.href = canvas.toDataURL('image/x-icon');
+      link.href = canvas.toDataURL("image/png");
       document.head.appendChild(link);
-    };
+};
+img.src = imgUrl;
+
     img.src = imgUrl;
   };
 
