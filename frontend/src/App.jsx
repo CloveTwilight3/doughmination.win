@@ -11,9 +11,9 @@ function App() {
 
   // Define link colors based on the current theme
   const linkClass = theme === 'light'
-  ? 'text-black no-underline hover:text-gray-700'
-  : 'text-white no-underline hover:text-gray-300';
-  
+  ? 'text-black no-underline visited:text-black hover:text-gray-700'
+  : 'text-white no-underline visited:text-white hover:text-gray-300';
+
   useEffect(() => {
     // Fetch members data
     fetch("/api/members")
