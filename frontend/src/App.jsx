@@ -3,7 +3,7 @@ import { Link, Routes, Route } from "react-router-dom"; // Importing Routes and 
 import useTheme from './useTheme';  // Import the custom hook
 
 // Import MemberDetails component to handle individual member pages
-import MemberDetails from './MemberDetails.js'; 
+import MemberDetails from './MemberDetails.jsx'; 
 
 function App() {
   const [members, setMembers] = useState([]);
