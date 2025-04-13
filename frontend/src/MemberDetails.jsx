@@ -1,45 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';  // Import useParams to access the URL parameter
+import { useParams } from 'react-router-dom';
 
-function MemberDetails() {
-  const { id } = useParams();  // Get the member id from the URL
-  const [member, setMember] = useState(null);
+const MemberDetails = () => {
+  const { member_username } = useParams();  // Get username from the URL
+  const [memberData, setMemberData] = useState(null);
 
   useEffect(() => {
-    // Make a request to your backend API using the member ID
-    fetch(`/api/member/${id}`)  // Backend endpoint adjusted to /api/member/:id
-      .then((res) => res.json())
-      .then((data) => {
-        setMember(data);
-      })
-      .catch((err) => {
-        console.error('Error fetching member data:', err);
-      });
-  }, [id]);  // Effect will run again when the id changes
+    const fetchMemberData = async () => {
+      try {
+        // Fetch data from your backend based on username
+        const response = await fetch(`/api/members/${member_username}`);
+        const data = await response.json();
+        setMemberData(data);
+      } catch (error) {
+        console.error("Error fetching member data:", error);
+      }
+    };
 
-  if (!member) return <div>Loading...</div>;  // Show loading until data is fetched
+    fetchMemberData();
+  }, [member_username]);  // Re-fetch if the username changes
+
+  if (!memberData) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-semibold">{member.display_name || member.name}</h2>
-      <img
-        src={member.avatar_url || 'https://clovetwilight3.co.uk/system.png'}  // Fallback to default avatar if none exists
-        alt={member.display_name || member.name}
-        className="w-32 h-32 rounded-full mt-4"
-      />
-      <p className="mt-4">{member.bio || 'No bio available.'}</p> {/* You can replace 'bio' with the correct property if it's different */}
-      
-      {/* Display other member information as needed */}
-      <div className="mt-6">
-        <h3 className="text-xl">Additional Information:</h3>
-        <ul>
-          {/* Update with actual fields you'd like to show */}
-          <li><strong>System ID:</strong> {member.system_id}</li>
-          <li><strong>Joined:</strong> {member.joined_at}</li>
-        </ul>
-      </div>
+    <div>
+      <h1>{memberData.name}</h1>
+      <p>{memberData.description}</p>  {/* Display member info */}
+      {/* Render other member info here */}
     </div>
   );
-}
+};
 
 export default MemberDetails;
