@@ -92,10 +92,7 @@ function App() {
         <ul>
           {members.map((member) => (
             <li key={member.id} className="mb-4 p-4 border rounded-lg shadow-sm bg-white dark:bg-gray-800 dark:border-gray-700">
-              <Link
-                to={`/${member.username}`}
-                className={`flex items-center no-underline ${theme === 'light' ? 'text-black hover:text-gray-700 visited:text-black' : 'text-white hover:text-gray-300 visited:text-white'}`}  // Dynamically handle colors for both light and dark modes
-              >
+              <Link to={`/${member.id}`} className="flex items-center text-black dark:text-white no-underline hover:text-gray-700 dark:hover:text-gray-300">
                 <img
                   src={member.avatar_url || defaultAvatar}
                   alt={member.name}
