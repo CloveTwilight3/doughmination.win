@@ -36,27 +36,45 @@ function App() {
       });
   }, []);
 
-  // Dynamically update the document title based on fronting member
+  // Function to create a circular favicon from an image URL
+  const setFavicon = (imgUrl) => {
+    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/x-icon';
+    link.rel = 'icon';
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.onload = () => {
+      const size = 64; // Size of the favicon
+      canvas.width = size;
+      canvas.height = size;
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
+      ctx.clip();
+      ctx.drawImage(img, 0, 0, size, size);
+
+      // Set the favicon to the circular image
+      link.href = canvas.toDataURL('image/x-icon');
+      document.head.appendChild(link);
+    };
+    img.src = imgUrl;
+  };
+
+  // Dynamically update the document title and favicon based on fronting member
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
       document.title = `Currently Fronting: ${fronting.members[0].display_name || 'Unknown'}`;
       
-      // Set favicon to the fronting member's avatar
+      // Set favicon to the fronting member's avatar (or default)
       const frontingAvatar = fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar;
-      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-      link.type = 'image/x-icon';
-      link.rel = 'icon';
-      link.href = frontingAvatar;
-      document.head.appendChild(link);
+      setFavicon(frontingAvatar);
     } else {
       document.title = "Doughmination System Server";  // Default title
       
       // Reset favicon to default
-      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-      link.type = 'image/x-icon';
-      link.rel = 'icon';
-      link.href = defaultAvatar;
-      document.head.appendChild(link);
+      setFavicon(defaultAvatar);
     }
   }, [fronting]); // Runs only when fronting changes
 
