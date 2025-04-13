@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Routes, Route } from "react-router-dom"; // Importing Routes and Route
 import useTheme from './useTheme';  // Import the custom hook
+
+// Import MemberDetails component to handle individual member pages
+import MemberDetails from './MemberDetails'; 
 
 function App() {
   const [members, setMembers] = useState([]);
   const [fronting, setFronting] = useState(null);
   const [theme, toggleTheme] = useTheme();  // Use the custom theme hook
 
-  const defaultAvatar = "https://clovetwilight3.co.uk/system.png";  // Replace this with your system's default avatar URL or a placeholder
+  const defaultAvatar = "https://clovetwilight3.co.uk/system.png";  // Default avatar URL
 
   useEffect(() => {
     // Fetch members data
@@ -38,7 +41,6 @@ function App() {
     if (fronting && fronting.members && fronting.members.length > 0) {
       document.title = `Currently Fronting: ${fronting.members[0].display_name || 'Unknown'}`;
       
-      // Set favicon to the fronting member's avatar
       const frontingAvatar = fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar;
       const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
       link.type = 'image/x-icon';
@@ -47,15 +49,13 @@ function App() {
       document.head.appendChild(link);
     } else {
       document.title = "Doughmination System Server";  // Default title
-      
-      // Reset favicon to default
       const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
       link.type = 'image/x-icon';
       link.rel = 'icon';
       link.href = defaultAvatar;
       document.head.appendChild(link);
     }
-  }, [fronting]); // Runs only when fronting changes
+  }, [fronting]);
 
   if (members.length === 0) return <div>Loading...</div>;
 
@@ -77,7 +77,7 @@ function App() {
           <h2 className="text-xl font-semibold">Currently Fronting:</h2>
           <div className="flex items-center">
             <img
-              src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}  // Fallback to member avatar or default
+              src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
               alt="Fronting member"
               className="w-10 h-10 mr-3 rounded-full"
             />
@@ -104,6 +104,11 @@ function App() {
           ))}
         </ul>
       </div>
+      
+      {/* Add your routes here */}
+      <Routes>
+        <Route path="/:id" element={<MemberDetails />} />
+      </Routes>
     </div>
   );
 }
