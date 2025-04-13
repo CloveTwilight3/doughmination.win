@@ -99,7 +99,7 @@ function App() {
             <li key={member.id} className="mb-4 p-4 border rounded-lg shadow-sm bg-white dark:bg-gray-800 dark:border-gray-700">
               <Link
                 to={`/${member.username}`}
-                className={`flex items-center ${linkClass}`}  // Use dynamic link class
+                className="flex items-center text-black dark:text-white no-underline visited:text-black dark:visited:text-white hover:text-gray-700 dark:hover:text-gray-300"  // Use dynamic link class
               >
                 <img
                   src={member.avatar_url || defaultAvatar}  // Use the default avatar if no avatar_url
