@@ -1,0 +1,119 @@
+/* Base Styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* General Body Styling */
+body {
+  font-family: 'Inter', sans-serif; /* You can choose any font you like */
+  background-color: #f9fafb; /* Default light background */
+  color: #111827; /* Default text color */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition between light and dark */
+}
+
+/* Dark Mode */
+.dark body {
+  background-color: #1f2937; /* Dark background */
+  color: #d1d5db; /* Light text color */
+}
+
+/* Styling for the members section */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Styling for user avatars */
+img {
+  border-radius: 50%;
+}
+
+.w-10 {
+  width: 2.5rem; /* Adjusted size */
+  height: 2.5rem;
+}
+
+/* Spacing between user names and avatars */
+li .text-blue-600 {
+  margin-left: 1rem; /* Adds space between the avatar and the name */
+}
+
+/* Theme Toggle Button */
+button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: #2563eb; /* Blue button */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Button Hover Effect */
+button:hover {
+  background-color: #1d4ed8; /* Darker blue when hovered */
+}
+
+/* Header Styling */
+h1, h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
+
+/* Fronting Member Section */
+.fronting-section {
+  margin-top: 2rem;
+}
+
+.fronting-section h2 {
+  font-size: 1.25rem;
+}
+
+.fronting-section .flex {
+  display: flex;
+  align-items: center;
+}
+
+.fronting-section img {
+  width: 3rem;
+  height: 3rem;
+  margin-right: 1rem;
+}
+
+/* Members List Styling */
+.members-section {
+  margin-top: 2rem;
+}
+
+.members-section ul {
+  margin-top: 1rem;
+}
+
+.members-section li {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.members-section .avatar {
+  margin-right: 1rem;
+}
+
+/* Add some spacing for better layout */
+.mt-6 {
+  margin-top: 1.5rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
