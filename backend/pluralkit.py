@@ -1,0 +1,47 @@
+import httpx
+import os
+from dotenv import load_dotenv
+from cache import get_from_cache, set_in_cache
+
+load_dotenv()
+
+BASE_URL = "https://api.pluralkit.me/v2"
+TOKEN = os.getenv("SYSTEM_TOKEN")
+CACHE_TTL = int(os.getenv("CACHE_TTL", 30))
+
+HEADERS = {
+    "Authorization": TOKEN
+}
+
+async def get_system():
+    cache_key = "system"
+    if (cached := get_from_cache(cache_key)):
+        return cached
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(f"{BASE_URL}/systems/@me", headers=HEADERS)
+        resp.raise_for_status()
+        data = resp.json()
+        set_in_cache(cache_key, data, CACHE_TTL)
+        return data
+
+async def get_members():
+    cache_key = "members"
+    if (cached := get_from_cache(cache_key)):
+        return cached
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(f"{BASE_URL}/systems/@me/members", headers=HEADERS)
+        resp.raise_for_status()
+        data = resp.json()
+        set_in_cache(cache_key, data, CACHE_TTL)
+        return data
+
+async def get_fronters():
+    cache_key = "fronters"
+    if (cached := get_from_cache(cache_key)):
+        return cached
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(f"{BASE_URL}/systems/@me/fronters", headers=HEADERS)
+        resp.raise_for_status()
+        data = resp.json()
+        set_in_cache(cache_key, data, CACHE_TTL)
+        return data
