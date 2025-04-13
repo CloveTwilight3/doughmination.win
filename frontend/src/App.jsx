@@ -36,6 +36,15 @@ function App() {
       });
   }, []);
 
+  // Dynamically update the document title based on fronting member
+  useEffect(() => {
+    if (fronting && fronting.members && fronting.members.length > 0) {
+      document.title = `Currently Fronting: ${fronting.members[0].display_name || 'Unknown'}`;
+    } else {
+      document.title = "Doughmination System Server";  // Default title
+    }
+  }, [fronting]); // Runs only when fronting changes
+
   if (members.length === 0) return <div>Loading...</div>;
 
   return (
