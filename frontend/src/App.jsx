@@ -10,8 +10,10 @@ function App() {
   const defaultAvatar = "https://clovetwilight3.co.uk/system.png";  // Replace this with your system's default avatar URL or a placeholder
 
   // Define link colors based on the current theme
-  const linkClass = theme === 'light' ? 'text-blue-600 hover:text-blue-800' : 'text-blue-400 hover:text-blue-600';
-
+  const linkClass = theme === 'light'
+  ? 'text-black no-underline hover:text-gray-700'
+  : 'text-white no-underline hover:text-gray-300';
+  
   useEffect(() => {
     // Fetch members data
     fetch("/api/members")
