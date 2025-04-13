@@ -14,7 +14,7 @@ function App() {
 
   useEffect(() => {
     // Fetch members data
-    fetch("https://friends.clovetwilight3.co.uk:8000/api/members")
+    fetch("/api/members")
       .then((res) => res.json())
       .then((data) => {
         console.log("Members data from backend:", data);
@@ -25,7 +25,7 @@ function App() {
       });
 
     // Fetch current fronting member (if available)
-    fetch("https://friends.clovetwilight3.co.uk:8000/api/fronters")
+    fetch("/api/fronters")
       .then((res) => res.json())
       .then((data) => {
         console.log("Fronting member data:", data);
