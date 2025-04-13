@@ -7,7 +7,7 @@ function App() {
   const [fronting, setFronting] = useState(null);
   const [theme, toggleTheme] = useTheme();  // Use the custom theme hook
 
-  const defaultAvatar = "https://www.example.com/default-avatar.png";  // Replace this with your system's default avatar URL or a placeholder
+  const defaultAvatar = "https://clovetwilight3.co.uk/system.png";  // Replace this with your system's default avatar URL or a placeholder
 
   // Define link colors based on the current theme
   const linkClass = theme === 'light' ? 'text-blue-600 hover:text-blue-800' : 'text-blue-400 hover:text-blue-600';
