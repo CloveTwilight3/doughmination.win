@@ -36,46 +36,27 @@ function App() {
       });
   }, []);
 
-  // Function to create a circular favicon from an image URL
-  const setFavicon = (imgUrl) => {
-    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-    link.type = 'image/x-icon';
-    link.rel = 'icon';
-  
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const size = 64;
-  
-      canvas.width = size;
-      canvas.height = size;
-  
-      // Just draw the image directly, no clipping
-      ctx.drawImage(img, 0, 0, size, size);
-  
-      link.href = canvas.toDataURL("image/png");
-      document.head.appendChild(link);
-    };
-  
-    img.src = imgUrl;
-  };
-
-  
-  // Dynamically update the document title and favicon based on fronting member
+  // Dynamically update the document title based on fronting member
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
       document.title = `Currently Fronting: ${fronting.members[0].display_name || 'Unknown'}`;
       
-      // Set favicon to the fronting member's avatar (or default)
+      // Set favicon to the fronting member's avatar
       const frontingAvatar = fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar;
-      setFavicon(frontingAvatar);
+      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon';
+      link.rel = 'icon';
+      link.href = frontingAvatar;
+      document.head.appendChild(link);
     } else {
       document.title = "Doughmination System Server";  // Default title
       
       // Reset favicon to default
-      setFavicon(defaultAvatar);
+      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon';
+      link.rel = 'icon';
+      link.href = defaultAvatar;
+      document.head.appendChild(link);
     }
   }, [fronting]); // Runs only when fronting changes
 
