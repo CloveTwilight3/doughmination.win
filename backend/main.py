@@ -7,7 +7,7 @@ app = FastAPI()
 # CORS configuration: Allowing frontend to communicate with the backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://104.219.236.52:443", "https://plural.clovetwilight3.co.uk"],  # Replace with your frontend's origin or use a list of origins
+    allow_origins=["https://104.219.236.52:8080", "https://plural.clovetwilight3.co.uk:8080"],  # Replace with your frontend's origin or use a list of origins
     allow_credentials=True,
     allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allows all headers
