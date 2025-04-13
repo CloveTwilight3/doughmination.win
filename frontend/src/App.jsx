@@ -80,7 +80,7 @@ function App() {
                   alt={member.name}
                   className="w-10 h-10 mr-3 rounded-full"  // Adjusted size for Discord-like appearance
                 />
-                <span>{member.name}</span>
+                <span>{member.display_name}</span>
               </Link>
             </li>
           ))}
