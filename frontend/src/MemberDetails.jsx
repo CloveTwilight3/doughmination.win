@@ -6,7 +6,8 @@ function MemberDetails() {
   const [member, setMember] = useState(null);
 
   useEffect(() => {
-    fetch(`/api/members/${id}`)  // Assuming your backend has an endpoint like /api/members/:id
+    // Make a request to your backend API using the member ID
+    fetch(`/api/member/${id}`)  // Backend endpoint adjusted to /api/member/:id
       .then((res) => res.json())
       .then((data) => {
         setMember(data);
@@ -19,14 +20,24 @@ function MemberDetails() {
   if (!member) return <div>Loading...</div>;  // Show loading until data is fetched
 
   return (
-    <div>
-      <h2>{member.display_name || member.name}</h2>
+    <div className="p-4">
+      <h2 className="text-2xl font-semibold">{member.display_name || member.name}</h2>
       <img
-        src={member.avatar_url || 'defaultAvatarURL'}
-        alt={member.name}
-        className="w-10 h-10 rounded-full"
+        src={member.avatar_url || 'https://clovetwilight3.co.uk/system.png'}  // Fallback to default avatar if none exists
+        alt={member.display_name || member.name}
+        className="w-32 h-32 rounded-full mt-4"
       />
-      <p>{member.bio}</p> {/* Replace with actual data you want to show */}
+      <p className="mt-4">{member.bio || 'No bio available.'}</p> {/* You can replace 'bio' with the correct property if it's different */}
+      
+      {/* Display other member information as needed */}
+      <div className="mt-6">
+        <h3 className="text-xl">Additional Information:</h3>
+        <ul>
+          {/* Update with actual fields you'd like to show */}
+          <li><strong>System ID:</strong> {member.system_id}</li>
+          <li><strong>Joined:</strong> {member.joined_at}</li>
+        </ul>
+      </div>
     </div>
   );
 }
