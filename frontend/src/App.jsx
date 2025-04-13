@@ -60,7 +60,7 @@ function App() {
               alt="Fronting member"
               className="w-10 h-10 mr-3 rounded-full"
             />
-            <span>{fronting.name}</span>
+            <span>{fronting.members[0]?.display_name}</span>
           </div>
         </div>
       )}
