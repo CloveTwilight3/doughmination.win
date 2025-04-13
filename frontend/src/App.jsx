@@ -14,7 +14,7 @@ function App() {
 
   useEffect(() => {
     // Fetch members data
-    fetch("http://104.219.236.52:8000/api/members")
+    fetch("https://104.219.236.52:8000/api/members")
       .then((res) => res.json())
       .then((data) => {
         console.log("Members data from backend:", data);
@@ -25,7 +25,7 @@ function App() {
       });
 
     // Fetch current fronting member (if available)
-    fetch("http://104.219.236.52:8000/api/fronters")
+    fetch("https://104.219.236.52:8000/api/fronters")
       .then((res) => res.json())
       .then((data) => {
         console.log("Fronting member data:", data);
