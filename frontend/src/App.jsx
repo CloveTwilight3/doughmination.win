@@ -56,7 +56,7 @@ function App() {
           <h2 className="text-xl font-semibold">Currently Fronting:</h2>
           <div className="flex items-center">
             <img
-              src={fronting.avatar_url || defaultAvatar}  // Use the default avatar if no avatar_url
+              src={fronting.members.avatar_url || defaultAvatar}  // Use the default avatar if no avatar_url
               alt="Fronting member"
               className="w-10 h-10 mr-3 rounded-full"
             />
