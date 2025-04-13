@@ -107,7 +107,7 @@ function App() {
       
       {/* Add your routes here */}
       <Routes>
-        <Route path="/member/:id" element={<MemberDetails />} />
+        <Route path="/user/:id" element={<MemberDetails />} />
       </Routes>
     </div>
   );
