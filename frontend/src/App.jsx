@@ -40,8 +40,23 @@ function App() {
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
       document.title = `Currently Fronting: ${fronting.members[0].display_name || 'Unknown'}`;
+      
+      // Set favicon to the fronting member's avatar
+      const frontingAvatar = fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar;
+      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon';
+      link.rel = 'icon';
+      link.href = frontingAvatar;
+      document.head.appendChild(link);
     } else {
       document.title = "Doughmination System Server";  // Default title
+      
+      // Reset favicon to default
+      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon';
+      link.rel = 'icon';
+      link.href = defaultAvatar;
+      document.head.appendChild(link);
     }
   }, [fronting]); // Runs only when fronting changes
 
