@@ -43,8 +43,8 @@ const MemberDetails = ({ members, defaultAvatar }) => {
   if (loading) {
     return (
       <div className="p-8 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-        <p className="text-base text-black dark:text-white">Loading member data...</p>
+        <div className="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+        <p className="text-lg text-black dark:text-white">Loading member data...</p>
       </div>
     );
   }
@@ -52,7 +52,7 @@ const MemberDetails = ({ members, defaultAvatar }) => {
   if (error) {
     return (
       <div className="p-8 text-center">
-        <p className="text-base text-red-500 mb-4">{error}</p>
+        <p className="text-lg text-red-500 mb-4">{error}</p>
         <Link to="/" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
           Back to Members
         </Link>
@@ -63,7 +63,7 @@ const MemberDetails = ({ members, defaultAvatar }) => {
   if (!memberData) {
     return (
       <div className="p-8 text-center">
-        <p className="text-base text-black dark:text-white mb-4">Member not found</p>
+        <p className="text-lg text-black dark:text-white mb-4">Member not found</p>
         <Link to="/" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
           Back to Members
         </Link>
@@ -72,35 +72,35 @@ const MemberDetails = ({ members, defaultAvatar }) => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-4 p-4 border rounded-lg shadow-lg bg-white dark:bg-gray-800 dark:border-gray-700">
-      <div className="flex flex-col items-center mb-4">
+    <div className="max-w-2xl mx-auto mt-6 p-6 border rounded-lg shadow-lg bg-white dark:bg-gray-800 dark:border-gray-700">
+      <div className="flex flex-col items-center mb-6">
         <img
           src={memberData.avatar_url || defaultAvatar}
           alt={memberData.name}
-          className="w-20 h-20 mb-3 rounded-full shadow-md"
+          className="w-24 h-24 mb-4 rounded-full shadow-md"
         />
-        <h1 className="text-xl font-bold text-black dark:text-white">{memberData.display_name || memberData.name}</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white">{memberData.display_name || memberData.name}</h1>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {memberData.description && (
-          <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-            <h2 className="text-lg font-semibold mb-1 text-black dark:text-white">About</h2>
-            <p className="text-sm text-black dark:text-white">{memberData.description}</p>
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-2 text-black dark:text-white">About</h2>
+            <p className="text-base text-black dark:text-white">{memberData.description}</p>
           </div>
         )}
         
         {memberData.pronouns && (
-          <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-            <h2 className="text-lg font-semibold mb-1 text-black dark:text-white">Pronouns</h2>
-            <p className="text-sm text-black dark:text-white">{memberData.pronouns}</p>
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-2 text-black dark:text-white">Pronouns</h2>
+            <p className="text-base text-black dark:text-white">{memberData.pronouns}</p>
           </div>
         )}
       </div>
       
       {/* Back button */}
       <div className="mt-6 text-center">
-        <Link to="/" className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm">
+        <Link to="/" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-base">
           Back to All Members
         </Link>
       </div>

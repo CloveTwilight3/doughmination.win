@@ -59,12 +59,12 @@ function App() {
 
   return (
     <div className="p-3 max-w-6xl mx-auto text-black dark:text-white">
-      <h1 className="text-xl font-bold mb-4 text-center text-black dark:text-white">System Members</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center text-black dark:text-white">System Members</h1>
 
       {/* Theme Toggle Button */}
       <button
         onClick={toggleTheme}
-        className="fixed top-4 right-4 px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs"
+        className="fixed top-4 right-4 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
       >
         Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
       </button>
@@ -72,14 +72,14 @@ function App() {
       {/* Fronting Member - Show on all pages */}
       {fronting && fronting.members && fronting.members.length > 0 && (
         <div className="mb-6 p-4 border-b dark:border-gray-700">
-          <h2 className="text-sm font-semibold mb-2 text-center text-black dark:text-white">Currently Fronting:</h2>
+          <h2 className="text-lg font-semibold mb-3 text-center text-black dark:text-white">Currently Fronting:</h2>
           <div className="flex items-center justify-center">
             <img
               src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
               alt="Fronting member"
-              className="h-10 w-10 mr-3 rounded-full shadow-md object-cover"
+              className="h-14 w-14 mr-4 rounded-full shadow-md object-cover"
             />
-            <span className="text-sm font-medium text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
+            <span className="fronting-member-name text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
           </div>
         </div>
       )}
@@ -88,26 +88,28 @@ function App() {
       <Routes>
         {/* Main route with grid of members */}
         <Route path="/" element={
-          <div className="mt-4">
-            <h2 className="text-sm font-semibold mb-3 text-black dark:text-white">Members:</h2>
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold mb-4 text-center text-black dark:text-white">Members:</h2>
 
-            {/* Grid layout with smaller items */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            {/* Grid layout with fixed size items and spacing */}
+            <div className="grid member-grid gap-5">
               {members.map((member) => (
-                <div key={member.id} className="transition-all duration-300 hover:scale-105">
-                  <Link 
-                    to={`/${member.name.toLowerCase()}`} 
-                    className="block p-2 border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 text-black dark:text-white hover:shadow-lg"
-                  >
-                    <div className="flex flex-col items-center">
-                      <img
-                        src={member.avatar_url || defaultAvatar}
-                        alt={member.name}
-                        className="h-10 w-10 mb-4 rounded-full object-cover"
-                      />
-                      <span className="text-xs font-medium text-center">{member.display_name || member.name}</span>
-                    </div>
-                  </Link>
+                <div key={member.id} className="member-grid-item">
+                  <div className="h-full w-full p-2">
+                    <Link 
+                      to={`/${member.name.toLowerCase()}`} 
+                      className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 text-black dark:text-white hover:shadow-lg transform transition-all duration-300 hover:scale-105"
+                    >
+                      <div className="flex flex-col items-center justify-center h-full p-3">
+                        <img
+                          src={member.avatar_url || defaultAvatar}
+                          alt={member.name}
+                          className="h-16 w-16 mb-3 rounded-full object-cover shadow-sm"
+                        />
+                        <span className="member-name text-black dark:text-white">{member.display_name || member.name}</span>
+                      </div>
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
