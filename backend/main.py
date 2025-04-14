@@ -12,7 +12,7 @@ app = FastAPI()
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://104.219.236.52:8080", "https://plural.clovetwilight3.co.uk:8080"],
+    allow_origins=["https://104.219.236.52:8000", "https://plural.clovetwilight3.co.uk:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
