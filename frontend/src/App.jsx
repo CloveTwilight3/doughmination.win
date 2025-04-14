@@ -16,18 +16,19 @@ function App() {
   const navigate = useNavigate();
 
   const defaultAvatar = "https://clovetwilight3.co.uk/system.png";
-  // Fallback to a relative path if env variable isn't available
-  const API_URL = import.meta.env.VITE_API_URL || '';
+  // We're using direct API paths instead of env variables
+  const API_URL = '';
 
   useEffect(() => {
     // For public access, we'll still fetch basic data regardless of login state
     const fetchPublicData = async () => {
       try {
-        // Fetch public members data - no authentication required
-        const membersRes = await fetch(`${API_URL}/api/public/members`);
+        // Use the original working endpoints
+        const membersRes = await fetch(`/api/members`);
         
         if (membersRes.ok) {
           const data = await membersRes.json();
+          console.log("Members data from backend:", data);
           const sortedMembers = [...data].sort((a, b) => {
             const nameA = (a.display_name || a.name).toLowerCase();
             const nameB = (b.display_name || b.name).toLowerCase();
@@ -35,12 +36,13 @@ function App() {
           });
           setMembers(sortedMembers);
         }
-
-        // Fetch current fronting member - also public data
-        const frontingRes = await fetch(`${API_URL}/api/public/fronters`);
+  
+        // Use original working endpoint
+        const frontingRes = await fetch(`/api/fronters`);
         
         if (frontingRes.ok) {
           const data = await frontingRes.json();
+          console.log("Fronting member data:", data);
           setFronting(data || { members: [] });
         }
       } catch (err) {
@@ -49,7 +51,7 @@ function App() {
         setLoading(false);
       }
     };
-
+  
     // Check authentication status if token exists
     const checkAuthStatus = async () => {
       const token = localStorage.getItem("token");
@@ -57,10 +59,10 @@ function App() {
         fetchPublicData();
         return;
       }
-
+  
       try {
         // Check if logged in user is an admin
-        const adminRes = await fetch(`${API_URL}/api/is_admin`, {
+        const adminRes = await fetch(`/api/is_admin`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -70,38 +72,14 @@ function App() {
           const data = await adminRes.json();
           setIsAdmin(!!data.isAdmin);
           setLoggedIn(true);
+          
+          // Now fetch the main data
+          fetchPublicData();
         } else {
           // If admin check fails, logout
           localStorage.removeItem("token");
           setLoggedIn(false);
-        }
-
-        // Fetch members and fronting data using authenticated endpoints
-        const membersRes = await fetch(`${API_URL}/api/members`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        if (membersRes.ok) {
-          const data = await membersRes.json();
-          const sortedMembers = [...data].sort((a, b) => {
-            const nameA = (a.display_name || a.name).toLowerCase();
-            const nameB = (b.display_name || b.name).toLowerCase();
-            return nameA.localeCompare(nameB);
-          });
-          setMembers(sortedMembers);
-        }
-
-        const frontingRes = await fetch(`${API_URL}/api/fronters`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        if (frontingRes.ok) {
-          const data = await frontingRes.json();
-          setFronting(data || { members: [] });
+          fetchPublicData();
         }
       } catch (err) {
         console.error("Error checking auth status:", err);
@@ -109,18 +87,16 @@ function App() {
         setLoggedIn(false);
         // Fall back to public data
         fetchPublicData();
-      } finally {
-        setLoading(false);
       }
     };
-
+  
     checkAuthStatus();
-  }, [API_URL]);
+  }, []);
 
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
       const frontingMember = fronting.members[0];
-      document.title = `Currently Fronting: ${frontingMember.display_name || frontingMember.name}`;
+      document.title = `Currently Fronting: ${frontingMember.display_name || frontingMember.name || 'Unknown'}`;
       const frontingAvatar = frontingMember.webhook_avatar_url || frontingMember.avatar_url || defaultAvatar;
       const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
       link.type = 'image/x-icon';
@@ -216,7 +192,7 @@ function App() {
                     <div className="h-full w-full p-2">
                       <Link 
                         to={`/${member.name.toLowerCase()}`} 
-                        className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 hover:shadow-lg transform transition-all duration-300 hover:scale-105"
+                        className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transform transition-all duration-300 hover:scale-105"
                       >
                         <div className="flex flex-col items-center justify-center h-full p-3">
                           <div className="avatar-container">
@@ -243,7 +219,7 @@ function App() {
         
         {/* Protected Admin Routes */}
         <Route path="/admin/dashboard" element={
-          <ProtectedRoute adminRequired={true}>
+          <ProtectedRoute adminRequired={true} isAdmin={isAdmin} isLoggedIn={loggedIn}>
             <AdminDashboard fronting={fronting} />
           </ProtectedRoute>
         } />
