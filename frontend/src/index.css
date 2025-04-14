@@ -71,7 +71,7 @@ li {
 .avatar-container img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Keep as contain for better image display */
+  object-fit: contain;
   border-radius: 50%;
 }
 
@@ -112,10 +112,11 @@ h1, h2 {
   display: grid !important;
 }
 
-/* Member grid layout */
+/* Member grid layout with INCREASED GAPS */
 .member-grid {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1.5rem;
+  gap: 2.5rem; /* Increased from 1.5rem to 2.5rem for more space between items */
+  padding: 1rem; /* Added padding around the entire grid */
 }
 
 /* Fixed size grid items with proper overflow */
@@ -123,13 +124,14 @@ h1, h2 {
   aspect-ratio: 1 / 1.2;
   position: relative;
   overflow: visible;
+  margin: 0.5rem; /* Added additional margin to each grid item */
 }
 
 /* Member card container */
 .member-grid-item > div {
   height: 100%;
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem; /* Increased padding from 0.5rem */
 }
 
 /* Link styling for member cards */
@@ -140,7 +142,7 @@ h1, h2 {
   justify-content: center;
   height: 100%;
   width: 100%;
-  padding: 1rem;
+  padding: 1.25rem; /* Increased internal padding */
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   background: white;
@@ -164,7 +166,7 @@ html.dark .member-grid-item a {
   font-size: 1rem;
   font-weight: 500;
   text-align: center;
-  margin-top: 0.75rem;
+  margin-top: 1rem; /* Increased from 0.75rem */
   line-height: 1.2;
   max-width: 100%;
   word-wrap: break-word;
@@ -176,13 +178,13 @@ html.dark .member-grid-item a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem; /* Increased from 2rem */
 }
 
 .fronting-avatar {
   width: 64px;
   height: 64px;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem; /* Increased from 0.75rem */
 }
 
 .fronting-member-name {
@@ -195,5 +197,5 @@ html.dark .member-grid-item a {
 .member-details-avatar {
   width: 96px;
   height: 96px;
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.5rem; /* Increased bottom margin */
 }
