@@ -103,7 +103,7 @@ function App() {
                       <img
                         src={member.avatar_url || defaultAvatar}
                         alt={member.name}
-                        className="h-10 w-10 mb-2 rounded-full object-cover"
+                        className="h-10 w-10 mb-4 rounded-full object-cover"
                       />
                       <span className="text-xs font-medium text-center">{member.display_name || member.name}</span>
                     </div>
