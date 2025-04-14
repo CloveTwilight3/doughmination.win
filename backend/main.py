@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from pluralkit import get_system, get_members, get_fronters
+from pluralkit import get_system, get_members, get_fronters, set_front
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -32,3 +32,18 @@ async def member_detail(member_id: str):
         if member["id"] == member_id or member["name"].lower() == member_id.lower():
             return member
     raise HTTPException(status_code=404, detail="Member not found")
+
+@app.post("/api/switch")
+async def switch_front(request: Request):
+    try:
+        body = await request.json()
+        member_ids = body.get("members", [])
+
+        if not isinstance(member_ids, list):
+            raise HTTPException(status_code=400, detail="'members' must be a list of member IDs")
+
+        await set_front(member_ids)
+        return {"status": "success", "message": "Front updated successfully"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

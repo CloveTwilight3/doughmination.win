@@ -45,3 +45,17 @@ async def get_fronters():
         data = resp.json()
         set_in_cache(cache_key, data, CACHE_TTL)
         return data
+
+async def set_front(member_ids):
+    """
+    Sets the current front to the provided list of member IDs.
+    Pass an empty list to clear the front.
+    """
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
+            f"{BASE_URL}/systems/@me/switches",
+            headers=HEADERS,
+            json={"members": member_ids}
+        )
+        if resp.status_code != 204:
+            raise Exception(f"Failed to set front: {resp.status_code} - {resp.text}")
