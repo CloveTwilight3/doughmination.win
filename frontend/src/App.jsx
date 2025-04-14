@@ -79,7 +79,7 @@ function App() {
               alt="Fronting member"
               className="w-10 h-10 mr-3 rounded-full"
             />
-            <span className="text-base text-black dark:text-white">{fronting.members[0]?.display_name}</span>
+            <span className="text-base text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
           </div>
         </div>
       )}
