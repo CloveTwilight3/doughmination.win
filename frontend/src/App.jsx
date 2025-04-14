@@ -37,7 +37,7 @@ function App() {
   // Dynamically update the document title based on fronting member
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
-      document.title = `Currently Fronting: ${fronting.members[0].display_name || 'Unknown'}`;
+      document.title = `Currently Fronting: ${fronting.members[0].display_name || fronting.members[0].name || 'Unknown'}`;
       
       const frontingAvatar = fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar;
       const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
