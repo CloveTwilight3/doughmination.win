@@ -9,6 +9,7 @@ body {
   background-color: #f9fafb; /* Default light background */
   color: #111827; /* Default text color */
   transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition between light and dark */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 /* Dark Mode */
@@ -112,11 +113,22 @@ h1, h2 {
   display: grid !important;
 }
 
-/* Member grid layout with INCREASED GAPS */
+/* Member grid layout with INCREASED GAPS and responsive behavior */
 .member-grid {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 2.5rem; /* Increased from 1.5rem to 2.5rem for more space between items */
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Slightly smaller min size */
+  gap: 2rem; /* Slightly reduced from 2.5rem to prevent overflow */
   padding: 1rem; /* Added padding around the entire grid */
+  width: 100%; /* Ensure grid takes full width of container */
+  box-sizing: border-box; /* Include padding in width calculation */
+  margin: 0 auto; /* Center the grid */
+}
+
+/* Media queries for responsive grid sizes */
+@media (max-width: 640px) {
+  .member-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1.5rem;
+  }
 }
 
 /* Fixed size grid items with proper overflow */
@@ -124,14 +136,15 @@ h1, h2 {
   aspect-ratio: 1 / 1.2;
   position: relative;
   overflow: visible;
-  margin: 0.5rem; /* Added additional margin to each grid item */
+  margin: 0;
+  width: 100%; /* Ensure item takes full column width */
 }
 
 /* Member card container */
 .member-grid-item > div {
   height: 100%;
   width: 100%;
-  padding: 0.75rem; /* Increased padding from 0.5rem */
+  padding: 0.5rem;
 }
 
 /* Link styling for member cards */
@@ -142,7 +155,7 @@ h1, h2 {
   justify-content: center;
   height: 100%;
   width: 100%;
-  padding: 1.25rem; /* Increased internal padding */
+  padding: 1rem;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   background: white;
@@ -166,7 +179,7 @@ html.dark .member-grid-item a {
   font-size: 1rem;
   font-weight: 500;
   text-align: center;
-  margin-top: 1rem; /* Increased from 0.75rem */
+  margin-top: 1rem;
   line-height: 1.2;
   max-width: 100%;
   word-wrap: break-word;
@@ -178,13 +191,13 @@ html.dark .member-grid-item a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 3rem; /* Increased from 2rem */
+  margin-bottom: 3rem;
 }
 
 .fronting-avatar {
   width: 64px;
   height: 64px;
-  margin-bottom: 1rem; /* Increased from 0.75rem */
+  margin-bottom: 1rem;
 }
 
 .fronting-member-name {
@@ -197,5 +210,5 @@ html.dark .member-grid-item a {
 .member-details-avatar {
   width: 96px;
   height: 96px;
-  margin: 0 auto 1.5rem; /* Increased bottom margin */
+  margin: 0 auto 1.5rem;
 }
