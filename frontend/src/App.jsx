@@ -75,10 +75,6 @@ function App() {
     navigate('/');
   }
 
-  if (!loggedIn) {
-    return <Login onLogin={() => setLoggedIn(true)} />;
-  }
-
   if (members.length === 0) return <div className="text-black dark:text-white">Loading...</div>;
 
   return (
@@ -93,12 +89,14 @@ function App() {
         >
           Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
         </button>
-        <button
-          onClick={handleLogout}
-          className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
-        >
-          Logout
-        </button>
+        {loggedIn && (
+          <button
+            onClick={handleLogout}
+            className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+          >
+            Logout
+          </button>
+        )}
       </div>
 
       {/* Fronting */}
@@ -147,7 +145,9 @@ function App() {
           </div>
         )} />
         <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
-        {isAdmin && (
+        
+        {/* Admin Routes (Only if logged in) */}
+        {loggedIn && isAdmin && (
           <>
             <Route path="/admin/login" element={<Login onLogin={() => setLoggedIn(true)} />} />
             <Route path="/admin/dash" element={<AdminDashboard fronting={fronting} />} />
