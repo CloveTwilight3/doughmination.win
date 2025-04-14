@@ -77,7 +77,7 @@ function App() {
             <img
               src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
               alt="Fronting member"
-              className="w-10 h-10 mr-3 rounded-full shadow-md"
+              className="h-10 w-10 mr-3 rounded-full shadow-md object-cover"
             />
             <span className="text-sm font-medium text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
           </div>
@@ -103,7 +103,7 @@ function App() {
                       <img
                         src={member.avatar_url || defaultAvatar}
                         alt={member.name}
-                        className="w-10 h-10 mb-2 rounded-full object-cover"
+                        className="h-10 w-10 mb-2 rounded-full object-cover"
                       />
                       <span className="text-xs font-medium text-center">{member.display_name || member.name}</span>
                     </div>
