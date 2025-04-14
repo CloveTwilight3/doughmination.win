@@ -1,8 +1,10 @@
-from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi import FastAPI, HTTPException, Request, Depends, Security
 from fastapi.middleware.cors import CORSMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
-from auth import router as auth_router, get_current_user  # Import auth
+from auth import router as auth_router, get_current_user, oauth2_scheme  # Import auth
 import os
+from fastapi.security import SecurityScopes
+from jose import JWTError
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,29 +26,36 @@ app.add_middleware(
 # Include login route
 app.include_router(auth_router)
 
+# Optional authentication function for public endpoints
+async def get_optional_user(token: str = Security(oauth2_scheme, scopes=[])):
+    try:
+        return await get_current_user(token)
+    except (HTTPException, JWTError):
+        return None
+
 @app.get("/api/system")
-async def system_info(user: str = Depends(get_current_user)):
+async def system_info():
     try:
         return await get_system()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch system info: {str(e)}")
 
 @app.get("/api/members")
-async def members(user: str = Depends(get_current_user)):
+async def members():
     try:
         return await get_members()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch members: {str(e)}")
 
 @app.get("/api/fronters")
-async def fronters(user: str = Depends(get_current_user)):
+async def fronters():
     try:
         return await get_fronters()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch fronters: {str(e)}")
 
 @app.get("/api/member/{member_id}")
-async def member_detail(member_id: str, user: str = Depends(get_current_user)):
+async def member_detail(member_id: str):
     try:
         members = await get_members()
         for member in members:

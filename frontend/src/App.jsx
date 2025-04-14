@@ -16,81 +16,92 @@ function App() {
   const navigate = useNavigate();
 
   const defaultAvatar = "https://clovetwilight3.co.uk/system.png";
-  // We're using direct API paths instead of env variables
-  const API_URL = '';
 
   useEffect(() => {
-    // For public access, we'll still fetch basic data regardless of login state
+    // Fetch public data (members and fronters)
     const fetchPublicData = async () => {
       try {
-        // Use the original working endpoints
-        const membersRes = await fetch(`/api/members`);
-        
+        // Fetch members data
+        const membersRes = await fetch("/api/members");
         if (membersRes.ok) {
           const data = await membersRes.json();
           console.log("Members data from backend:", data);
+          // Sort members alphabetically by name
           const sortedMembers = [...data].sort((a, b) => {
+            // Use display_name if available, otherwise use name
             const nameA = (a.display_name || a.name).toLowerCase();
             const nameB = (b.display_name || b.name).toLowerCase();
             return nameA.localeCompare(nameB);
           });
           setMembers(sortedMembers);
+        } else {
+          console.error("Error fetching members:", membersRes.status);
         }
-  
-        // Use original working endpoint
-        const frontingRes = await fetch(`/api/fronters`);
-        
+
+        // Fetch current fronting member (if available)
+        const frontingRes = await fetch("/api/fronters");
         if (frontingRes.ok) {
           const data = await frontingRes.json();
           console.log("Fronting member data:", data);
           setFronting(data || { members: [] });
+        } else {
+          console.error("Error fetching fronters:", frontingRes.status);
         }
       } catch (err) {
-        console.error("Error fetching public data:", err);
+        console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
       }
     };
-  
-    // Check authentication status if token exists
-    const checkAuthStatus = async () => {
+
+    // Check if user is admin when logged in
+    const checkAdminStatus = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        fetchPublicData();
-        return;
+        setLoggedIn(false);
+        return false;
       }
-  
+
       try {
-        // Check if logged in user is an admin
-        const adminRes = await fetch(`/api/is_admin`, {
+        const res = await fetch("/api/is_admin", {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        
-        if (adminRes.ok) {
-          const data = await adminRes.json();
+
+        if (res.ok) {
+          const data = await res.json();
           setIsAdmin(!!data.isAdmin);
           setLoggedIn(true);
-          
-          // Now fetch the main data
-          fetchPublicData();
+          return true;
         } else {
-          // If admin check fails, logout
+          // Token invalid or expired
           localStorage.removeItem("token");
           setLoggedIn(false);
-          fetchPublicData();
+          setIsAdmin(false);
+          return false;
         }
       } catch (err) {
-        console.error("Error checking auth status:", err);
+        console.error("Error checking admin status:", err);
         localStorage.removeItem("token");
         setLoggedIn(false);
-        // Fall back to public data
-        fetchPublicData();
+        setIsAdmin(false);
+        return false;
       }
     };
-  
-    checkAuthStatus();
+
+    // Main initialization function
+    const initialize = async () => {
+      // First check auth status if there's a token
+      if (localStorage.getItem("token")) {
+        await checkAdminStatus();
+      }
+      
+      // Then fetch public data regardless of auth status
+      await fetchPublicData();
+    };
+
+    initialize();
   }, []);
 
   useEffect(() => {
@@ -215,7 +226,28 @@ function App() {
         } />
         
         <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
-        <Route path="/admin/login" element={<Login onLogin={() => setLoggedIn(true)} />} />
+        <Route path="/admin/login" element={<Login onLogin={() => {
+          setLoggedIn(true);
+          // After login, check if user is admin
+          fetch("/api/is_admin", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          })
+          .then(res => res.json())
+          .then(data => {
+            setIsAdmin(!!data.isAdmin);
+            if (data.isAdmin) {
+              navigate('/admin/dashboard');
+            } else {
+              navigate('/');
+            }
+          })
+          .catch(err => {
+            console.error("Error checking admin status after login:", err);
+            navigate('/');
+          });
+        }} />} />
         
         {/* Protected Admin Routes */}
         <Route path="/admin/dashboard" element={
