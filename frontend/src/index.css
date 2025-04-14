@@ -5,16 +5,38 @@
 
 /* General Body Styling */
 body {
-  font-family: 'Inter', sans-serif; /* You can choose any font you like */
+  font-family: 'Inter', sans-serif;
   background-color: #f9fafb; /* Default light background */
   color: #111827; /* Default text color */
   transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition between light and dark */
 }
 
 /* Dark Mode */
-.dark body {
+html.dark body {
   background-color: #1f2937; /* Dark background */
-  color: #d1d5db; /* Light text color */
+  color: #fff; /* Light text color */
+}
+
+/* Global text color rules */
+html.dark .text-black {
+  color: #fff !important;
+}
+
+html:not(.dark) .text-white {
+  color: #111827 !important;
+}
+
+/* Ensure links follow color scheme */
+a {
+  text-decoration: none;
+}
+
+html:not(.dark) a {
+  color: #111827; /* Black in light mode */
+}
+
+html.dark a {
+  color: #fff; /* White in dark mode */
 }
 
 /* Styling for the members section */
@@ -35,13 +57,8 @@ img {
 }
 
 .w-10 {
-  width: 2.5rem; /* Adjusted size */
+  width: 2.5rem;
   height: 2.5rem;
-}
-
-/* Spacing between user names and avatars */
-li .text-blue-600 {
-  margin-left: 1rem; /* Adds space between the avatar and the name */
 }
 
 /* Theme Toggle Button */
@@ -68,45 +85,6 @@ button:hover {
 h1, h2 {
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
-}
-
-/* Fronting Member Section */
-.fronting-section {
-  margin-top: 2rem;
-}
-
-.fronting-section h2 {
-  font-size: 1.25rem;
-}
-
-.fronting-section .flex {
-  display: flex;
-  align-items: center;
-}
-
-.fronting-section img {
-  width: 3rem;
-  height: 3rem;
-  margin-right: 1rem;
-}
-
-/* Members List Styling */
-.members-section {
-  margin-top: 2rem;
-}
-
-.members-section ul {
-  margin-top: 1rem;
-}
-
-.members-section li {
-  display: flex;
-  align-items: center;
-  font-size: 1rem;
-}
-
-.members-section .avatar {
-  margin-right: 1rem;
 }
 
 /* Add some spacing for better layout */
