@@ -59,7 +59,7 @@ function App() {
 
   return (
     <div className="p-3 max-w-6xl mx-auto text-black dark:text-white">
-      <h1 className="text-2xl font-bold mb-4 text-center text-black dark:text-white">System Members</h1>
+      <h1 className="text-xl font-bold mb-4 text-center text-black dark:text-white">System Members</h1>
 
       {/* Theme Toggle Button */}
       <button
@@ -72,14 +72,14 @@ function App() {
       {/* Fronting Member - Show on all pages */}
       {fronting && fronting.members && fronting.members.length > 0 && (
         <div className="mb-6 p-4 border-b dark:border-gray-700">
-          <h2 className="text-lg font-semibold mb-2 text-center text-black dark:text-white">Currently Fronting:</h2>
+          <h2 className="text-sm font-semibold mb-2 text-center text-black dark:text-white">Currently Fronting:</h2>
           <div className="flex items-center justify-center">
             <img
               src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
               alt="Fronting member"
-              className="w-12 h-12 mr-4 rounded-full shadow-md"
+              className="w-10 h-10 mr-3 rounded-full shadow-md"
             />
-            <span className="text-base font-medium text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
+            <span className="text-sm font-medium text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
           </div>
         </div>
       )}
@@ -89,23 +89,23 @@ function App() {
         {/* Main route with grid of members */}
         <Route path="/" element={
           <div className="mt-4">
-            <h2 className="text-lg font-semibold mb-3 text-black dark:text-white">Members:</h2>
+            <h2 className="text-sm font-semibold mb-3 text-black dark:text-white">Members:</h2>
 
             {/* Grid layout with smaller items */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {members.map((member) => (
                 <div key={member.id} className="transition-all duration-300 hover:scale-105">
                   <Link 
                     to={`/${member.name.toLowerCase()}`} 
-                    className="block p-3 border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 text-black dark:text-white hover:shadow-lg"
+                    className="block p-2 border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 text-black dark:text-white hover:shadow-lg"
                   >
                     <div className="flex flex-col items-center">
                       <img
                         src={member.avatar_url || defaultAvatar}
                         alt={member.name}
-                        className="w-16 h-16 mb-3 rounded-full object-cover"
+                        className="w-10 h-10 mb-2 rounded-full object-cover"
                       />
-                      <span className="text-sm font-medium text-center">{member.display_name || member.name}</span>
+                      <span className="text-xs font-medium text-center">{member.display_name || member.name}</span>
                     </div>
                   </Link>
                 </div>
