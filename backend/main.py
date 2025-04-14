@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pluralkit import get_system, get_members, get_fronters, set_front
 from fastapi.middleware.cors import CORSMiddleware
 
