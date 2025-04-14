@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link, Routes, Route } from "react-router-dom"; // Importing Routes and Route
-import useTheme from './useTheme';  // Import the custom hook
-
-// Import MemberDetails component to handle individual member pages
-import MemberDetails from './MemberDetails.jsx'; 
+import { Link, Routes, Route } from "react-router-dom";
+import useTheme from './useTheme';
+import MemberDetails from './MemberDetails.jsx';
 
 function App() {
   const [members, setMembers] = useState([]);
   const [fronting, setFronting] = useState(null);
-  const [theme, toggleTheme] = useTheme();  // Use the custom theme hook
-
-  const defaultAvatar = "https://clovetwilight3.co.uk/system.png";  // Default avatar URL
+  const [theme, toggleTheme] = useTheme();
+  
+  const defaultAvatar = "https://clovetwilight3.co.uk/system.png";
 
   useEffect(() => {
     // Fetch members data
@@ -48,7 +46,7 @@ function App() {
       link.href = frontingAvatar;
       document.head.appendChild(link);
     } else {
-      document.title = "Doughmination System Server";  // Default title
+      document.title = "Doughmination System Server";
       const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
       link.type = 'image/x-icon';
       link.rel = 'icon';
@@ -71,8 +69,8 @@ function App() {
         Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
       </button>
 
-      {/* Fronting Member */}
-      {fronting && fronting.members.length > 0 && (
+      {/* Fronting Member - Show on all pages */}
+      {fronting && fronting.members && fronting.members.length > 0 && (
         <div className="mt-6">
           <h2 className="text-xl font-semibold">Currently Fronting:</h2>
           <div className="flex items-center">
@@ -86,28 +84,31 @@ function App() {
         </div>
       )}
 
-      {/* Members List */}
-      <div className="mt-6">
-        <h2 className="text-xl font-semibold">Members:</h2>
-        <ul>
-          {members.map((member) => (
-            <li key={member.id} className="mb-4 p-4 border rounded-lg shadow-sm bg-white dark:bg-gray-800 dark:border-gray-700">
-              <Link to={`/${member.username}`} className="flex items-center text-black dark:text-white no-underline hover:text-gray-700 dark:hover:text-gray-300">
-                <img
-                  src={member.avatar_url || defaultAvatar}
-                  alt={member.name}
-                  className="w-10 h-10 mr-3 rounded-full"
-                />
-                <span>{member.display_name || member.name}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-      
-      {/* Add your routes here */}
+      {/* Routes */}
       <Routes>
-        <Route path="/:member_username" element={<MemberDetails />} />
+        {/* Main route with list of members */}
+        <Route path="/" element={
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold">Members:</h2>
+            <ul>
+              {members.map((member) => (
+                <li key={member.id} className="mb-4 p-4 border rounded-lg shadow-sm bg-white dark:bg-gray-800 dark:border-gray-700">
+                  <Link to={`/${member.name.toLowerCase()}`} className="flex items-center text-black dark:text-white no-underline hover:text-gray-700 dark:hover:text-gray-300">
+                    <img
+                      src={member.avatar_url || defaultAvatar}
+                      alt={member.name}
+                      className="w-10 h-10 mr-3 rounded-full"
+                    />
+                    <span>{member.display_name || member.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        } />
+        
+        {/* Member details route */}
+        <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
       </Routes>
     </div>
   );
