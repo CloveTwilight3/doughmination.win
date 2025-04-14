@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Link, Routes, Route } from "react-router-dom";
+import { Link, Routes, Route, useNavigate } from "react-router-dom";
 import useTheme from './useTheme';
 import MemberDetails from './MemberDetails.jsx';
 import Login from './Login.jsx'; // you'll create this
+import AdminDashboard from './AdminDashboard.jsx'; // Create this component
 
 function App() {
   const [members, setMembers] = useState([]);
   const [fronting, setFronting] = useState(null);
   const [theme, toggleTheme] = useTheme();
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [isAdmin, setIsAdmin] = useState(false); // track admin status
+  const navigate = useNavigate();
 
   const defaultAvatar = "https://clovetwilight3.co.uk/system.png";
 
@@ -37,6 +40,14 @@ function App() {
       .catch((err) => {
         console.error("Error fetching fronting data:", err);
       });
+
+    // Check if logged in user is an admin (you may need to verify this from your backend)
+    fetch("/api/is_admin")
+      .then((res) => res.json())
+      .then((data) => setIsAdmin(data.isAdmin))
+      .catch((err) => {
+        console.error("Error checking admin status:", err);
+      });
   }, [loggedIn]);
 
   useEffect(() => {
@@ -61,6 +72,7 @@ function App() {
   function handleLogout() {
     localStorage.removeItem("token");
     setLoggedIn(false);
+    navigate('/');
   }
 
   if (!loggedIn) {
@@ -107,7 +119,7 @@ function App() {
 
       {/* Routes */}
       <Routes>
-        <Route path="/" element={
+        <Route path="/" element={(
           <div className="mt-6">
             <h2 className="text-lg font-semibold mb-4 text-center">Members:</h2>
             <div className="grid member-grid gap-5">
@@ -133,8 +145,14 @@ function App() {
               ))}
             </div>
           </div>
-        } />
+        )} />
         <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
+        {isAdmin && (
+          <>
+            <Route path="/admin/login" element={<Login onLogin={() => setLoggedIn(true)} />} />
+            <Route path="/admin/dash" element={<AdminDashboard fronting={fronting} />} />
+          </>
+        )}
       </Routes>
     </div>
   );
