@@ -113,12 +113,18 @@ h1, h2 {
   display: grid !important;
 }
 
+/* Container for members grid - added margins */
+div.mt-6 {
+  margin-left: 1rem;
+  margin-right: 1rem;  /* Added right margin to prevent edge overlap */
+}
+
 /* Member grid layout with INCREASED GAPS and responsive behavior */
 .member-grid {
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Slightly smaller min size */
-  gap: 2rem; /* Slightly reduced from 2.5rem to prevent overflow */
-  padding: 1rem; /* Added padding around the entire grid */
-  width: 100%; /* Ensure grid takes full width of container */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Slightly smaller min size */
+  gap: 2.5rem; /* Increased gap back to 2.5rem */
+  padding: 1rem 2rem; /* Increased horizontal padding */
+  width: calc(100% - 1rem); /* Account for right margin */
   box-sizing: border-box; /* Include padding in width calculation */
   margin: 0 auto; /* Center the grid */
 }
@@ -127,8 +133,15 @@ h1, h2 {
 @media (max-width: 640px) {
   .member-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 1.5rem;
+    gap: 2rem;
+    padding: 1rem;
   }
+}
+
+/* Main container adjustments */
+.p-3 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 /* Fixed size grid items with proper overflow */
@@ -211,4 +224,11 @@ html.dark .member-grid-item a {
   width: 96px;
   height: 96px;
   margin: 0 auto 1.5rem;
+}
+
+/* Additional container wrapper for consistent margins */
+#root {
+  max-width: calc(1280px - 2rem); /* Account for margins */
+  margin: 0 auto;
+  overflow: hidden;
 }
