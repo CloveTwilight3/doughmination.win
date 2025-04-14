@@ -32,6 +32,7 @@ async def get_members():
         resp = await client.get(f"{BASE_URL}/systems/@me/members", headers=HEADERS)
         resp.raise_for_status()
         data = resp.json()
+        # Format data structure to match frontend expectation
         set_in_cache(cache_key, data, CACHE_TTL)
         return data
 
@@ -51,6 +52,10 @@ async def set_front(member_ids):
     Sets the current front to the provided list of member IDs.
     Pass an empty list to clear the front.
     """
+    # Clear fronters cache since we're updating it
+    cache_key = "fronters"
+    set_in_cache(cache_key, None, 0)  # Invalidate cache
+    
     async with httpx.AsyncClient() as client:
         resp = await client.post(
             f"{BASE_URL}/systems/@me/switches",
