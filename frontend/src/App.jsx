@@ -14,12 +14,13 @@ function App() {
   const navigate = useNavigate();
 
   const defaultAvatar = "https://clovetwilight3.co.uk/system.png";
+  const API_URL = import.meta.env.VITE_API_URL; // Fetch API URL from environment variable
 
   useEffect(() => {
     if (!loggedIn) return;
 
     // Fetch members data
-    fetch("/api/members")
+    fetch(`${API_URL}/api/members`)
       .then((res) => res.json())
       .then((data) => {
         const sortedMembers = [...data].sort((a, b) => {
@@ -34,7 +35,7 @@ function App() {
       });
 
     // Fetch current fronting member
-    fetch("/api/fronters")
+    fetch(`${API_URL}/api/fronters`)
       .then((res) => res.json())
       .then((data) => setFronting(data))
       .catch((err) => {
@@ -42,7 +43,7 @@ function App() {
       });
 
     // Check if logged in user is an admin (you may need to verify this from your backend)
-    fetch("/api/is_admin")
+    fetch(`${API_URL}/api/is_admin`)
       .then((res) => res.json())
       .then((data) => setIsAdmin(data.isAdmin))
       .catch((err) => {
