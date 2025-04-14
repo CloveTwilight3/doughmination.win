@@ -73,12 +73,13 @@ function App() {
       {fronting && fronting.members && fronting.members.length > 0 && (
         <div className="mb-6 p-4 border-b dark:border-gray-700">
           <h2 className="text-lg font-semibold mb-3 text-center text-black dark:text-white">Currently Fronting:</h2>
-          <div className="flex items-center justify-center">
-            <img
-              src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
-              alt="Fronting member"
-              className="h-14 w-14 mr-4 rounded-full shadow-md object-cover"
-            />
+          <div className="fronting-member">
+            <div className="avatar-container fronting-avatar">
+              <img
+                src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
+                alt="Fronting member"
+              />
+            </div>
             <span className="fronting-member-name text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
           </div>
         </div>
@@ -101,11 +102,12 @@ function App() {
                       className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 text-black dark:text-white hover:shadow-lg transform transition-all duration-300 hover:scale-105"
                     >
                       <div className="flex flex-col items-center justify-center h-full p-3">
-                        <img
-                          src={member.avatar_url || defaultAvatar}
-                          alt={member.name}
-                          className="h-16 w-16 mb-3 rounded-full object-cover shadow-sm"
-                        />
+                        <div className="avatar-container">
+                          <img
+                            src={member.avatar_url || defaultAvatar}
+                            alt={member.name}
+                          />
+                        </div>
                         <span className="member-name text-black dark:text-white">{member.display_name || member.name}</span>
                       </div>
                     </Link>

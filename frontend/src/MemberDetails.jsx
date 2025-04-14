@@ -74,12 +74,13 @@ const MemberDetails = ({ members, defaultAvatar }) => {
   return (
     <div className="max-w-2xl mx-auto mt-6 p-6 border rounded-lg shadow-lg bg-white dark:bg-gray-800 dark:border-gray-700">
       <div className="flex flex-col items-center mb-6">
-        <img
-          src={memberData.avatar_url || defaultAvatar}
-          alt={memberData.name}
-          className="w-24 h-24 mb-4 rounded-full shadow-md"
-        />
-        <h1 className="text-2xl font-bold text-black dark:text-white">{memberData.display_name || memberData.name}</h1>
+        <div className="avatar-container member-details-avatar">
+          <img
+            src={memberData.avatar_url || defaultAvatar}
+            alt={memberData.name}
+          />
+        </div>
+        <h1 className="text-2xl font-bold mt-2 text-black dark:text-white">{memberData.display_name || memberData.name}</h1>
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
