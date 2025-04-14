@@ -10,19 +10,13 @@ const MemberDetails = ({ members, defaultAvatar }) => {
   useEffect(() => {
     const fetchMemberData = async () => {
       try {
-        // First check if we already have the member data in props
-        const existingMember = members?.find(m => 
-          m.id === member_id || 
-          m.name.toLowerCase() === member_id.toLowerCase()
-        );
-        
+        const existingMember = members?.find(m => m.id === member_id || m.name.toLowerCase() === member_id.toLowerCase());
         if (existingMember) {
           setMemberData(existingMember);
           setLoading(false);
           return;
         }
-        
-        // Otherwise fetch from API
+
         const response = await fetch(`/api/member/${member_id}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch member data: ${response.status}`);
@@ -31,7 +25,6 @@ const MemberDetails = ({ members, defaultAvatar }) => {
         setMemberData(data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching member data:", error);
         setError(error.message);
         setLoading(false);
       }
@@ -44,7 +37,7 @@ const MemberDetails = ({ members, defaultAvatar }) => {
     return (
       <div className="p-8 text-center">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-        <p className="text-base text-black dark:text-white">Loading member data...</p>
+        <p className="text-base">Loading member data...</p>
       </div>
     );
   }
@@ -63,7 +56,7 @@ const MemberDetails = ({ members, defaultAvatar }) => {
   if (!memberData) {
     return (
       <div className="p-8 text-center">
-        <p className="text-base text-black dark:text-white mb-4">Member not found</p>
+        <p className="text-base">Member not found</p>
         <Link to="/" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
           Back to Members
         </Link>
@@ -79,26 +72,24 @@ const MemberDetails = ({ members, defaultAvatar }) => {
           alt={memberData.name}
           className="w-24 h-24 mb-4 rounded-full shadow-md"
         />
-        <h1 className="text-2xl font-bold text-black dark:text-white">{memberData.display_name || memberData.name}</h1>
+        <h1 className="text-2xl font-bold">{memberData.display_name || memberData.name}</h1>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {memberData.description && (
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-            <h2 className="text-lg font-semibold mb-2 text-black dark:text-white">About</h2>
-            <p className="text-sm text-black dark:text-white">{memberData.description}</p>
+            <h2 className="text-lg font-semibold mb-2">About</h2>
+            <p className="text-sm">{memberData.description}</p>
           </div>
         )}
-        
         {memberData.pronouns && (
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-            <h2 className="text-lg font-semibold mb-2 text-black dark:text-white">Pronouns</h2>
-            <p className="text-sm text-black dark:text-white">{memberData.pronouns}</p>
+            <h2 className="text-lg font-semibold mb-2">Pronouns</h2>
+            <p className="text-sm">{memberData.pronouns}</p>
           </div>
         )}
       </div>
-      
-      {/* Back button */}
+
       <div className="mt-8 text-center">
         <Link to="/" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
           Back to All Members
