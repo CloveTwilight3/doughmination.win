@@ -72,14 +72,14 @@ function App() {
       {/* Fronting Member - Show on all pages */}
       {fronting && fronting.members && fronting.members.length > 0 && (
         <div className="mb-8 p-4 border-b dark:border-gray-700">
-          <h2 className="text-xl font-semibold mb-3 text-black dark:text-white">Currently Fronting:</h2>
+          <h2 className="text-xl font-semibold mb-3 text-center text-black dark:text-white">Currently Fronting:</h2>
           <div className="flex items-center justify-center">
             <img
               src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
               alt="Fronting member"
               className="w-16 h-16 mr-4 rounded-full shadow-md"
             />
-            <span className="text-lg font-medium text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
+            <span className="text-xl font-medium text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
           </div>
         </div>
       )}
@@ -90,20 +90,27 @@ function App() {
         <Route path="/" element={
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">Members:</h2>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            
+            {/* Replace ul/li with div grid to ensure proper grid layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {members.map((member) => (
-                <li key={member.id} className="transition-transform hover:scale-105 p-4 border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700">
-                  <Link to={`/${member.name.toLowerCase()}`} className="flex flex-col items-center text-black dark:text-white hover:text-gray-700 dark:hover:text-gray-300">
-                    <img
-                      src={member.avatar_url || defaultAvatar}
-                      alt={member.name}
-                      className="w-16 h-16 mb-3 rounded-full"
-                    />
-                    <span className="text-base font-medium text-center">{member.display_name || member.name}</span>
+                <div key={member.id} className="transition-all duration-300 hover:scale-105 h-full">
+                  <Link 
+                    to={`/${member.name.toLowerCase()}`} 
+                    className="block h-full p-4 border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 text-black dark:text-white hover:shadow-lg"
+                  >
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <img
+                        src={member.avatar_url || defaultAvatar}
+                        alt={member.name}
+                        className="w-16 h-16 mb-3 rounded-full object-cover"
+                      />
+                      <span className="text-base font-medium text-center">{member.display_name || member.name}</span>
+                    </div>
                   </Link>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         } />
         
