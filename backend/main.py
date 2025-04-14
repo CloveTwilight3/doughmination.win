@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
-
 from auth import router as auth_router, get_current_user  # 👈 Import auth
 import os
 from dotenv import load_dotenv
@@ -13,7 +12,7 @@ app = FastAPI()
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://104.219.236.52:8000", "https://plural.clovetwilight3.co.uk:8000"],
+    allow_origins=["https://104.219.236.52:8080", "https://plural.clovetwilight3.co.uk:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,23 +23,35 @@ app.include_router(auth_router)
 
 @app.get("/api/system")
 async def system_info():
-    return await get_system()
+    try:
+        return await get_system()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch system info: {str(e)}")
 
 @app.get("/api/members")
 async def members():
-    return await get_members()
+    try:
+        return await get_members()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch members: {str(e)}")
 
 @app.get("/api/fronters")
 async def fronters():
-    return await get_fronters()
+    try:
+        return await get_fronters()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch fronters: {str(e)}")
 
 @app.get("/api/member/{member_id}")
 async def member_detail(member_id: str):
-    members = await get_members()
-    for member in members.get("members", []):
-        if member["id"] == member_id or member["name"].lower() == member_id.lower():
-            return member
-    raise HTTPException(status_code=404, detail="Member not found")
+    try:
+        members = await get_members()
+        for member in members.get("members", []):
+            if member["id"] == member_id or member["name"].lower() == member_id.lower():
+                return member
+        raise HTTPException(status_code=404, detail="Member not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch member details: {str(e)}")
 
 @app.post("/api/switch")
 async def switch_front(request: Request, user: str = Depends(get_current_user)):  # 🔐 protected
@@ -53,6 +64,5 @@ async def switch_front(request: Request, user: str = Depends(get_current_user)):
 
         await set_front(member_ids)
         return {"status": "success", "message": "Front updated successfully"}
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
