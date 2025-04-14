@@ -1,17 +1,26 @@
-from fastapi import FastAPI, HTTPException, Request
-from pluralkit import get_system, get_members, get_fronters, set_front
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from pluralkit import get_system, get_members, get_fronters, set_front
+
+from auth import router as auth_router, get_current_user  # 👈 Import auth
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
-# CORS configuration: Allowing frontend to communicate with the backend
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://104.219.236.52:8080", "https://plural.clovetwilight3.co.uk:8080"],  # Replace with your frontend's origin or use a list of origins
+    allow_origins=["https://104.219.236.52:8080", "https://plural.clovetwilight3.co.uk:8080"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+# Include login route
+app.include_router(auth_router)
 
 @app.get("/api/system")
 async def system_info():
@@ -34,7 +43,7 @@ async def member_detail(member_id: str):
     raise HTTPException(status_code=404, detail="Member not found")
 
 @app.post("/api/switch")
-async def switch_front(request: Request):
+async def switch_front(request: Request, user: str = Depends(get_current_user)):  # 🔐 protected
     try:
         body = await request.json()
         member_ids = body.get("members", [])

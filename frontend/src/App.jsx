@@ -2,23 +2,24 @@ import React, { useEffect, useState } from "react";
 import { Link, Routes, Route } from "react-router-dom";
 import useTheme from './useTheme';
 import MemberDetails from './MemberDetails.jsx';
+import Login from './Login.jsx'; // you'll create this
 
 function App() {
   const [members, setMembers] = useState([]);
   const [fronting, setFronting] = useState(null);
   const [theme, toggleTheme] = useTheme();
-  
+  const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token"));
+
   const defaultAvatar = "https://clovetwilight3.co.uk/system.png";
 
   useEffect(() => {
+    if (!loggedIn) return;
+
     // Fetch members data
     fetch("/api/members")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Members data from backend:", data);
-        // Sort members alphabetically by name
         const sortedMembers = [...data].sort((a, b) => {
-          // Use display_name if available, otherwise use name
           const nameA = (a.display_name || a.name).toLowerCase();
           const nameB = (b.display_name || b.name).toLowerCase();
           return nameA.localeCompare(nameB);
@@ -29,23 +30,18 @@ function App() {
         console.error("Error fetching members data:", err);
       });
 
-    // Fetch current fronting member (if available)
+    // Fetch current fronting member
     fetch("/api/fronters")
       .then((res) => res.json())
-      .then((data) => {
-        console.log("Fronting member data:", data);
-        setFronting(data);
-      })
+      .then((data) => setFronting(data))
       .catch((err) => {
         console.error("Error fetching fronting data:", err);
       });
-  }, []);
+  }, [loggedIn]);
 
-  // Dynamically update the document title based on fronting member
   useEffect(() => {
-    if (fronting && fronting.members && fronting.members.length > 0) {
-      document.title = `Currently Fronting: ${fronting.members[0].display_name || fronting.members[0].name || 'Unknown'}`;
-      
+    if (fronting && fronting.members?.length > 0) {
+      document.title = `Currently Fronting: ${fronting.members[0].display_name || fronting.members[0].name}`;
       const frontingAvatar = fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar;
       const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
       link.type = 'image/x-icon';
@@ -62,24 +58,41 @@ function App() {
     }
   }, [fronting]);
 
+  function handleLogout() {
+    localStorage.removeItem("token");
+    setLoggedIn(false);
+  }
+
+  if (!loggedIn) {
+    return <Login onLogin={() => setLoggedIn(true)} />;
+  }
+
   if (members.length === 0) return <div className="text-black dark:text-white">Loading...</div>;
 
   return (
     <div className="p-3 max-w-6xl mx-auto text-black dark:text-white">
-      <h1 className="text-2xl font-bold mb-6 text-center text-black dark:text-white">System Members</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">System Members</h1>
 
-      {/* Theme Toggle Button */}
-      <button
-        onClick={toggleTheme}
-        className="fixed top-4 right-4 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
-      >
-        Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
-      </button>
+      {/* Theme + Logout buttons */}
+      <div className="fixed top-4 right-4 flex gap-3">
+        <button
+          onClick={toggleTheme}
+          className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
+        >
+          Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
+        </button>
+        <button
+          onClick={handleLogout}
+          className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+        >
+          Logout
+        </button>
+      </div>
 
-      {/* Fronting Member - Show on all pages */}
-      {fronting && fronting.members && fronting.members.length > 0 && (
+      {/* Fronting */}
+      {fronting?.members?.length > 0 && (
         <div className="mb-6 p-4 border-b dark:border-gray-700">
-          <h2 className="text-lg font-semibold mb-3 text-center text-black dark:text-white">Currently Fronting:</h2>
+          <h2 className="text-lg font-semibold mb-3 text-center">Currently Fronting:</h2>
           <div className="fronting-member">
             <div className="avatar-container fronting-avatar">
               <img
@@ -87,26 +100,23 @@ function App() {
                 alt="Fronting member"
               />
             </div>
-            <span className="fronting-member-name text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
+            <span className="fronting-member-name">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
           </div>
         </div>
       )}
 
       {/* Routes */}
       <Routes>
-        {/* Main route with grid of members */}
         <Route path="/" element={
           <div className="mt-6">
-            <h2 className="text-lg font-semibold mb-4 text-center text-black dark:text-white">Members:</h2>
-
-            {/* Grid layout with fixed size items and spacing */}
+            <h2 className="text-lg font-semibold mb-4 text-center">Members:</h2>
             <div className="grid member-grid gap-5">
               {members.map((member) => (
                 <div key={member.id} className="member-grid-item">
                   <div className="h-full w-full p-2">
                     <Link 
                       to={`/${member.name.toLowerCase()}`} 
-                      className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 text-black dark:text-white hover:shadow-lg transform transition-all duration-300 hover:scale-105"
+                      className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 hover:shadow-lg transform transition-all duration-300 hover:scale-105"
                     >
                       <div className="flex flex-col items-center justify-center h-full p-3">
                         <div className="avatar-container">
@@ -115,7 +125,7 @@ function App() {
                             alt={member.name}
                           />
                         </div>
-                        <span className="member-name text-black dark:text-white">{member.display_name || member.name}</span>
+                        <span className="member-name">{member.display_name || member.name}</span>
                       </div>
                     </Link>
                   </div>
@@ -124,8 +134,6 @@ function App() {
             </div>
           </div>
         } />
-        
-        {/* Member details route */}
         <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
       </Routes>
     </div>
