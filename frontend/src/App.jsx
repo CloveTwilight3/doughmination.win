@@ -70,20 +70,20 @@ function App() {
       </button>
 
       {/* Fronting Member - Show on all pages */}
-      {fronting && fronting.members && fronting.members.length > 0 && (
-        <div className="mb-6 p-4 border-b dark:border-gray-700">
-          <h2 className="text-lg font-semibold mb-3 text-center text-black dark:text-white">Currently Fronting:</h2>
-          <div className="fronting-member">
-            <div className="avatar-container fronting-avatar">
-              <img
-                src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
-                alt="Fronting member"
-              />
-            </div>
-            <span className="fronting-member-name text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
-          </div>
-        </div>
-      )}
+{fronting && fronting.members && fronting.members.length > 0 && (
+  <div className="mb-6 p-4 border-b dark:border-gray-700">
+    <h2 className="text-lg font-semibold mb-3 text-center text-black dark:text-white">Currently Fronting:</h2>
+    <div className="fronting-member">
+      <div className="avatar-container fronting-avatar">
+        <img
+          src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
+          alt="Fronting member"
+        />
+      </div>
+      <span className="fronting-member-name text-black dark:text-white">{fronting.members[0]?.display_name || fronting.members[0].name}</span>
+    </div>
+  </div>
+)}
 
       {/* Routes */}
       <Routes>
