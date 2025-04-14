@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -7,6 +7,10 @@ export default function Login({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get the page the user was trying to access before being redirected to login
+  const from = location.state?.from?.pathname || "/";
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -36,7 +40,11 @@ export default function Login({ onLogin }) {
       if (res.ok) {
         localStorage.setItem("token", data.access_token);
         onLogin(); // notify parent
-        navigate("/"); // redirect to home page
+        
+        // Check if we need to redirect to the admin dashboard or the page they were trying to access
+        // If they directly navigated to /admin/login, send them to dashboard
+        const redirectTo = from === "/admin/login" ? "/admin/dashboard" : from;
+        navigate(redirectTo);
       } else {
         setError(data.detail || "Login failed. Please check your credentials.");
       }
@@ -50,7 +58,7 @@ export default function Login({ onLogin }) {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700">
-      <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">Admin Login</h2>
       
       {error && (
         <div className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 p-3 rounded-md mb-4">

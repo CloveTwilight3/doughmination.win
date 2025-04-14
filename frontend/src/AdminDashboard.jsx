@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function AdminDashboard({ fronting }) {
   const [newFront, setNewFront] = useState("");
@@ -144,6 +145,12 @@ export default function AdminDashboard({ fronting }) {
             </button>
           </div>
         </div>
+      </div>
+      
+      <div className="mt-6 pt-4 border-t dark:border-gray-700">
+        <Link to="/" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">
+          &larr; Back to Home
+        </Link>
       </div>
     </div>
   );
