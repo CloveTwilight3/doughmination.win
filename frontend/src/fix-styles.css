@@ -73,14 +73,35 @@ main.container {
 }
 
 /* Reset any broken overflow settings */
-body, 
 html, 
-#root, 
-.max-w-6xl,
-.container {
+body {
   overflow-x: hidden !important;
-  max-width: 100% !important;
 }
+
+/* Prevent double scrollbars and layout overflow */
+* {
+    box-sizing: border-box;
+  }
+  
+  /* Proper spacing between title and divider */
+  div.mb-6.p-4.border-b,
+  div[class*="border-b"] {
+    margin-top: 2rem !important;  /* ADD this */
+    margin-bottom: 3rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  
+  /* Optional: add a clean custom divider class */
+  .border-section-divider {
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  html.dark .border-section-divider {
+    border-bottom: 1px solid #4b5563;
+  }
+  
 
 /* Fix navbar button layouts */
 nav ul.flex {
