@@ -155,6 +155,57 @@ html.dark .fixed.top-0 {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Critical navbar styles - NEW */
+header.fixed {
+  width: 100%;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+html.dark header.fixed {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure buttons are visible - NEW */
+button, a.px-3 {
+  display: inline-block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure proper spacing after navbar - NEW */
+.pt-16 {
+  padding-top: 4rem !important;
+}
+
+/* Make sure text is always readable - NEW */
+.text-black.dark\:text-white {
+  color: #000 !important;
+}
+
+html.dark .text-black.dark\:text-white {
+  color: #fff !important;
+}
+
+/* Fix member grid layout - NEW */
+.member-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+  gap: 1rem !important;
+}
+
+/* Ensure list items in navbar don't have default styling - NEW */
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li {
+  margin: 0;
+  padding: 0;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 640px) {
   .fixed.top-0 .flex {
@@ -164,11 +215,24 @@ html.dark .fixed.top-0 {
   }
   
   .member-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
   }
   
   .avatar-container {
     width: 4rem;
     height: 4rem;
+  }
+  
+  /* Ensure navbar buttons don't stack on mobile - NEW */
+  nav ul.flex {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+  }
+  
+  /* Add scrolling for very small screens - NEW */
+  nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
   }
 }

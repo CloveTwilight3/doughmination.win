@@ -134,139 +134,151 @@ function App() {
   if (loading) return <div className="text-black dark:text-white p-10 text-center">Loading...</div>;
 
   return (
-    <div className="p-3 max-w-6xl mx-auto text-black dark:text-white">
-      {/* Fixed navbar */}
-      <div className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 p-2 shadow-md z-50">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
+    <div className="max-w-6xl mx-auto text-black dark:text-white">
+      {/* IMPORTANT: Updated navbar structure */}
+      <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Link to="/" className="text-lg font-semibold">System</Link>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
-            >
-              {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-            </button>
-            {loggedIn ? (
-              <>
-                {isAdmin && (
-                  <Link 
-                    to="/admin/dashboard"
-                    className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm"
-                  >
-                    Admin Panel
-                  </Link>
-                )}
+          <nav>
+            <ul className="flex items-center gap-3">
+              <li>
                 <button
-                  onClick={handleLogout}
-                  className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+                  onClick={toggleTheme}
+                  className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
                 >
-                  Logout
+                  {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
                 </button>
-              </>
-            ) : (
-              <Link 
-                to="/admin/login"
-                className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm"
-              >
-                Login
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Proper top spacing to avoid content being hidden under the navbar */}
-      <div className="pt-16 md:pt-16"></div>
-
-      <h1 className="text-2xl font-bold mb-6 text-center">System Members</h1>
-
-      {/* Fronting */}
-      {fronting && fronting.members && fronting.members.length > 0 && (
-        <div className="mb-6 p-4 border-b dark:border-gray-700">
-          <h2 className="text-lg font-semibold mb-3 text-center">Currently Fronting:</h2>
-          <div className="fronting-member">
-            <div className="avatar-container fronting-avatar">
-              <img
-                src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
-                alt="Fronting member"
-              />
-            </div>
-            <span className="fronting-member-name">
-              {fronting.members[0]?.display_name || fronting.members[0]?.name || "Unknown"}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Routes */}
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold mb-4 text-center">Members:</h2>
-            {members.length > 0 ? (
-              <div className="grid member-grid gap-5">
-                {members.map((member) => (
-                  <div key={member.id} className="member-grid-item">
-                    <div className="h-full w-full p-2">
+              </li>
+              {loggedIn ? (
+                <>
+                  {isAdmin && (
+                    <li>
                       <Link 
-                        to={`/${member.name.toLowerCase()}`} 
-                        className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transform transition-all duration-300 hover:scale-105"
+                        to="/admin/dashboard"
+                        className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm"
                       >
-                        <div className="flex flex-col items-center justify-center h-full p-3">
-                          <div className="avatar-container">
-                            <img
-                              src={member.avatar_url || defaultAvatar}
-                              alt={member.name}
-                            />
-                          </div>
-                          <span className="member-name">{member.display_name || member.name}</span>
-                        </div>
+                        Admin Panel
                       </Link>
-                    </div>
-                  </div>
-                ))}
+                    </li>
+                  )}
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <li>
+                  <Link 
+                    to="/admin/login"
+                    className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm"
+                  >
+                    Login
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      {/* Clear space for the fixed header */}
+      <div className="pt-16"></div>
+
+      <main className="container mx-auto px-4 pt-4">
+        <h1 className="text-2xl font-bold mb-6 text-center">System Members</h1>
+
+        {/* Fronting */}
+        {fronting && fronting.members && fronting.members.length > 0 && (
+          <div className="mb-6 p-4 border-b dark:border-gray-700">
+            <h2 className="text-lg font-semibold mb-3 text-center">Currently Fronting:</h2>
+            <div className="fronting-member">
+              <div className="avatar-container fronting-avatar">
+                <img
+                  src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
+                  alt="Fronting member"
+                />
               </div>
-            ) : (
-              <p className="text-center mt-8">No members found. Please check your connection.</p>
-            )}
+              <span className="fronting-member-name">
+                {fronting.members[0]?.display_name || fronting.members[0]?.name || "Unknown"}
+              </span>
+            </div>
           </div>
-        } />
-        
-        <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
-        <Route path="/admin/login" element={<Login onLogin={() => {
-          setLoggedIn(true);
-          // After login, check if user is admin
-          fetch("/api/is_admin", {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-          })
-          .then(res => res.json())
-          .then(data => {
-            setIsAdmin(!!data.isAdmin);
-            if (data.isAdmin) {
-              navigate('/admin/dashboard');
-            } else {
+        )}
+
+        {/* Routes */}
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={
+            <div className="mt-6">
+              <h2 className="text-lg font-semibold mb-4 text-center">Members:</h2>
+              {members.length > 0 ? (
+                <div className="grid member-grid gap-5">
+                  {members.map((member) => (
+                    <div key={member.id} className="member-grid-item">
+                      <div className="h-full w-full p-2">
+                        <Link 
+                          to={`/${member.name.toLowerCase()}`} 
+                          className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transform transition-all duration-300 hover:scale-105"
+                        >
+                          <div className="flex flex-col items-center justify-center h-full p-3">
+                            <div className="avatar-container">
+                              <img
+                                src={member.avatar_url || defaultAvatar}
+                                alt={member.name}
+                              />
+                            </div>
+                            <span className="member-name">{member.display_name || member.name}</span>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center mt-8">No members found. Please check your connection.</p>
+              )}
+            </div>
+          } />
+          
+          <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
+          <Route path="/admin/login" element={<Login onLogin={() => {
+            setLoggedIn(true);
+            // After login, check if user is admin
+            fetch("/api/is_admin", {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+              }
+            })
+            .then(res => res.json())
+            .then(data => {
+              setIsAdmin(!!data.isAdmin);
+              if (data.isAdmin) {
+                navigate('/admin/dashboard');
+              } else {
+                navigate('/');
+              }
+            })
+            .catch(err => {
+              console.error("Error checking admin status after login:", err);
               navigate('/');
-            }
-          })
-          .catch(err => {
-            console.error("Error checking admin status after login:", err);
-            navigate('/');
-          });
-        }} />} />
-        
-        {/* Protected Admin Routes */}
-        <Route path="/admin/dashboard" element={
-          <ProtectedRoute adminRequired={true} isAdmin={isAdmin} isLoggedIn={loggedIn}>
-            <AdminDashboard fronting={fronting} />
-          </ProtectedRoute>
-        } />
-        
-        {/* Catch all for invalid routes */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+            });
+          }} />} />
+          
+          {/* Protected Admin Routes */}
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute adminRequired={true} isAdmin={isAdmin} isLoggedIn={loggedIn}>
+              <AdminDashboard fronting={fronting} />
+            </ProtectedRoute>
+          } />
+          
+          {/* Catch all for invalid routes */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </div>
   );
 }
