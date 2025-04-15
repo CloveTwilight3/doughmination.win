@@ -78,7 +78,7 @@ function App() {
           // Token invalid or expired
           localStorage.removeItem("token");
           setLoggedIn(false);
-          setIsAdmin(false);
+          setIsAdmin(false); 
           return false;
         }
       } catch (err) {
@@ -135,14 +135,11 @@ function App() {
 
   return (
     <div className="p-3 max-w-6xl mx-auto text-black dark:text-white">
-      {/* Add a padding div to prevent content from being hidden under the fixed buttons */}
-      <div className="h-16 md:h-12"></div>
-      
-      {/* Theme + Login/Logout buttons */}
-      <div className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 p-2 shadow-md z-20">
+      {/* Fixed navbar */}
+      <div className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 p-2 shadow-md z-50">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <Link to="/" className="text-lg font-semibold">System</Link>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
               className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
@@ -177,6 +174,9 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Proper top spacing to avoid content being hidden under the navbar */}
+      <div className="pt-16 md:pt-16"></div>
 
       <h1 className="text-2xl font-bold mb-6 text-center">System Members</h1>
 
