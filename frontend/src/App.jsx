@@ -140,38 +140,41 @@ function App() {
       
       {/* Theme + Login/Logout buttons */}
       <div className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 p-2 shadow-md z-20">
-        <div className="max-w-6xl mx-auto flex justify-end items-center gap-2">
-          <button
-            onClick={toggleTheme}
-            className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
-          >
-            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-          </button>
-          {loggedIn ? (
-            <>
-              {isAdmin && (
-                <Link 
-                  to="/admin/dashboard"
-                  className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm"
-                >
-                  Admin Panel
-                </Link>
-              )}
-              <button
-                onClick={handleLogout}
-                className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link 
-              to="/admin/login"
-              className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm"
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <Link to="/" className="text-lg font-semibold">System</Link>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={toggleTheme}
+              className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
             >
-              Login
-            </Link>
-          )}
+              {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+            </button>
+            {loggedIn ? (
+              <>
+                {isAdmin && (
+                  <Link 
+                    to="/admin/dashboard"
+                    className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link 
+                to="/admin/login"
+                className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm"
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
