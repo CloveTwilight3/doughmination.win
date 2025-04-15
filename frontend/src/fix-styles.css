@@ -1,0 +1,117 @@
+/* Critical UI fixes - add this as a new CSS file and import it LAST in your main.jsx */
+
+/* Force all buttons to be visible */
+button,
+a[class*="px-"],
+a.px-3.py-2,
+header.fixed a,
+nav a,
+.rounded-lg {
+  display: inline-block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Button color fixes */
+.bg-blue-500, 
+.bg-green-500, 
+.bg-red-500, 
+.bg-purple-500 {
+  background-color: currentColor !important;
+  color: white !important;
+}
+
+/* Fix navigation container */
+header.fixed {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  left: 0 !important;
+  right: 0 !important;
+  position: fixed !important;
+  top: 0 !important;
+}
+
+header.fixed .container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 1280px !important;
+  margin: 0 auto !important;
+  padding: 0.75rem 1rem !important;
+}
+
+/* Fix the separator line */
+.mb-6.p-4.border-b,
+div[class*="border-b"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  box-sizing: border-box !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+html.dark .mb-6.p-4.border-b,
+html.dark div[class*="border-b"] {
+  border-bottom: 1px solid #4b5563 !important;
+}
+
+/* Ensure proper page content width */
+main.container {
+  width: 100% !important;
+  max-width: 1280px !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  overflow-x: hidden !important;
+}
+
+/* Reset any broken overflow settings */
+body, 
+html, 
+#root, 
+.max-w-6xl,
+.container {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
+/* Fix navbar button layouts */
+nav ul.flex {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+/* Fix button colors and text visibility */
+.bg-blue-500 { background-color: #3b82f6 !important; }
+.bg-green-500 { background-color: #10b981 !important; }
+.bg-purple-500 { background-color: #8b5cf6 !important; }
+.bg-red-500 { background-color: #ef4444 !important; }
+
+.bg-blue-500:hover { background-color: #2563eb !important; }
+.bg-green-500:hover { background-color: #059669 !important; }
+.bg-purple-500:hover { background-color: #7c3aed !important; }
+.bg-red-500:hover { background-color: #dc2626 !important; }
+
+.text-white {
+  color: white !important;
+}
+
+/* Mobile fixes */
+@media (max-width: 640px) {
+  header.fixed .container {
+    flex-wrap: wrap !important;
+  }
+  
+  nav ul.flex {
+    justify-content: center !important;
+    margin-top: 0.5rem !important;
+  }
+}
