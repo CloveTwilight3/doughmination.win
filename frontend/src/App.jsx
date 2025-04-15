@@ -189,8 +189,10 @@ function App() {
       <div className="pt-16"></div>
 
       <main className="container mx-auto px-4 pt-4">
-        <h1 className="text-2xl font-bold mb-6 text-center">System Members</h1>
-
+        <h1 className="text-2xl font-bold mt-8 mb-6 text-center text-black dark:text-white">
+          System Members: 
+        </h1> 
+        
         {/* Fronting */}
         {fronting && fronting.members && fronting.members.length > 0 && (
           <div className="mb-6 p-4 border-b dark:border-gray-700">
