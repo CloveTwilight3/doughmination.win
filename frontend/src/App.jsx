@@ -135,42 +135,47 @@ function App() {
 
   return (
     <div className="p-3 max-w-6xl mx-auto text-black dark:text-white">
-      <h1 className="text-2xl font-bold mb-6 text-center">System Members</h1>
-
+      {/* Add a padding div to prevent content from being hidden under the fixed buttons */}
+      <div className="h-16 md:h-12"></div>
+      
       {/* Theme + Login/Logout buttons */}
-      <div className="fixed top-4 right-4 flex flex-wrap gap-2 z-10">
-        <button
-          onClick={toggleTheme}
-          className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
-        >
-          Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode
-        </button>
-        {loggedIn ? (
-          <>
-            {isAdmin && (
-              <Link 
-                to="/admin/dashboard"
-                className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm"
-              >
-                Admin Panel
-              </Link>
-            )}
-            <button
-              onClick={handleLogout}
-              className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <Link 
-            to="/admin/login"
-            className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm"
+      <div className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 p-2 shadow-md z-20">
+        <div className="max-w-6xl mx-auto flex justify-end items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
           >
-            Login
-          </Link>
-        )}
+            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          </button>
+          {loggedIn ? (
+            <>
+              {isAdmin && (
+                <Link 
+                  to="/admin/dashboard"
+                  className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm"
+                >
+                  Admin Panel
+                </Link>
+              )}
+              <button
+                onClick={handleLogout}
+                className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link 
+              to="/admin/login"
+              className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm"
+            >
+              Login
+            </Link>
+          )}
+        </div>
       </div>
+
+      <h1 className="text-2xl font-bold mb-6 text-center">System Members</h1>
 
       {/* Fronting */}
       {fronting && fronting.members && fronting.members.length > 0 && (

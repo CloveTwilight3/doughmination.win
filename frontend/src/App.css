@@ -89,7 +89,7 @@ html.dark .card {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: 1rem;
   width: 100%;
 }
 
@@ -106,9 +106,8 @@ html.dark .card {
   text-align: center;
 }
 
-/* Fix for overlapping UI elements */
+/* Member Grid */
 .member-grid {
-  margin-top: 3rem; /* Provide more space for the floating header buttons */
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 1rem;
@@ -146,21 +145,33 @@ html.dark .card {
   margin-top: 0.5rem;
 }
 
-/* Mobile responsiveness fixes */
+/* Navigation Bar */
+.fixed.top-0 {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+html.dark .fixed.top-0 {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile responsiveness */
 @media (max-width: 640px) {
-  .fixed.top-4.right-4 {
-    position: static;
-    margin-bottom: 1rem;
+  .fixed.top-0 .flex {
+    flex-wrap: wrap;
     justify-content: center;
   }
   
   .member-grid {
-    margin-top: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
   
   .avatar-container {
     width: 4rem;
+    height: 4rem;
+  }
+  
+  /* Create more space in mobile view */
+  .h-16 {
     height: 4rem;
   }
 }
