@@ -89,23 +89,20 @@ async def switch_single_front(request: Request, user: str = Depends(get_current_
         
         if not member_id:
             raise HTTPException(status_code=400, detail="member_id is required")
-        
-        await set_front([member_id])
-        return {"success": True, "message": "Front updated successfully"}
+
+        result = await set_front([member_id])
+
+        # If result is a successful dict, return it or just say success
+        return {"success": True, "message": "Front updated", "data": result}
 
     except HTTPException as http_exc:
-        raise http_exc  # re-raise fastapi-style exceptions as-is
+        raise http_exc
 
     except Exception as e:
-        # Specific handling for known Pluralkit response
-        if "identical to current fronter list" in str(e):
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"success": False, "message": "Member is already fronting."}
-            )
-        
+        # Optionally log and parse pluralkit error responses here
         print("Error in /api/switch_front:", e)
         raise HTTPException(status_code=500, detail=f"Failed to switch front: {str(e)}")
+
         
 # Add admin check endpoint
 @app.get("/api/is_admin")

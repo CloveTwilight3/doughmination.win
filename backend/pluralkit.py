@@ -62,5 +62,8 @@ async def set_front(member_ids):
             headers=HEADERS,
             json={"members": member_ids}
         )
-        if resp.status_code != 204:
+        if resp.status_code not in (200, 204):
             raise Exception(f"Failed to set front: {resp.status_code} - {resp.text}")
+
+        # If there's a response body, return it, otherwise return None
+        return resp.json() if resp.content else None
