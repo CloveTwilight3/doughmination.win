@@ -10,6 +10,8 @@ body {
   background-color: #fff;
   color: #333;
   transition: background-color 0.3s, color 0.3s;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* Root Container */
@@ -18,6 +20,7 @@ body {
   margin: 0 auto;
   padding: 1rem;
   text-align: center;
+  overflow-x: hidden;
 }
 
 /* Logo Styles */
@@ -39,6 +42,7 @@ body {
 /* Links - Black in light mode, White in dark mode */
 a {
   text-decoration: none;
+  display: inline-block;
 }
 
 html:not(.dark) a {
@@ -111,6 +115,8 @@ html.dark .card {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .avatar-container {
@@ -149,36 +155,48 @@ html.dark .card {
 .fixed.top-0 {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 50;
+  width: 100%;
+  max-width: 100%;
 }
 
 html.dark .fixed.top-0 {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Critical navbar styles - NEW */
+/* Critical navbar styles */
 header.fixed {
   width: 100%;
   z-index: 100;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
 }
 
 html.dark header.fixed {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Ensure buttons are visible - NEW */
-button, a.px-3 {
+/* Ensure buttons are visible */
+button, 
+a.px-3,
+.fixed.top-0 a,
+nav a,
+.px-3.py-2 {
   display: inline-block !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
 
-/* Ensure proper spacing after navbar - NEW */
+/* Button specific styling */
+.px-3.py-2 {
+  padding: 0.5rem 0.75rem !important;
+}
+
+/* Ensure proper spacing after navbar */
 .pt-16 {
   padding-top: 4rem !important;
 }
 
-/* Make sure text is always readable - NEW */
+/* Make sure text is always readable */
 .text-black.dark\:text-white {
   color: #000 !important;
 }
@@ -187,31 +205,62 @@ html.dark .text-black.dark\:text-white {
   color: #fff !important;
 }
 
-/* Fix member grid layout - NEW */
+/* Fix member grid layout */
 .member-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
   gap: 1rem !important;
 }
 
-/* Ensure list items in navbar don't have default styling - NEW */
+/* Container styling */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* Ensure list items in navbar don't have default styling */
 nav ul {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: flex;
 }
 
 nav ul li {
   margin: 0;
   padding: 0;
+  display: flex;
+}
+
+/* Fix for separator line issue */
+.mb-6.p-4.border-b {
+  border-bottom-width: 1px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* Mobile responsiveness */
 @media (max-width: 640px) {
-  .fixed.top-0 .flex {
-    flex-wrap: wrap;
+  header.fixed .container {
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+  
+  header.fixed .container nav {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+  
+  header.fixed .container nav ul {
     justify-content: center;
-    padding: 8px 0;
+    flex-wrap: wrap;
   }
   
   .member-grid {
@@ -223,16 +272,18 @@ nav ul li {
     height: 4rem;
   }
   
-  /* Ensure navbar buttons don't stack on mobile - NEW */
+  /* Ensure navbar buttons don't stack on mobile */
   nav ul.flex {
     flex-direction: row !important;
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;
+    justify-content: center;
   }
   
-  /* Add scrolling for very small screens - NEW */
+  /* Add scrolling for very small screens */
   nav {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 0.5rem;
+    width: 100%;
   }
 }
