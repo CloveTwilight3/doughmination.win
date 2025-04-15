@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Request, Depends, Security
+from fastapi import FastAPI, HTTPException, Request, Depends, Security, status
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
 from auth import router as auth_router, get_current_user, oauth2_scheme  # Import auth
@@ -85,15 +86,25 @@ async def switch_single_front(request: Request, user: str = Depends(get_current_
     try:
         body = await request.json()
         member_id = body.get("member_id")
-
+        
         if not member_id:
             raise HTTPException(status_code=400, detail="member_id is required")
-
+        
         await set_front([member_id])
         return {"success": True, "message": "Front updated successfully"}
 
+    except HTTPException as http_exc:
+        raise http_exc  # re-raise fastapi-style exceptions as-is
+
     except Exception as e:
-        print("Error in /api/switch_front:", e)  # 👈 add this
+        # Specific handling for known Pluralkit response
+        if "identical to current fronter list" in str(e):
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"success": False, "message": "Member is already fronting."}
+            )
+        
+        print("Error in /api/switch_front:", e)
         raise HTTPException(status_code=500, detail=f"Failed to switch front: {str(e)}")
         
 # Add admin check endpoint
