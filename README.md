@@ -2,12 +2,15 @@
 
 This is a personal project built for our own system's use — a lightweight frontend that interfaces with the Pluralkit API to display our system members, current fronters, and individual member profiles in a clean and simple way. It includes a light/dark mode toggle and minimal UI for clarity.
 
+The site is hosted at [https://friends.clovetwilight3.co.uk](https://friends.clovetwilight3.co.uk)
+
 ## This is for:
 
 - Displaying our own Pluralkit system members in a user-friendly interface
 - Showing who’s fronting, with automatic favicon and title updates
 - Viewing individual member details like pronouns and descriptions
 - Switching between dark and light themes depending on vibes
+- Adding an Admin interface to switch users while in a call or similar situations.
 
 ## Notes:
 
