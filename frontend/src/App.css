@@ -148,10 +148,16 @@ html.dark .card {
 /* Navigation Bar */
 .fixed.top-0 {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  z-index: 50;
 }
 
 html.dark .fixed.top-0 {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Add more space at the top to prevent content from being hidden under the navbar */
+.top-spacing {
+  padding-top: 70px;
 }
 
 /* Mobile responsiveness */
@@ -159,6 +165,7 @@ html.dark .fixed.top-0 {
   .fixed.top-0 .flex {
     flex-wrap: wrap;
     justify-content: center;
+    padding: 8px 0;
   }
   
   .member-grid {
@@ -172,6 +179,10 @@ html.dark .fixed.top-0 {
   
   /* Create more space in mobile view */
   .h-16 {
-    height: 4rem;
+    height: 5rem; /* Increased for mobile to prevent overlap */
+  }
+  
+  .top-spacing {
+    padding-top: 90px; /* More padding for mobile */
   }
 }
