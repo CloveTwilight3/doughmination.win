@@ -85,14 +85,15 @@ async def switch_single_front(request: Request, user: str = Depends(get_current_
     try:
         body = await request.json()
         member_id = body.get("member_id")
-        
+
         if not member_id:
             raise HTTPException(status_code=400, detail="member_id is required")
-            
-        # Convert single ID to list format for the existing function
+
         await set_front([member_id])
         return {"success": True, "message": "Front updated successfully"}
+
     except Exception as e:
+        print("Error in /api/switch_front:", e)  # 👈 add this
         raise HTTPException(status_code=500, detail=f"Failed to switch front: {str(e)}")
         
 # Add admin check endpoint
