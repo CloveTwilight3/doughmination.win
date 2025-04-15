@@ -120,29 +120,31 @@ export default function AdminDashboard({ fronting }) {
               <label htmlFor="member-select" className="block mb-2 text-sm font-medium">
                 Select new fronting member:
               </label>
-              <select 
-                id="member-select"
-                onChange={(e) => setNewFront(e.target.value)} 
-                value={newFront}
-                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-              >
-                {!members.length && <option value="">No members available</option>}
+              <div className="flex space-x-2 items-center">
+                <select 
+                  id="member-select"
+                  onChange={(e) => setNewFront(e.target.value)} 
+                  value={newFront}
+                  className="flex-grow p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                >
+                  {!members.length && <option value="">No members available</option>}
+                  
+                  {members.map((member) => (
+                    <option key={member.id} value={member.id}>
+                      {member.display_name || member.name}
+                    </option>
+                  ))}
+                </select>
                 
-                {members.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {member.display_name || member.name}
-                  </option>
-                ))}
-              </select>
+                <button 
+                  onClick={handleSwitchFront}
+                  disabled={loading || !newFront || members.length === 0}
+                  className="whitespace-nowrap py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-md transition-colors"
+                >
+                  {loading ? "Switching..." : "Switch Front"}
+                </button>
+              </div>
             </div>
-            
-            <button 
-              onClick={handleSwitchFront}
-              disabled={loading || !newFront || members.length === 0}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-md transition-colors"
-            >
-              {loading ? "Switching..." : "Switch Front"}
-            </button>
           </div>
         </div>
       </div>

@@ -138,7 +138,7 @@ function App() {
       <h1 className="text-2xl font-bold mb-6 text-center">System Members</h1>
 
       {/* Theme + Login/Logout buttons */}
-      <div className="fixed top-4 right-4 flex gap-3">
+      <div className="fixed top-4 right-4 flex flex-wrap gap-2 z-10">
         <button
           onClick={toggleTheme}
           className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
