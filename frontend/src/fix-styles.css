@@ -1,6 +1,6 @@
-/* Critical UI fixes - add this as a new CSS file and import it LAST in your main.jsx */
+/* Critical UI fixes - comprehensive avatar and layout corrections */
 
-/* Avatar Size Fixes */
+/* Avatar Container and Sizing Fixes */
 .avatar-container {
   position: relative !important;
   width: 4.5rem !important; /* Reduced from 6rem */
@@ -12,6 +12,7 @@
   flex-shrink: 0 !important;
   display: block !important;
   margin: 0 auto !important;
+  box-sizing: border-box !important; /* Critical for proper sizing */
 }
 
 /* Make all avatars consistent size, including fronting one */
@@ -20,13 +21,16 @@
   height: 4.5rem !important;
 }
 
-/* Make sure images fit properly */
+/* Make sure images fit properly within avatars */
 .avatar-container img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
   display: block !important;
   object-position: center !important;
+  position: relative !important; /* Override absolute positioning */
+  top: auto !important;
+  left: auto !important;
 }
 
 /* Make member grid items smaller */
@@ -36,6 +40,16 @@
   gap: 1.5rem !important; /* Reduced gap */
   padding: 1rem !important;
   width: 100% !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+/* Make sure member grid items maintain proper dimensions */
+.member-grid-item {
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
 }
 
 /* Add padding within cards to give text more space */
@@ -81,6 +95,21 @@ nav a,
   color: white !important;
 }
 
+/* Specific button color fixes */
+.bg-blue-500 { background-color: #3b82f6 !important; }
+.bg-green-500 { background-color: #10b981 !important; }
+.bg-purple-500 { background-color: #8b5cf6 !important; }
+.bg-red-500 { background-color: #ef4444 !important; }
+
+.bg-blue-500:hover { background-color: #2563eb !important; }
+.bg-green-500:hover { background-color: #059669 !important; }
+.bg-purple-500:hover { background-color: #7c3aed !important; }
+.bg-red-500:hover { background-color: #dc2626 !important; }
+
+.text-white {
+  color: white !important;
+}
+
 /* Fix navigation container */
 header.fixed {
   width: 100vw !important;
@@ -118,6 +147,12 @@ div[class*="border-b"] {
 html.dark .mb-6.p-4.border-b,
 html.dark div[class*="border-b"] {
   border-bottom: 1px solid #4b5563 !important;
+}
+
+/* Override dark mode settings for avatars */
+html.dark .avatar-container {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
 }
 
 /* Ensure proper page content width */
@@ -164,21 +199,6 @@ nav ul.flex {
   display: flex !important;
   align-items: center !important;
   gap: 0.5rem !important;
-}
-
-/* Fix button colors and text visibility */
-.bg-blue-500 { background-color: #3b82f6 !important; }
-.bg-green-500 { background-color: #10b981 !important; }
-.bg-purple-500 { background-color: #8b5cf6 !important; }
-.bg-red-500 { background-color: #ef4444 !important; }
-
-.bg-blue-500:hover { background-color: #2563eb !important; }
-.bg-green-500:hover { background-color: #059669 !important; }
-.bg-purple-500:hover { background-color: #7c3aed !important; }
-.bg-red-500:hover { background-color: #dc2626 !important; }
-
-.text-white {
-  color: white !important;
 }
 
 /* Fix hover effects to prevent distortion */
@@ -234,6 +254,12 @@ html.dark .github-footer {
   display: flex !important;
 }
 
+/* Special fix for member details page avatar */
+.member-details-avatar {
+  width: 6rem !important;
+  height: 6rem !important;
+}
+
 /* Mobile specific adjustments */
 @media (max-width: 640px) {
   header.fixed .container {
@@ -250,19 +276,9 @@ html.dark .github-footer {
     gap: 1rem !important;
   }
   
-  .avatar-container {
-    width: 3.5rem !important;
-    height: 3.5rem !important;
-  }
-  
+  .avatar-container,
   .fronting-avatar {
     width: 3.5rem !important;
     height: 3.5rem !important;
   }
-}
-
-/* Special fix for member details page avatar */
-.member-details-avatar {
-  width: 6rem !important;
-  height: 6rem !important;
 }
