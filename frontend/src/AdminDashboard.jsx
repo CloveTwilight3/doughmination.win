@@ -156,7 +156,7 @@ export default function AdminDashboard({ fronting }) {
       
       <div className="mt-6 pt-4 border-t dark:border-gray-700">
         <Link to="/" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">
-          &larr; Back to Home
+          ← Back to Home
         </Link>
       </div>
     </div>
