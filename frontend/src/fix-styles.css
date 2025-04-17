@@ -136,7 +136,7 @@ nav ul.flex {
   }
 }
 
-/* Fix stretched avatar images */
+/* Avatar Circle Fix - UPDATED */
 .avatar-container {
   position: relative !important;
   width: 6rem !important;
@@ -145,6 +145,9 @@ nav ul.flex {
   overflow: hidden !important;
   background-color: #f3f4f6 !important;
   border: 2px solid #e5e7eb !important;
+  flex-shrink: 0 !important;
+  display: block !important;
+  margin: 0 auto !important;
 }
 
 .fronting-avatar {
@@ -157,16 +160,24 @@ nav ul.flex {
   height: 8rem !important;
 }
 
+/* The critical fix - force images to cover the container perfectly */
 .avatar-container img {
-  object-fit: cover !important;
   width: 100% !important;
   height: 100% !important;
-  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important; 
+  display: block !important;
+  object-position: center !important;
 }
 
 html.dark .avatar-container {
   background-color: #374151 !important;
   border-color: #4b5563 !important;
+}
+
+/* Fix hover effects to prevent distortion */
+.member-grid-item a:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* GitHub link footer */
@@ -201,4 +212,19 @@ html.dark .github-footer {
   width: 1.25rem;
   height: 1.25rem;
   fill: currentColor;
+}
+
+/* Make sure cards and flex containers maintain proper alignment */
+.flex.flex-col.items-center {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+/* Ensure member cards have proper spacing */
+.member-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+  gap: 1rem !important;
+  width: 100% !important;
 }
