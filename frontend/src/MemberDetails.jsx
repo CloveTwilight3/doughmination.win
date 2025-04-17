@@ -53,7 +53,7 @@ const MemberDetails = ({ members, defaultAvatar }) => {
     return (
       <div className="p-8 text-center">
         <p className="text-lg text-red-500 mb-4">{error}</p>
-        <Link to="/" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+        <Link to="/" className="px-4 py-2 bg-blue-500 text-white rounded-lg transition-colors">
           Back to Members
         </Link>
       </div>
@@ -64,7 +64,7 @@ const MemberDetails = ({ members, defaultAvatar }) => {
     return (
       <div className="p-8 text-center">
         <p className="text-lg text-black dark:text-white mb-4">Member not found</p>
-        <Link to="/" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+        <Link to="/" className="px-4 py-2 bg-blue-500 text-white rounded-lg transition-colors">
           ← Back to Members
         </Link>
       </div>
@@ -101,7 +101,7 @@ const MemberDetails = ({ members, defaultAvatar }) => {
       
       {/* Back button */}
       <div className="mt-6 text-center">
-        <Link to="/" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-base">
+        <Link to="/" className="px-4 py-2 bg-blue-500 text-white rounded-lg transition-colors text-base">
            ← Back to All Members
         </Link>
       </div>

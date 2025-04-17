@@ -145,7 +145,7 @@ export default function AdminDashboard({ fronting }) {
               <button 
                 onClick={handleSwitchFront}
                 disabled={loading || !newFront || members.length === 0}
-                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-md transition-colors"
+                className="w-full py-2 px-4 bg-blue-600 disabled:bg-blue-300 text-white rounded-md transition-colors"
               >
                 {loading ? "Switching..." : "Switch Front"}
               </button>
@@ -155,7 +155,7 @@ export default function AdminDashboard({ fronting }) {
       </div>
       
       <div className="mt-6 pt-4 border-t dark:border-gray-700">
-        <Link to="/" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">
+        <Link to="/" className="text-blue-500 dark:text-blue-400">
           ← Back to Home
         </Link>
       </div>

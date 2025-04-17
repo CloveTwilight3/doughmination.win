@@ -99,7 +99,7 @@ export default function Login({ onLogin }) {
         
         <button 
           type="submit" 
-          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:bg-blue-300 transition-colors"
+          className="bg-blue-600 text-white p-2 rounded disabled:bg-blue-300 transition-colors"
           disabled={loading}
         >
           {loading ? "Logging in..." : "Log In"}
