@@ -90,8 +90,38 @@ html.dark .text-black {
   color: #fff !important;
 }
 
-html:not(.dark) .text-white {
+/* Light mode text color fixes */
+html:not(.dark) .bg-white,
+html:not(.dark) .member-grid-item a,
+html:not(.dark) .rounded-lg,
+html:not(.dark) .border {
+  color: #111827 !important; /* Black text for light mode */
+}
+
+/* Fix text colors throughout light mode */
+html:not(.dark) h1,
+html:not(.dark) h2,
+html:not(.dark) h3,
+html:not(.dark) p,
+html:not(.dark) span,
+html:not(.dark) div:not([class*="bg-"]) {
+  color: #111827;
+}
+
+/* Text color overrides for containers in light mode */
+html:not(.dark) .max-w-2xl,
+html:not(.dark) .max-w-md {
+  color: #111827;
+}
+
+html:not(.dark) .text-black {
   color: #111827 !important;
+}
+
+/* Ensure buttons maintain proper contrast in light mode */
+html:not(.dark) button:not(.bg-blue-500):not(.bg-purple-500):not(.bg-green-500):not(.bg-red-500),
+html:not(.dark) a:not(.bg-blue-500):not(.bg-purple-500):not(.bg-green-500):not(.bg-red-500) {
+  color: #111827;
 }
 
 /* ===== LINK STYLES ===== */
@@ -492,6 +522,7 @@ html.dark .avatar-container {
   align-items: center;
 }
 
+/* Enhanced card styles for member items */
 .member-grid-item a {
   padding: 0.75rem;
   display: flex;
@@ -500,20 +531,28 @@ html.dark .avatar-container {
   justify-content: center;
   height: 100%;
   width: 100%;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background: white;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
   transition: all 0.3s ease;
 }
 
 html.dark .member-grid-item a {
-  background: #374151;
-  border-color: #4b5563;
+  background: rgba(30, 27, 75, 0.7);
+  border-color: rgba(139, 92, 246, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .member-grid-item a:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+html.dark .member-grid-item a:hover {
+  box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.4);
+  border-color: rgba(139, 92, 246, 0.7);
 }
 
 .member-name {
