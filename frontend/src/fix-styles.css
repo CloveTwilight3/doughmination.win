@@ -80,28 +80,27 @@ body {
 
 /* Prevent double scrollbars and layout overflow */
 * {
-    box-sizing: border-box;
-  }
-  
-  /* Proper spacing between title and divider */
-  div.mb-6.p-4.border-b,
-  div[class*="border-b"] {
-    margin-top: 2rem !important;  /* ADD this */
-    margin-bottom: 3rem !important;
-    padding-bottom: 1.5rem !important;
-  }
-  
-  /* Optional: add a clean custom divider class */
-  .border-section-divider {
-    margin-top: 2rem;
-    margin-bottom: 3rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  html.dark .border-section-divider {
-    border-bottom: 1px solid #4b5563;
-  }
-  
+  box-sizing: border-box;
+}
+
+/* Proper spacing between title and divider */
+div.mb-6.p-4.border-b,
+div[class*="border-b"] {
+  margin-top: 2rem !important;
+  margin-bottom: 3rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+/* Optional: add a clean custom divider class */
+.border-section-divider {
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+html.dark .border-section-divider {
+  border-bottom: 1px solid #4b5563;
+}
 
 /* Fix navbar button layouts */
 nav ul.flex {
@@ -135,4 +134,71 @@ nav ul.flex {
     justify-content: center !important;
     margin-top: 0.5rem !important;
   }
+}
+
+/* Fix stretched avatar images */
+.avatar-container {
+  position: relative !important;
+  width: 6rem !important;
+  height: 6rem !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  background-color: #f3f4f6 !important;
+  border: 2px solid #e5e7eb !important;
+}
+
+.fronting-avatar {
+  width: 5rem !important;
+  height: 5rem !important;
+}
+
+.member-details-avatar {
+  width: 8rem !important;
+  height: 8rem !important;
+}
+
+.avatar-container img {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+html.dark .avatar-container {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+}
+
+/* GitHub link footer */
+.github-footer {
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+  text-align: center;
+  border-top: 1px solid #e5e7eb;
+}
+
+html.dark .github-footer {
+  border-top: 1px solid #4b5563;
+}
+
+.github-button {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  background-color: #24292e;
+  color: white !important;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.github-button:hover {
+  background-color: #1a1e22;
+}
+
+.github-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
 }
