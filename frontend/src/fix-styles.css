@@ -1,5 +1,62 @@
 /* Critical UI fixes - add this as a new CSS file and import it LAST in your main.jsx */
 
+/* Avatar Size Fixes */
+.avatar-container {
+  position: relative !important;
+  width: 4.5rem !important; /* Reduced from 6rem */
+  height: 4.5rem !important; /* Reduced from 6rem */
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  background-color: #f3f4f6 !important;
+  border: 2px solid #e5e7eb !important;
+  flex-shrink: 0 !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* Make all avatars consistent size, including fronting one */
+.fronting-avatar {
+  width: 4.5rem !important; /* Match the standard avatar size */
+  height: 4.5rem !important;
+}
+
+/* Make sure images fit properly */
+.avatar-container img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  object-position: center !important;
+}
+
+/* Make member grid items smaller */
+.member-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important; /* Reduced from 150px */
+  gap: 1.5rem !important; /* Reduced gap */
+  padding: 1rem !important;
+  width: 100% !important;
+}
+
+/* Add padding within cards to give text more space */
+.member-grid-item a {
+  padding: 0.75rem !important;
+}
+
+/* Make text smaller to fit better */
+.member-name {
+  font-size: 0.9rem !important;
+  margin-top: 0.75rem !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Fix admin panel fronting avatar to match others */
+.max-w-md.mx-auto.mt-8 .flex.items-center .w-12.h-12 {
+  width: 4.5rem !important;
+  height: 4.5rem !important;
+}
+
 /* Force all buttons to be visible */
 button,
 a[class*="px-"],
@@ -124,56 +181,6 @@ nav ul.flex {
   color: white !important;
 }
 
-/* Mobile fixes */
-@media (max-width: 640px) {
-  header.fixed .container {
-    flex-wrap: wrap !important;
-  }
-  
-  nav ul.flex {
-    justify-content: center !important;
-    margin-top: 0.5rem !important;
-  }
-}
-
-/* Avatar Circle Fix - UPDATED */
-.avatar-container {
-  position: relative !important;
-  width: 6rem !important;
-  height: 6rem !important;
-  border-radius: 50% !important;
-  overflow: hidden !important;
-  background-color: #f3f4f6 !important;
-  border: 2px solid #e5e7eb !important;
-  flex-shrink: 0 !important;
-  display: block !important;
-  margin: 0 auto !important;
-}
-
-.fronting-avatar {
-  width: 5rem !important;
-  height: 5rem !important;
-}
-
-.member-details-avatar {
-  width: 8rem !important;
-  height: 8rem !important;
-}
-
-/* The critical fix - force images to cover the container perfectly */
-.avatar-container img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important; 
-  display: block !important;
-  object-position: center !important;
-}
-
-html.dark .avatar-container {
-  background-color: #374151 !important;
-  border-color: #4b5563 !important;
-}
-
 /* Fix hover effects to prevent distortion */
 .member-grid-item a:hover {
   transform: translateY(-5px) !important;
@@ -221,10 +228,41 @@ html.dark .github-footer {
   align-items: center !important;
 }
 
-/* Ensure member cards have proper spacing */
-.member-grid {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
-  gap: 1rem !important;
-  width: 100% !important;
+/* Fix layout in the admin panel */
+.flex.items-center {
+  align-items: center !important;
+  display: flex !important;
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 640px) {
+  header.fixed .container {
+    flex-wrap: wrap !important;
+  }
+  
+  nav ul.flex {
+    justify-content: center !important;
+    margin-top: 0.5rem !important;
+  }
+  
+  .member-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    gap: 1rem !important;
+  }
+  
+  .avatar-container {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+  }
+  
+  .fronting-avatar {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+  }
+}
+
+/* Special fix for member details page avatar */
+.member-details-avatar {
+  width: 6rem !important;
+  height: 6rem !important;
 }
