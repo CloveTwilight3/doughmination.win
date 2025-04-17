@@ -157,18 +157,45 @@ nav a,
 }
 
 /* Button color styles */
-.bg-blue-500 { background-color: #3b82f6; color: white; }
-.bg-green-500 { background-color: #10b981; color: white; }
-.bg-purple-500 { background-color: #8b5cf6; color: white; }
-.bg-red-500 { background-color: #ef4444; color: white; }
+.bg-blue-500 { background-color: #3b82f6; }
+.bg-green-500 { background-color: #10b981; }
+.bg-purple-500 { background-color: #8b5cf6; }
+.bg-red-500 { background-color: #ef4444; }
 
 .bg-blue-500:hover { background-color: #2563eb; }
 .bg-green-500:hover { background-color: #059669; }
 .bg-purple-500:hover { background-color: #7c3aed; }
 .bg-red-500:hover { background-color: #dc2626; }
 
+/* Button text color overrides - ensure text is always visible */
+.bg-blue-500, 
+.bg-green-500, 
+.bg-purple-500, 
+.bg-red-500,
+a.px-3.py-2,
+.rounded-lg.text-white,
+button.text-white {
+  color: white !important;
+}
+
+html.dark .bg-blue-500, 
+html.dark .bg-green-500, 
+html.dark .bg-purple-500, 
+html.dark .bg-red-500,
+html.dark a.px-3.py-2,
+html.dark .rounded-lg.text-white,
+html.dark button.text-white {
+  color: white !important;
+}
+
 .text-white {
   color: white;
+}
+
+/* Fix for specific button styles that might be inverted */
+html.dark button.text-black,
+html.dark a.text-black {
+  color: white !important;
 }
 
 /* ===== AVATARS & MEMBER STYLING ===== */
@@ -368,19 +395,27 @@ html.dark .github-footer {
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
   background-color: #24292e;
-  color: white;
+  color: white !important;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+}
+
+html.dark .github-button {
+  background-color: #2d333b;
 }
 
 .github-button:hover {
   background-color: #1a1e22;
 }
 
+html.dark .github-button:hover {
+  background-color: #444c56;
+}
+
 .github-icon {
   width: 1.25rem;
   height: 1.25rem;
-  fill: currentColor;
+  fill: white;
 }
 
 /* ===== LOGO ANIMATIONS ===== */
