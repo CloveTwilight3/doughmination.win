@@ -144,7 +144,7 @@ function App() {
               <li>
                 <button
                   onClick={toggleTheme}
-                  className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm"
+                  className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm"
                 >
                   {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
                 </button>
@@ -155,7 +155,7 @@ function App() {
                     <li>
                       <Link 
                         to="/admin/dashboard"
-                        className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm"
+                        className="px-3 py-2 bg-purple-500 text-white rounded-lg text-sm"
                       >
                         Admin Panel
                       </Link>
@@ -164,7 +164,7 @@ function App() {
                   <li>
                     <button
                       onClick={handleLogout}
-                      className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+                      className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm"
                     >
                       Logout
                     </button>
@@ -174,7 +174,7 @@ function App() {
                 <li>
                   <Link 
                     to="/admin/login"
-                    className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm"
+                    className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm"
                   >
                     Login
                   </Link>
@@ -224,7 +224,7 @@ function App() {
                       <div className="h-full w-full p-2">
                         <Link 
                           to={`/${member.name.toLowerCase()}`} 
-                          className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transform transition-all duration-300 hover:scale-105"
+                          className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 transform transition-all duration-300"
                         >
                           <div className="flex flex-col items-center justify-center h-full p-3">
                             <div className="avatar-container">
