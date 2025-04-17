@@ -108,7 +108,7 @@ export default function AdminDashboard({ fronting }) {
             <div className="flex items-center">
               <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
                 <img 
-                  src={currentFronting.webhook_avatar_url || currentFronting.avatar_url || "/default-avatar.png"} 
+                  src={currentFronting.avatar_url || "https://clovetwilight3.co.uk/system.png"} 
                   alt={currentFronting.name}
                   className="w-full h-full object-cover"
                 />
