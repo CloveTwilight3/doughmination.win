@@ -156,16 +156,157 @@ nav a,
   padding: 0.5rem 0.75rem;
 }
 
-/* Button color styles */
+/* Button color styles - with improved dark mode support */
+/* Enhanced button styling for a modern, professional look */
+.bg-blue-500,
+.bg-green-500, 
+.bg-purple-500, 
+.bg-red-500,
+a.px-3.py-2,
+.rounded-lg.text-white,
+button.text-white,
+.bg-blue-600,
+.bg-blue-700,
+button[type="submit"],
+.w-full.py-2.px-4.bg-blue-600,
+.bg-purple-600,
+.bg-green-600 {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: none;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: capitalize;
+  backdrop-filter: blur(5px);
+}
+
+/* Base background colors */
 .bg-blue-500 { background-color: #3b82f6; }
 .bg-green-500 { background-color: #10b981; }
 .bg-purple-500 { background-color: #8b5cf6; }
 .bg-red-500 { background-color: #ef4444; }
+.bg-blue-600, 
+.bg-blue-700,
+button[type="submit"] { background-color: #2563eb; }
+.bg-purple-600 { background-color: #7c3aed; }
+.bg-green-600 { background-color: #059669; }
+
+/* Hover states with enhanced effects */
+.bg-blue-500:hover,
+.bg-green-500:hover,
+.bg-purple-500:hover,
+.bg-red-500:hover,
+.bg-blue-600:hover,
+.bg-blue-700:hover,
+button[type="submit"]:hover,
+.bg-purple-600:hover,
+.bg-green-600:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 
 .bg-blue-500:hover { background-color: #2563eb; }
 .bg-green-500:hover { background-color: #059669; }
 .bg-purple-500:hover { background-color: #7c3aed; }
 .bg-red-500:hover { background-color: #dc2626; }
+.bg-blue-600:hover,
+.bg-blue-700:hover,
+button[type="submit"]:hover { background-color: #1d4ed8; }
+.bg-purple-600:hover { background-color: #6d28d9; }
+.bg-green-600:hover { background-color: #047857; }
+
+/* Active states */
+.bg-blue-500:active,
+.bg-green-500:active,
+.bg-purple-500:active,
+.bg-red-500:active,
+.bg-blue-600:active,
+.bg-blue-700:active,
+button[type="submit"]:active,
+.bg-purple-600:active,
+.bg-green-600:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark mode specific adjustments */
+html.dark .bg-blue-500,
+html.dark .bg-green-500,
+html.dark .bg-purple-500,
+html.dark .bg-red-500,
+html.dark .bg-blue-600,
+html.dark .bg-blue-700,
+html.dark button[type="submit"],
+html.dark .bg-purple-600,
+html.dark .bg-green-600 {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+html.dark .bg-blue-500 { background-color: #60a5fa; }
+html.dark .bg-green-500 { background-color: #34d399; }
+html.dark .bg-purple-500 { background-color: #a78bfa; }
+html.dark .bg-red-500 { background-color: #f87171; }
+html.dark .bg-blue-600,
+html.dark .bg-blue-700,
+html.dark button[type="submit"] { background-color: #3b82f6; }
+html.dark .bg-purple-600 { background-color: #a78bfa; }
+html.dark .bg-green-600 { background-color: #34d399; }
+
+html.dark .bg-blue-500:hover { background-color: #3b82f6; }
+html.dark .bg-green-500:hover { background-color: #10b981; }
+html.dark .bg-purple-500:hover { background-color: #8b5cf6; }
+html.dark .bg-red-500:hover { background-color: #ef4444; }
+html.dark .bg-blue-600:hover,
+html.dark .bg-blue-700:hover,
+html.dark button[type="submit"]:hover { background-color: #2563eb; }
+html.dark .bg-purple-600:hover { background-color: #8b5cf6; }
+html.dark .bg-green-600:hover { background-color: #10b981; }
+
+html.dark .bg-blue-500:hover,
+html.dark .bg-green-500:hover,
+html.dark .bg-purple-500:hover,
+html.dark .bg-red-500:hover,
+html.dark .bg-blue-600:hover,
+html.dark .bg-blue-700:hover,
+html.dark button[type="submit"]:hover,
+html.dark .bg-purple-600:hover,
+html.dark .bg-green-600:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Button focus states */
+.bg-blue-500:focus,
+.bg-green-500:focus, 
+.bg-purple-500:focus, 
+.bg-red-500:focus,
+.bg-blue-600:focus,
+.bg-blue-700:focus,
+button[type="submit"]:focus,
+.bg-purple-600:focus,
+.bg-green-600:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+html.dark .bg-blue-500:focus,
+html.dark .bg-green-500:focus, 
+html.dark .bg-purple-500:focus, 
+html.dark .bg-red-500:focus,
+html.dark .bg-blue-600:focus,
+html.dark .bg-blue-700:focus,
+html.dark button[type="submit"]:focus,
+html.dark .bg-purple-600:focus,
+html.dark .bg-green-600:focus {
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5);
+}
+
+/* Improved button sizing and padding */
+.px-3.py-2 {
+  padding: 0.6rem 1rem;
+  border-radius: 0.375rem;
+}
 
 /* Admin panel and form button fixes */
 .bg-blue-600,
