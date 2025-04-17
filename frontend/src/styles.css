@@ -502,10 +502,19 @@ html.dark .avatar-container {
   border-color: #4b5563;
 }
 
-/* Admin panel fronting avatar fix */
-.max-w-md.mx-auto.mt-8 .flex.items-center .w-12.h-12 {
-  width: 4.5rem;
-  height: 4.5rem;
+/* Fix for current fronting avatar in admin panel */
+.flex.items-center .w-12.h-12.rounded-full {
+  overflow: hidden;
+  position: relative;
+}
+
+.flex.items-center .w-12.h-12.rounded-full img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* ===== MEMBER GRID LAYOUT ===== */

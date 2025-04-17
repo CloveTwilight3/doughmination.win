@@ -9,6 +9,10 @@ const useTheme = () => {
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    
+    // Dispatch a custom event to notify theme change
+    const event = new CustomEvent('themeChanged', { detail: { theme: newTheme } });
+    document.dispatchEvent(event);
   };
 
   useEffect(() => {
