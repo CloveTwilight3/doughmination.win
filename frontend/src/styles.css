@@ -18,11 +18,13 @@ body {
   max-width: 100vw;
 }
 
-/* Pink to white gradient for light mode */
+/* Pink to white gradient for light mode - stronger version */
 body {
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #fce7f3 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #fbcfe8 0%, #ffffff 100%);
   background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
   color: #111827;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -31,6 +33,8 @@ body {
 html.dark body {
   background: linear-gradient(135deg, #8b5cf6 0%, #1e1b4b 35%, #000000 100%);
   background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
   color: #fff;
 }
 
