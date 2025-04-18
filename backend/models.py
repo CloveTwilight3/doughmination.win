@@ -22,3 +22,6 @@ class UserResponse(BaseModel):
 
 class UserUpdate(BaseModel):
     display_name: Optional[str] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
+    avatar_url: Optional[str] = None

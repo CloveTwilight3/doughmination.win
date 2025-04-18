@@ -61,13 +61,25 @@ def update_user(user_id: str, user_update: UserUpdate) -> Optional[User]:
     
     for i, user in enumerate(users):
         if user.id == user_id:
+            # Verify current password if attempting to change password
+            if user_update.current_password and user_update.new_password:
+                if not bcrypt.verify(user_update.current_password, user.password_hash):
+                    raise ValueError("Current password is incorrect")
+                
+                # Update password hash
+                password_hash = bcrypt.hash(user_update.new_password)
+            else:
+                # Keep existing password
+                password_hash = user.password_hash
+            
             # Update the user
             updated_user = User(
                 id=user.id,
                 username=user.username,
-                password_hash=user.password_hash,
+                password_hash=password_hash,
                 display_name=user_update.display_name if user_update.display_name is not None else user.display_name,
-                is_admin=user.is_admin
+                is_admin=user.is_admin,
+                avatar_url=user_update.avatar_url if user_update.avatar_url is not None else getattr(user, 'avatar_url', None)
             )
             users[i] = updated_user
             save_users(users)

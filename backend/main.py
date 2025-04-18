@@ -1,8 +1,12 @@
-from fastapi import FastAPI, HTTPException, Request, Depends, Security, status
+from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile
+from typing import Optional
+import uuid
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
-from auth import router as auth_router, get_current_user, oauth2_scheme
+from auth import router as auth_router, get_current_user, 
+import shutil
+import aiofiles
 import os
 from fastapi.security import SecurityScopes
 from jose import JWTError
@@ -11,10 +15,15 @@ from models import UserCreate, UserResponse, UserUpdate
 from users import get_users, create_user, delete_user, initialize_admin_user, update_user
 from typing import List
 from metrics import get_fronting_time_metrics, get_switch_frequency_metrics
+from pathlib import Path
 
 load_dotenv()
 
 app = FastAPI()
+
+# Create upload directory if it doesn't exist
+UPLOAD_DIR = Path("avatars")
+UPLOAD_DIR.mkdir(exist_ok=True)
 
 # Initialize the admin user if no users exist
 initialize_admin_user()
