@@ -11,6 +11,9 @@ load_dotenv()
 
 router = APIRouter()
 
+# Debug environment variables
+print("==== AUTH DEBUGGING ====")
+print(f"JWT_SECRET available: {'Yes, length: ' + str(len(os.getenv('JWT_SECRET'))) if os.getenv('JWT_SECRET') else 'No'}")
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key-for-jwt")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
@@ -19,14 +22,40 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
 @router.post("/api/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    print(f"Login attempt: username='{form_data.username}', password_length={len(form_data.password)}")
+    
+    # Debug: Check if the user exists
+    existing_user = get_user_by_username(form_data.username)
+    if existing_user:
+        print(f"User found in database: id={existing_user.id}")
+        print(f"  username='{existing_user.username}'")
+        print(f"  is_admin={existing_user.is_admin}")
+        print(f"  password_hash_starts_with='{existing_user.password_hash[:10]}...'")
+    else:
+        print(f"User NOT found in database: '{form_data.username}'")
+    
+    # Try authenticate
     user = verify_user(form_data.username, form_data.password)
     if not user:
+        print(f"Authentication FAILED for: '{form_data.username}'")
+        if existing_user:
+            print("  User exists but password verification failed")
+            # Debug the bcrypt verification process
+            from passlib.hash import bcrypt
+            try:
+                is_valid = bcrypt.verify(form_data.password, existing_user.password_hash)
+                print(f"  Bcrypt verify result: {is_valid}")
+            except Exception as e:
+                print(f"  Bcrypt error: {str(e)}")
+        
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
+    
+    print(f"Authentication SUCCESS for: '{form_data.username}'")
+    
     token = jwt.encode({
         "sub": user.username,
         "id": user.id,
