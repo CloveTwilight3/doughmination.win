@@ -220,14 +220,14 @@ function App() {
 
   return (
     <div className="max-w-6xl mx-auto text-black dark:text-white">
-      {/* Updated navbar with hamburger menu */}
+      {/* Updated navbar with improved hamburger menu */}
       <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Link to="/" className="text-lg font-semibold z-10">Doughmination System</Link>
           
-          {/* Mobile menu button */}
+          {/* Improved Mobile menu button - more visible */}
           <button 
-            className="md:hidden p-2 text-gray-700 dark:text-gray-200 focus:outline-none"
+            className="md:hidden flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             onClick={toggleMobileMenu}
             aria-label="Toggle menu"
           >
@@ -306,18 +306,19 @@ function App() {
           </nav>
         </div>
         
-        {/* Mobile navigation menu - slides down when open */}
+        {/* Improved Mobile navigation menu - with better styling and only on mobile */}
         <div 
           className={`md:hidden absolute w-full bg-white dark:bg-gray-800 shadow-md transition-all duration-300 ease-in-out z-5 ${
-            mobileMenuOpen ? 'max-h-96 py-3 opacity-100' : 'max-h-0 py-0 opacity-0 overflow-hidden'
+            mobileMenuOpen ? 'max-h-[500px] opacity-100 py-4 border-t border-gray-200 dark:border-gray-700' : 'max-h-0 py-0 opacity-0 overflow-hidden border-none'
           }`}
+          style={{ top: '100%' }}
         >
           <div className="container mx-auto px-4">
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-3">
               <li>
                 <button
                   onClick={toggleTheme}
-                  className="w-full px-3 py-2 bg-blue-500 text-white rounded-lg text-sm text-center"
+                  className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
                 >
                   {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
                 </button>
@@ -326,7 +327,7 @@ function App() {
                 <li>
                   <Link 
                     to="/admin/metrics"
-                    className="block w-full px-3 py-2 bg-purple-500 text-white rounded-lg text-sm text-center"
+                    className="block w-full px-4 py-3 bg-purple-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
                   >
                     Metrics
                   </Link>
@@ -336,7 +337,7 @@ function App() {
                 <li>
                   <Link 
                     to="/admin/user"
-                    className="block w-full px-3 py-2 bg-purple-500 text-white rounded-lg text-sm text-center"
+                    className="block w-full px-4 py-3 bg-purple-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
                   >
                     My Profile
                   </Link>
@@ -348,7 +349,7 @@ function App() {
                     <li>
                       <Link 
                         to="/admin/dashboard"
-                        className="block w-full px-3 py-2 bg-purple-500 text-white rounded-lg text-sm text-center"
+                        className="block w-full px-4 py-3 bg-purple-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
                       >
                         Admin Panel
                       </Link>
@@ -357,7 +358,7 @@ function App() {
                   <li>
                     <button
                       onClick={handleLogout}
-                      className="w-full px-3 py-2 bg-red-500 text-white rounded-lg text-sm text-center"
+                      className="w-full px-4 py-3 bg-red-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
                     >
                       Logout
                     </button>
@@ -367,7 +368,7 @@ function App() {
                 <li>
                   <Link 
                     to="/admin/login"
-                    className="block w-full px-3 py-2 bg-green-500 text-white rounded-lg text-sm text-center"
+                    className="block w-full px-4 py-3 bg-green-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
                   >
                     Login
                   </Link>
