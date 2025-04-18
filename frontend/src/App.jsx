@@ -6,7 +6,9 @@ import Login from './Login.jsx';
 import AdminDashboard from './AdminDashboard.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import Welcome from './Welcome.jsx';
-import Metrics from './Metrics.jsx'; // Import the Metrics component
+import Metrics from './Metrics.jsx';
+import UserProfile from './UserProfile.jsx';
+import UserEdit from './UserEdit.jsx';
 
 function App() {
   const [members, setMembers] = useState([]);
@@ -232,6 +234,16 @@ function App() {
                   </Link>
                 </li>
               )}
+              {loggedIn && (
+                <li>
+                  <Link 
+                    to="/admin/user"
+                    className="px-3 py-2 bg-purple-500 text-white rounded-lg text-sm"
+                  >
+                    My Profile
+                  </Link>
+                </li>
+              )}
               {loggedIn ? (
                 <>
                   {isAdmin && (
@@ -357,6 +369,19 @@ function App() {
               navigate('/');
             });
           }} />} />
+          
+          {/* User Profile Routes */}
+          <Route path="/admin/user" element={
+            <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
+              <UserProfile />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admin/user/edit" element={
+            <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
+              <UserEdit />
+            </ProtectedRoute>
+          } />
           
           {/* Protected Admin Routes */}
           <Route path="/admin/dashboard" element={
