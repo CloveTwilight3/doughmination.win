@@ -72,6 +72,14 @@ const UserEdit = () => {
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Check file size (limit to 2MB)
+      const fileSizeInMB = file.size / (1024 * 1024);
+      if (fileSizeInMB > 2) {
+        setError("Image file is too large. Please select an image under 2MB.");
+        e.target.value = ''; // Clear the file input
+        return;
+      }
+      
       setAvatar(file);
       
       // Create a preview URL
@@ -80,6 +88,12 @@ const UserEdit = () => {
         setAvatarPreview(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDiscardChanges = () => {
+    if (window.confirm("Are you sure you want to discard your changes?")) {
+      navigate('/admin/user');
     }
   };
 
@@ -163,6 +177,10 @@ const UserEdit = () => {
         });
         
         if (!avatarResponse.ok) {
+          // If we get a 413 error, show a specific message
+          if (avatarResponse.status === 413) {
+            throw new Error("The image file is too large. Please select an image under 2MB.");
+          }
           throw new Error(`Failed to upload avatar: ${avatarResponse.status}`);
         }
       }
@@ -181,7 +199,13 @@ const UserEdit = () => {
       fetchUserData();
     } catch (error) {
       console.error('Error updating profile:', error);
-      setError(error.message);
+      
+      // Improved error messages
+      if (error.message.includes("413")) {
+        setError("The image file is too large. Please select an image under 2MB.");
+      } else {
+        setError(error.message);
+      }
     } finally {
       setSaving(false);
     }
@@ -360,12 +384,13 @@ const UserEdit = () => {
         
         {/* Submit Buttons */}
         <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <Link 
-            to="/admin/user" 
+          <button 
+            type="button" 
+            onClick={handleDiscardChanges}
             className="px-4 py-2 bg-gray-500 text-white rounded-lg transition-colors text-center"
           >
-            Cancel
-          </Link>
+            Discard Changes
+          </button>
           <button 
             type="submit" 
             disabled={saving}
