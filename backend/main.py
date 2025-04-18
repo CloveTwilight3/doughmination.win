@@ -2,18 +2,21 @@ from fastapi import FastAPI, HTTPException, Request, Depends, Security, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
-from auth import router as auth_router, get_current_user, oauth2_scheme  # Import auth
+from auth import router as auth_router, get_current_user, oauth2_scheme
 import os
 from fastapi.security import SecurityScopes
 from jose import JWTError
 from dotenv import load_dotenv
+from models import UserCreate, UserResponse
+from users import get_users, create_user, delete_user, initialize_admin_user
+from typing import List
 
 load_dotenv()
 
 app = FastAPI()
 
-# Get environment variables
-ADMIN_USERNAME = os.getenv("USERNAME")
+# Initialize the admin user if no users exist
+initialize_admin_user()
 
 # CORS - Updated for local development
 app.add_middleware(
@@ -67,7 +70,7 @@ async def member_detail(member_id: str):
         raise HTTPException(status_code=500, detail=f"Failed to fetch member details: {str(e)}")
 
 @app.post("/api/switch")
-async def switch_front(request: Request, user: str = Depends(get_current_user)):
+async def switch_front(request: Request, user = Depends(get_current_user)):
     try:
         body = await request.json()
         member_ids = body.get("members", [])
@@ -82,7 +85,7 @@ async def switch_front(request: Request, user: str = Depends(get_current_user)):
 
 # New endpoint to match frontend's AdminDashboard component
 @app.post("/api/switch_front")
-async def switch_single_front(request: Request, user: str = Depends(get_current_user)):
+async def switch_single_front(request: Request, user = Depends(get_current_user)):
     try:
         body = await request.json()
         member_id = body.get("member_id")
@@ -106,7 +109,42 @@ async def switch_single_front(request: Request, user: str = Depends(get_current_
         
 # Add admin check endpoint
 @app.get("/api/is_admin")
-async def check_admin(user: str = Depends(get_current_user)):
-    # Since we only have one admin user, we can simply check if the authenticated
-    # user matches the admin username from environment variables
-    return {"isAdmin": user == ADMIN_USERNAME}
+async def check_admin(user = Depends(get_current_user)):
+    return {"isAdmin": user.is_admin}
+
+# User management endpoints
+@app.get("/api/users", response_model=List[UserResponse])
+async def list_users(current_user = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    users = get_users()
+    return [UserResponse(id=user.id, username=user.username, is_admin=user.is_admin) for user in users]
+
+@app.post("/api/users", response_model=UserResponse)
+async def add_user(user_create: UserCreate, current_user = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        new_user = create_user(user_create)
+        return UserResponse(id=new_user.id, username=new_user.username, is_admin=new_user.is_admin)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create user: {str(e)}")
+
+@app.delete("/api/users/{user_id}")
+async def remove_user(user_id: str, current_user = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    # Prevent self-deletion
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    success = delete_user(user_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User deleted successfully"}

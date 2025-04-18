@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import UserManagement from './UserManagement'; // Import the new component
 
 export default function AdminDashboard({ fronting }) {
   const [newFront, setNewFront] = useState("");
@@ -92,7 +93,7 @@ export default function AdminDashboard({ fronting }) {
   const currentFronting = fronting?.members?.[0];
 
   return (
-    <div className="max-w-md mx-auto mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div className="max-w-4xl mx-auto mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6 text-center">Admin Dashboard</h1>
       
       {message && (
@@ -153,6 +154,9 @@ export default function AdminDashboard({ fronting }) {
           </div>
         </div>
       </div>
+      
+      {/* User Management Section */}
+      <UserManagement />
       
       <div className="mt-6 pt-4 border-t dark:border-gray-700">
         <Link to="/" className="text-blue-500 dark:text-blue-400">

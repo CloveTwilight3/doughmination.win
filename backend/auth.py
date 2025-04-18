@@ -1,30 +1,36 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
-from passlib.hash import bcrypt
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+from users import verify_user, get_user_by_username
+from models import UserResponse
 
 load_dotenv()
 
 router = APIRouter()
 
-USERNAME = os.getenv("USERNAME")
-PASSWORD_HASH = os.getenv("PASSWORD_HASH")
-JWT_SECRET = os.getenv("JWT_SECRET")
+JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key-for-jwt")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
 @router.post("/api/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    if form_data.username != USERNAME or not bcrypt.verify(form_data.password, PASSWORD_HASH):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    user = verify_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     token = jwt.encode({
-        "sub": form_data.username,
+        "sub": user.username,
+        "id": user.id,
+        "admin": user.is_admin,
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }, JWT_SECRET, algorithm=ALGORITHM)
 
@@ -33,6 +39,22 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
-        return payload["sub"]
+        username = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        user = get_user_by_username(username)
+        if user is None:
+            raise HTTPException(status_code=401, detail="User not found")
+            
+        return user
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+@router.get("/api/user_info", response_model=UserResponse)
+def get_user_info(user = Depends(get_current_user)):
+    return UserResponse(
+        id=user.id,
+        username=user.username,
+        is_admin=user.is_admin
+    )

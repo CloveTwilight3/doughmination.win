@@ -5,6 +5,7 @@ import MemberDetails from './MemberDetails.jsx';
 import Login from './Login.jsx';
 import AdminDashboard from './AdminDashboard.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
+import Welcome from './Welcome.jsx'; // Import the Welcome component
 
 function App() {
   const [members, setMembers] = useState([]);
@@ -138,7 +139,7 @@ function App() {
       {/* IMPORTANT: Updated navbar structure */}
       <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <Link to="/" className="text-lg font-semibold">Doughmination System Website</Link>
+          <Link to="/" className="text-lg font-semibold">System</Link>
           <nav>
             <ul className="flex items-center gap-3">
               <li>
@@ -189,6 +190,9 @@ function App() {
       <div className="pt-16"></div>
 
       <main className="container mx-auto px-4 pt-4">
+        {/* Welcome component - will only display when logged in */}
+        <Welcome loggedIn={loggedIn} isAdmin={isAdmin} />
+        
         <h1 className="text-2xl font-bold mt-8 mb-6 text-center text-black dark:text-white">
           System Members: 
         </h1> 
