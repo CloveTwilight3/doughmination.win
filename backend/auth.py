@@ -30,6 +30,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     token = jwt.encode({
         "sub": user.username,
         "id": user.id,
+        "display_name": user.display_name,
         "admin": user.is_admin,
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }, JWT_SECRET, algorithm=ALGORITHM)
@@ -56,5 +57,6 @@ def get_user_info(user = Depends(get_current_user)):
     return UserResponse(
         id=user.id,
         username=user.username,
+        display_name=user.display_name,
         is_admin=user.is_admin
     )
