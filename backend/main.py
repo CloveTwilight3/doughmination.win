@@ -148,3 +148,20 @@ async def remove_user(user_id: str, current_user = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="User not found")
     
     return {"message": "User deleted successfully"}
+
+@app.put("/api/users/{user_id}")
+async def update_user_info(user_id: str, user_update: UserUpdate, current_user = Depends(get_current_user)):
+    # Only admins or the user themselves can update their info
+    if not current_user.is_admin and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this user")
+    
+    updated_user = update_user(user_id, user_update)
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return UserResponse(
+        id=updated_user.id,
+        username=updated_user.username,
+        display_name=updated_user.display_name,
+        is_admin=updated_user.is_admin
+    )

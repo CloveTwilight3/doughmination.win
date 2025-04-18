@@ -3,7 +3,7 @@ import os
 import uuid
 from typing import List, Optional
 from passlib.hash import bcrypt
-from models import User, UserCreate, UserResponse
+from models import User, UserCreate, UserResponse, UserUpdate
 import time
 
 USERS_FILE = "users.json"
@@ -47,6 +47,7 @@ def create_user(user_create: UserCreate) -> User:
         id=str(uuid.uuid4()),
         username=user_create.username,
         password_hash=bcrypt.hash(user_create.password),
+        display_name=user_create.display_name,
         is_admin=user_create.is_admin
     )
     
@@ -54,6 +55,25 @@ def create_user(user_create: UserCreate) -> User:
     save_users(users)
     
     return new_user
+
+def update_user(user_id: str, user_update: UserUpdate) -> Optional[User]:
+    users = get_users()
+    
+    for i, user in enumerate(users):
+        if user.id == user_id:
+            # Update the user
+            updated_user = User(
+                id=user.id,
+                username=user.username,
+                password_hash=user.password_hash,
+                display_name=user_update.display_name if user_update.display_name is not None else user.display_name,
+                is_admin=user.is_admin
+            )
+            users[i] = updated_user
+            save_users(users)
+            return updated_user
+    
+    return None
 
 def delete_user(user_id: str) -> bool:
     users = get_users()
@@ -84,6 +104,7 @@ def initialize_admin_user():
     if not users:
         admin_username = os.getenv("ADMIN_USERNAME", "admin")
         admin_password = os.getenv("ADMIN_PASSWORD")
+        admin_display_name = os.getenv("ADMIN_DISPLAY_NAME", "Administrator")
         
         if not admin_password:
             print("Warning: No ADMIN_PASSWORD set in environment. Using default password 'admin'")
@@ -93,8 +114,9 @@ def initialize_admin_user():
             create_user(UserCreate(
                 username=admin_username,
                 password=admin_password,
+                display_name=admin_display_name,
                 is_admin=True
             ))
-            print(f"Created admin user: {admin_username}")
+            print(f"Created admin user: {admin_username} (Display name: {admin_display_name})")
         except Exception as e:
             print(f"Error creating admin user: {e}")

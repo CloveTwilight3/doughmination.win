@@ -5,14 +5,20 @@ class User(BaseModel):
     id: str
     username: str
     password_hash: str
+    display_name: Optional[str] = None
     is_admin: bool = False
 
 class UserCreate(BaseModel):
     username: str
     password: str
+    display_name: Optional[str] = None
     is_admin: bool = False
 
 class UserResponse(BaseModel):
     id: str
     username: str
+    display_name: Optional[str] = None
     is_admin: bool = False
+
+class UserUpdate(BaseModel):
+    display_name: Optional[str] = None
