@@ -20,24 +20,44 @@ HEADERS = {
 
 def parse_timestamp(timestamp_str: str) -> datetime:
     """Parse timestamp string into datetime with proper timezone handling"""
-    # Check if timestamp has the problematic microsecond format
-    microsecond_match = re.match(r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{5,6})(\+\d{2}:\d{2})', timestamp_str)
-    if microsecond_match:
-        # Truncate microseconds to 6 digits and rebuild the string
-        timestamp_str = f"{microsecond_match.group(1)[:26]}{microsecond_match.group(2)}"
-    
-    # Handle Z timezone
-    if timestamp_str.endswith('Z'):
-        timestamp_str = timestamp_str[:-1] + '+00:00'
-    
-    # Create offset-aware datetime
-    dt = datetime.fromisoformat(timestamp_str)
-    
-    # Ensure it's timezone-aware
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    
-    return dt
+    try:
+        # Handle Z timezone
+        if timestamp_str.endswith('Z'):
+            timestamp_str = timestamp_str[:-1] + '+00:00'
+        
+        # Try direct parsing first
+        try:
+            dt = datetime.fromisoformat(timestamp_str)
+        except ValueError:
+            # If direct parsing fails, try handling microsecond precision issues
+            match = re.match(r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+)(\+\d{2}:\d{2})', timestamp_str)
+            if match:
+                # Truncate microseconds to 6 digits and rebuild the string
+                base = match.group(1)
+                if len(base.split('.')[-1]) > 6:
+                    base = base.split('.')[0] + '.' + base.split('.')[-1][:6]
+                timestamp_str = f"{base}{match.group(2)}"
+                dt = datetime.fromisoformat(timestamp_str)
+            else:
+                # Try another approach for microsecond issues
+                parts = timestamp_str.split('.')
+                if len(parts) == 2 and '+' in parts[1]:
+                    ms_part, tz_part = parts[1].split('+', 1)
+                    if len(ms_part) > 6:
+                        ms_part = ms_part[:6]
+                    timestamp_str = f"{parts[0]}.{ms_part}+{tz_part}"
+                    dt = datetime.fromisoformat(timestamp_str)
+                else:
+                    raise ValueError(f"Could not parse timestamp: {timestamp_str}")
+        
+        # Ensure it's timezone-aware
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        
+        return dt
+    except Exception as e:
+        print(f"Error parsing timestamp {timestamp_str}: {str(e)}")
+        raise
 
 async def get_switches(limit: int = 1000) -> List[Dict[str, Any]]:
     """Get recent switches from PluralKit"""
