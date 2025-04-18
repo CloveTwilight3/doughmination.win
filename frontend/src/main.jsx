@@ -4,9 +4,11 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './styles.css';
 
+// Initialize the application
 const rootElement = document.getElementById('root');
 const root = ReactDOM.createRoot(rootElement);
 
+// Render the application with routing
 root.render(
   <BrowserRouter>
     <App />
