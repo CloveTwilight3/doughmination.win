@@ -188,6 +188,38 @@ nav ul li {
   padding-top: 4rem;
 }
 
+/* Mobile Navigation Improvements */
+/* Hamburger menu styles */
+.md\:hidden.p-2 {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Mobile menu transition */
+.max-h-0 {
+  transition: all 0.3s ease-in-out;
+}
+
+.max-h-96 {
+  transition: all 0.5s ease-in-out;
+}
+
+/* Fix for the mobile menu positioning */
+@media (max-width: 768px) {
+  header.fixed .container {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .md\:hidden.absolute.w-full {
+    top: calc(100% - 1px);
+    left: 0;
+    right: 0;
+    z-index: 40;
+  }
+}
+
 /* ===== BUTTONS & INTERACTIVE ELEMENTS ===== */
 button,
 a[class*="px-"],
@@ -531,10 +563,6 @@ html.dark div[class*="border-b"] {
   width: 100%;
 }
 
-html.dark .border-section-divider {
-  border-bottom: 1px solid #4b5563;
-}
-
 /* ===== FLEX CONTAINER FIXES ===== */
 .flex.flex-col.items-center {
   display: flex;
@@ -590,6 +618,195 @@ html.dark .github-button:hover {
   fill: white;
 }
 
+/* ===== IMPROVED MOBILE EXPERIENCE ===== */
+
+/* Improved table scrolling on mobile */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: 0.5rem;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 4px;
+}
+
+/* Scrollbar Track */
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+/* Scrollbar Handle */
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 10px;
+}
+
+/* Improved scrolling for time range selector */
+.overflow-x-auto.pb-2 .flex.flex-nowrap {
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;  /* Space for scrollbar */
+}
+
+/* Fix tab overflow issues */
+.flex.mb-6.overflow-x-auto.border-b {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;  /* Firefox */
+}
+
+.flex.mb-6.overflow-x-auto.border-b::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Edge */
+}
+
+/* Add right padding to make sure last tab is fully visible */
+.flex.mb-6.overflow-x-auto.border-b button:last-child {
+  margin-right: 1rem;
+}
+
+/* ===== MOBILE RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 640px) {
+  header.fixed .container {
+    flex-wrap: wrap;
+  }
+  
+  nav ul.flex {
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  
+  .member-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .avatar-container,
+  .fronting-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+  
+  .member-name {
+    font-size: 0.8rem;
+  }
+  
+  /* Better tap targets for mobile */
+  button, 
+  a.px-3.py-2,
+  .px-3.py-2,
+  .rounded-lg,
+  nav a,
+  nav button {
+    min-height: 44px;  /* Apple's recommended minimum */
+    padding: 0.6rem 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Allow text truncation in tables */
+  td .truncate {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Fix table padding on small screens */
+  th, td {
+    padding: 0.5rem 0.5rem;
+  }
+  
+  /* Better padding for mobile containers */
+  .container, 
+  .max-w-4xl,
+  .max-w-2xl {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  /* Fix member name text */
+  .member-name {
+    font-size: 0.7rem;
+    line-height: 1.2;
+    margin-top: 0.4rem;
+  }
+  
+  /* More compact headings */
+  h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  /* More compact margins */
+  .mb-6 {
+    margin-bottom: 1rem;
+  }
+  
+  .mt-8 {
+    margin-top: 1.5rem;
+  }
+  
+  /* Better switch metrics display on mobile */
+  .grid.grid-cols-2 > div,
+  .grid.grid-cols-3 > div {
+    padding: 0.5rem;
+  }
+  
+  /* Improve form elements on mobile */
+  input, select, textarea {
+    font-size: 16px !important; /* Prevent iOS zoom on focus */
+  }
+}
+
+/* ===== iOS ENHANCEMENT STYLES ===== */
+
+/* Improved responsive padding to account for iOS notches and UI elements */
+@supports (padding: max(0px)) {
+  body, header.fixed {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  
+  body {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  header.fixed {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+}
+
+/* iPhone notch/dynamic island adjustments */
+@supports (padding-top: env(safe-area-inset-top)) {
+  header.fixed {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    height: calc(60px + env(safe-area-inset-top));
+  }
+  
+  .container.mx-auto.px-4.py-3 {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .pt-16 {
+    padding-top: calc(60px + env(safe-area-inset-top));
+  }
+  
+  /* Adjust padding for bottom of iOS */
+  footer.github-footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 /* ===== LOGO ANIMATIONS ===== */
 .logo {
   height: 6em;
@@ -619,199 +836,4 @@ html.dark .github-button:hover {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
-}
-
-/* ===== MOBILE RESPONSIVE ADJUSTMENTS ===== */
-@media (max-width: 640px) {
-  header.fixed .container {
-    flex-wrap: wrap;
-  }
-  
-  nav ul.flex {
-    justify-content: center;
-    margin-top: 0.5rem;
-  }
-  
-  .member-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 1rem;
-  }
-  
-  .avatar-container,
-  .fronting-avatar {
-    width: 3.5rem;
-    height: 3.5rem;
-  }
-  
-  .member-name {
-    font-size: 0.8rem;
-  }
-}
-
-/* ===== iOS ENHANCEMENT STYLES ===== */
-
-/* Improved responsive padding to account for iOS notches and UI elements */
-@supports (padding: max(0px)) {
-  body, header.fixed {
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-  }
-  
-  body {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
-  
-  header.fixed {
-    padding-top: max(0.5rem, env(safe-area-inset-top));
-  }
-}
-
-/* Mobile improvements */
-@media (max-width: 640px) {
-  /* Improved member grid for mobile */
-  .member-grid {
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 10px;
-    padding: 0.5rem;
-  }
-  
-  .member-grid-item {
-    padding: 0;
-  }
-  
-  .member-grid-item a {
-    padding: 0.5rem;
-  }
-  
-  .avatar-container {
-    width: 3.5rem;
-    height: 3.5rem;
-  }
-  
-  .member-name {
-    font-size: 0.75rem;
-    margin-top: 0.5rem;
-  }
-  
-  /* Fix button sizes for better touch targets */
-  button, 
-  a.px-3.py-2,
-  .px-3.py-2 {
-    padding: 0.5rem 0.75rem;
-    min-height: 44px; /* Apple's recommended minimum touch target size */
-    min-width: 44px;
-  }
-  
-  /* Improve form elements on mobile */
-  input, select, textarea {
-    font-size: 16px !important; /* Prevent iOS zoom on focus */
-  }
-  
-  /* Fix table display on small screens */
-  table {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  td, th {
-    white-space: nowrap;
-  }
-  
-  /* Stack grid columns on very small screens */
-  .grid.grid-cols-3,
-  .grid.grid-cols-5 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .grid.gap-4 {
-    gap: 0.5rem;
-  }
-  
-  /* GitHub footer mobile styles */
-  .github-footer {
-    padding: 1rem 0;
-    margin-top: 2rem;
-  }
-  
-  .github-button {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-  }
-}
-
-/* Fix for screens with notches */
-@supports (padding: env(safe-area-inset-top)) {
-  header.fixed {
-    padding-top: env(safe-area-inset-top);
-  }
-  
-  .pt-16 {
-    padding-top: calc(60px + env(safe-area-inset-top));
-  }
-}
-
-/* ===== BUTTON SIZE STANDARDIZATION ===== */
-
-/* Standard button size and styling for all buttons in the navbar */
-header.fixed nav button,
-header.fixed nav a.px-3,
-header.fixed nav .px-3.py-2,
-header.fixed nav a[class*="bg-"] {
-  min-width: 110px; /* Fixed width for all buttons */
-  height: 40px;     /* Fixed height for all buttons */
-  padding: 0.5rem 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-/* Make sure all header buttons have consistent look */
-header.fixed nav .bg-blue-500,
-header.fixed nav .bg-purple-500,
-header.fixed nav .bg-green-500,
-header.fixed nav .bg-red-500 {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-}
-
-/* Hover effects for header buttons */
-header.fixed nav .bg-blue-500:hover,
-header.fixed nav .bg-purple-500:hover,
-header.fixed nav .bg-green-500:hover,
-header.fixed nav .bg-red-500:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-}
-
-/* For mobile devices, adjust the button sizes to fit smaller screens */
-@media (max-width: 768px) {
-  header.fixed nav button,
-  header.fixed nav a.px-3,
-  header.fixed nav .px-3.py-2,
-  header.fixed nav a[class*="bg-"] {
-    min-width: 90px;
-    font-size: 0.75rem;
-  }
-  
-  /* Adjust spacing between buttons */
-  nav ul.flex {
-    gap: 0.25rem;
-  }
-}
-
-/* Fix any flex issues in the navbar */
-header.fixed nav ul {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-}
-
-header.fixed nav ul li {
-  display: flex;
 }
