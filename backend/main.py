@@ -7,8 +7,8 @@ import os
 from fastapi.security import SecurityScopes
 from jose import JWTError
 from dotenv import load_dotenv
-from models import UserCreate, UserResponse
-from users import get_users, create_user, delete_user, initialize_admin_user
+from models import UserCreate, UserResponse, UserUpdate
+from users import get_users, create_user, delete_user, initialize_admin_user, update_user
 from typing import List
 
 load_dotenv()
