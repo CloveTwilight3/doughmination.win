@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.base import BaseHTTPMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
 from auth import router as auth_router, get_current_user, oauth2_scheme
 import os
@@ -23,6 +24,25 @@ app = FastAPI()
 # Initialize the admin user if no users exist
 initialize_admin_user()
 
+# File size limit middleware
+class FileSizeLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.method == 'POST' and '/avatar' in request.url.path:
+            try:
+                # 2MB in bytes
+                MAX_SIZE = 2 * 1024 * 1024
+                content_length = request.headers.get('content-length')
+                if content_length and int(content_length) > MAX_SIZE:
+                    return JSONResponse(
+                        status_code=413,
+                        content={"detail": "File size exceeds the limit of 2MB"}
+                    )
+            except:
+                pass
+        
+        response = await call_next(request)
+        return response
+
 # CORS - Updated for local development
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +51,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add the file size limit middleware
+app.add_middleware(FileSizeLimitMiddleware)
 
 # Include login route
 app.include_router(auth_router)
@@ -211,8 +234,28 @@ async def upload_user_avatar(
     if avatar.content_type not in valid_types:
         raise HTTPException(status_code=400, detail="Invalid file type. Only JPEG, PNG, and GIF are allowed.")
     
+    # Validate file size (2MB limit)
+    MAX_SIZE = 2 * 1024 * 1024  # 2MB in bytes
+    
+    # Check content-length header first for quick rejection
+    content_length = int(avatar.headers.get("content-length", 0))
+    if content_length > MAX_SIZE:
+        raise HTTPException(status_code=413, detail="File size exceeds the limit of 2MB")
+    
+    # Read the file in chunks to validate size
+    file_size = 0
+    content = b""
+    
+    chunk = await avatar.read(1024)
+    while chunk:
+        content += chunk
+        file_size += len(chunk)
+        if file_size > MAX_SIZE:
+            raise HTTPException(status_code=413, detail="File size exceeds the limit of 2MB")
+        chunk = await avatar.read(1024)
+    
     # Generate unique filename
-    file_ext = avatar.filename.split(".")[-1]
+    file_ext = avatar.filename.split(".")[-1].lower()
     unique_filename = f"{user_id}_{uuid.uuid4()}.{file_ext}"
     file_path = UPLOAD_DIR / unique_filename
     
@@ -232,7 +275,6 @@ async def upload_user_avatar(
         
         # Save the new file
         async with aiofiles.open(file_path, 'wb') as out_file:
-            content = await avatar.read()
             await out_file.write(content)
         
         # Update user with avatar URL
