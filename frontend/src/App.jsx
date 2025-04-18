@@ -105,33 +105,7 @@ function App() {
     };
 
     initialize();
-    
-    // Add event listener to close menu when clicking outside
-    const handleClickOutside = (e) => {
-      if (mobileMenuOpen && !e.target.closest('.mobile-menu-container') && !e.target.closest('.mobile-menu-button')) {
-        setMobileMenuOpen(false);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    
-    // Close mobile menu when route changes
-    const closeMenu = () => setMobileMenuOpen(false);
-    window.addEventListener('popstate', closeMenu);
-    
-    // Lock body scroll when mobile menu is open
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('popstate', closeMenu);
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
+  }, []);
 
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
@@ -227,7 +201,6 @@ function App() {
     localStorage.removeItem("token");
     setLoggedIn(false);
     setIsAdmin(false);
-    setMobileMenuOpen(false);
     navigate('/');
   }
 
@@ -235,28 +208,11 @@ function App() {
 
   return (
     <div className="max-w-6xl mx-auto text-black dark:text-white">
-      {/* Mobile-friendly header */}
+      {/* IMPORTANT: Updated navbar structure */}
       <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Link to="/" className="text-lg font-semibold">Doughmination System</Link>
-          
-          {/* Mobile menu button - only visible on small screens */}
-          <button 
-            className="md:hidden flex items-center justify-center p-2 mobile-menu-button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-          
-          {/* Desktop navigation - hidden on small screens */}
-          <nav className="hidden md:block">
+          <nav>
             <ul className="flex items-center gap-3">
               <li>
                 <button
@@ -312,73 +268,6 @@ function App() {
         </div>
       </header>
 
-      {/* Mobile menu overlay - only visible when mobile menu is open */}
-      <div 
-        className={`mobile-menu-overlay ${mobileMenuOpen ? 'open' : ''}`}
-        onClick={() => setMobileMenuOpen(false)}
-      ></div>
-      
-      {/* Mobile menu - slides in from the right on small screens */}
-      <div className={`mobile-menu-container ${mobileMenuOpen ? 'open' : ''}`}>
-        <div className="flex flex-col h-full">
-          <div className="mb-6 pb-4 border-b dark:border-gray-700">
-            <button
-              onClick={toggleTheme}
-              className="w-full px-3 py-2 bg-blue-500 text-white rounded-lg text-sm mb-3"
-            >
-              {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-            </button>
-            
-            {loggedIn && (
-              <Link 
-                to="/admin/metrics"
-                className="block w-full text-center px-3 py-2 mt-2 bg-purple-500 text-white rounded-lg text-sm"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Metrics
-              </Link>
-            )}
-          </div>
-          
-          {loggedIn ? (
-            <div>
-              {isAdmin && (
-                <Link 
-                  to="/admin/dashboard"
-                  className="block w-full text-center px-3 py-2 mb-3 bg-purple-500 text-white rounded-lg text-sm"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Admin Panel
-                </Link>
-              )}
-              <button
-                onClick={handleLogout}
-                className="block w-full px-3 py-2 mb-3 bg-red-500 text-white rounded-lg text-sm"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <Link 
-              to="/admin/login"
-              className="block w-full text-center px-3 py-2 mb-3 bg-green-500 text-white rounded-lg text-sm"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Login
-            </Link>
-          )}
-          
-          <div className="mt-auto pt-4 border-t dark:border-gray-700">
-            <button 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block w-full px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm"
-            >
-              Close Menu
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Clear space for the fixed header */}
       <div className="pt-16"></div>
 
@@ -423,7 +312,6 @@ function App() {
                         <Link 
                           to={`/${member.name.toLowerCase()}`} 
                           className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 transform transition-all duration-300"
-                          onClick={() => setMobileMenuOpen(false)}
                         >
                           <div className="flex flex-col items-center justify-center h-full p-3">
                             <div className="avatar-container">
