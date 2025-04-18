@@ -1,0 +1,21 @@
+{
+  "name": "Doughmination System",
+  "short_name": "Doughmination",
+  "description": "View current fronters and system members",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbcfe8",
+  "theme_color": "#8b5cf6",
+  "icons": [
+    {
+      "src": "https://clovetwilight3.co.uk/system.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://clovetwilight3.co.uk/system.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
