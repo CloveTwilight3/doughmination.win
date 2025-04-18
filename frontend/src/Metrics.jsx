@@ -125,65 +125,65 @@ const Metrics = () => {
   const timeframeKey = days === 1 ? '24h' : days === 2 ? '48h' : days === 5 ? '5d' : days === 7 ? '7d' : '30d';
   
   return (
-    <div className="max-w-4xl mx-auto mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6 text-center">System Metrics</h1>
+    <div className="max-w-4xl mx-auto mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <h1 className="text-xl sm:text-2xl font-bold mb-6 text-center">System Metrics</h1>
       
-      {/* Time Range Selector */}
-      <div className="mb-6">
+      {/* Time Range Selector - Scrollable on mobile */}
+      <div className="mb-6 overflow-x-auto pb-2">
         <label className="block text-sm font-medium mb-2">Time Range:</label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-nowrap gap-2 min-w-max">
           <button 
             onClick={() => handleDaysChange(1)}
-            className={`px-3 py-1 rounded ${days === 1 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+            className={`whitespace-nowrap px-3 py-1 rounded ${days === 1 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
           >
-            Last 24 Hours
+            Last 24h
           </button>
           <button 
             onClick={() => handleDaysChange(2)}
-            className={`px-3 py-1 rounded ${days === 2 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+            className={`whitespace-nowrap px-3 py-1 rounded ${days === 2 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
           >
-            Last 48 Hours
+            Last 48h
           </button>
           <button 
             onClick={() => handleDaysChange(5)}
-            className={`px-3 py-1 rounded ${days === 5 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+            className={`whitespace-nowrap px-3 py-1 rounded ${days === 5 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
           >
-            Last 5 Days
+            Last 5d
           </button>
           <button 
             onClick={() => handleDaysChange(7)}
-            className={`px-3 py-1 rounded ${days === 7 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+            className={`whitespace-nowrap px-3 py-1 rounded ${days === 7 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
           >
-            Last 7 Days
+            Last 7d
           </button>
           <button 
             onClick={() => handleDaysChange(30)}
-            className={`px-3 py-1 rounded ${days === 30 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
+            className={`whitespace-nowrap px-3 py-1 rounded ${days === 30 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
           >
-            Last 30 Days
+            Last 30d
           </button>
         </div>
       </div>
       
-      {/* Tabs */}
-      <div className="flex border-b mb-6">
+      {/* Tabs - Better mobile display */}
+      <div className="flex mb-6 overflow-x-auto border-b">
         <button 
           onClick={() => setActiveTab('summary')} 
-          className={`px-4 py-2 font-medium ${activeTab === 'summary' ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
+          className={`whitespace-nowrap px-3 py-2 text-sm sm:text-base font-medium ${activeTab === 'summary' ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
         >
           Summary
         </button>
         <button 
           onClick={() => setActiveTab('detail')} 
-          className={`px-4 py-2 font-medium ${activeTab === 'detail' ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
+          className={`whitespace-nowrap px-3 py-2 text-sm sm:text-base font-medium ${activeTab === 'detail' ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
         >
-          Detailed Stats
+          Details
         </button>
         <button 
           onClick={() => setActiveTab('switches')} 
-          className={`px-4 py-2 font-medium ${activeTab === 'switches' ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
+          className={`whitespace-nowrap px-3 py-2 text-sm sm:text-base font-medium ${activeTab === 'switches' ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
         >
-          Switch Data
+          Switches
         </button>
       </div>
       
@@ -191,7 +191,7 @@ const Metrics = () => {
       {activeTab === 'summary' && (
         <div>
           <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">Fronting Time Overview</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Fronting Time Overview</h2>
             
             {sortedMembers.length > 0 ? (
               <div className="space-y-4">
@@ -201,7 +201,7 @@ const Metrics = () => {
                   const percentage = timeframeSeconds > 0 ? (member[timeframeKey] / timeframeSeconds) * 100 : 0;
                   
                   return (
-                    <div key={member.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div key={member.id} className="bg-gray-50 dark:bg-gray-700 p-3 sm:p-4 rounded-lg">
                       <div className="flex items-center mb-2">
                         {member.avatar_url && (
                           <div className="w-8 h-8 rounded-full overflow-hidden mr-3 flex-shrink-0"
@@ -214,9 +214,9 @@ const Metrics = () => {
                             />
                           </div>
                         )}
-                        <div>
-                          <h3 className="font-semibold">{member.display_name}</h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{member.name}</p>
+                        <div className="overflow-hidden">
+                          <h3 className="font-semibold truncate">{member.display_name}</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.name}</p>
                         </div>
                       </div>
                       
@@ -228,7 +228,7 @@ const Metrics = () => {
                       </div>
                       
                       <div className="flex justify-between text-sm">
-                        <span>{formatTime(member[timeframeKey])}</span>
+                        <span className="truncate">{formatTime(member[timeframeKey])}</span>
                         <span>{percentage.toFixed(1)}%</span>
                       </div>
                     </div>
@@ -252,21 +252,21 @@ const Metrics = () => {
           </div>
           
           <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <h2 className="text-xl font-semibold mb-3">Switch Stats</h2>
-            <div className="grid grid-cols-3 gap-4">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3">Switch Stats</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-                <p className="text-sm text-gray-500 dark:text-gray-400">Total Switches</p>
-                <p className="text-xl font-bold">{switchMetrics.timeframes[timeframeKey]}</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Total Switches</p>
+                <p className="text-lg sm:text-xl font-bold">{switchMetrics.timeframes[timeframeKey]}</p>
               </div>
               
               <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-                <p className="text-sm text-gray-500 dark:text-gray-400">Avg. Per Day</p>
-                <p className="text-xl font-bold">{switchMetrics.avg_switches_per_day.toFixed(1)}</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Avg. Per Day</p>
+                <p className="text-lg sm:text-xl font-bold">{switchMetrics.avg_switches_per_day.toFixed(1)}</p>
               </div>
               
-              <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-                <p className="text-sm text-gray-500 dark:text-gray-400">Active Members</p>
-                <p className="text-xl font-bold">{sortedMembers.filter(m => m[timeframeKey] > 0).length}</p>
+              <div className="p-3 bg-white dark:bg-gray-800 rounded shadow col-span-2 sm:col-span-1">
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Active Members</p>
+                <p className="text-lg sm:text-xl font-bold">{sortedMembers.filter(m => m[timeframeKey] > 0).length}</p>
               </div>
             </div>
           </div>
@@ -276,53 +276,57 @@ const Metrics = () => {
       {/* Detail Tab */}
       {activeTab === 'detail' && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Detailed Member Stats</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Detailed Member Stats</h2>
           
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Member</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Time</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Percentage</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {sortedMembers.map(member => {
-                  // Calculate percentage for this timeframe
-                  const timeframeSeconds = Object.values(frontingMetrics.timeframes[timeframeKey]).reduce((sum, val) => sum + val, 0);
-                  const percentage = timeframeSeconds > 0 ? (member[timeframeKey] / timeframeSeconds) * 100 : 0;
-                  
-                  if (member[timeframeKey] <= 0) return null;
-                  
-                  return (
-                    <tr key={member.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          {member.avatar_url && (
-                            <div className="rounded-full overflow-hidden mr-3 flex-shrink-0" 
-                                 style={{ width: '2rem', height: '2rem', minWidth: '2rem' }}>
-                              <img 
-                                src={member.avatar_url} 
-                                alt={member.name}
-                                className="w-full h-full object-cover"
-                                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                              />
-                            </div>
-                          )}
-                          <div>
-                            <div className="font-medium">{member.display_name}</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">{member.name}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right font-medium">{formatTime(member[timeframeKey])}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">{percentage.toFixed(1)}%</td>
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="inline-block min-w-full align-middle">
+              <div className="overflow-hidden border rounded-lg">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Member</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Time</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Percentage</th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {sortedMembers.map(member => {
+                      // Calculate percentage for this timeframe
+                      const timeframeSeconds = Object.values(frontingMetrics.timeframes[timeframeKey]).reduce((sum, val) => sum + val, 0);
+                      const percentage = timeframeSeconds > 0 ? (member[timeframeKey] / timeframeSeconds) * 100 : 0;
+                      
+                      if (member[timeframeKey] <= 0) return null;
+                      
+                      return (
+                        <tr key={member.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="flex items-center">
+                              {member.avatar_url && (
+                                <div className="rounded-full overflow-hidden mr-3 flex-shrink-0" 
+                                     style={{ width: '1.75rem', height: '1.75rem', minWidth: '1.75rem' }}>
+                                  <img 
+                                    src={member.avatar_url} 
+                                    alt={member.name}
+                                    className="w-full h-full object-cover"
+                                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                  />
+                                </div>
+                              )}
+                              <div className="max-w-[120px] sm:max-w-full overflow-hidden">
+                                <div className="font-medium truncate">{member.display_name}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.name}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap text-right font-medium text-sm">{formatTime(member[timeframeKey])}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-right text-sm">{percentage.toFixed(1)}%</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -330,34 +334,34 @@ const Metrics = () => {
       {/* Switches Tab */}
       {activeTab === 'switches' && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Switch Frequency</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Switch Frequency</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6">
             <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Last 24h</p>
-              <p className="text-xl font-bold">{switchMetrics.timeframes['24h']} switches</p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Last 24h</p>
+              <p className="text-lg sm:text-xl font-bold">{switchMetrics.timeframes['24h']}</p>
             </div>
             <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Last 48h</p>
-              <p className="text-xl font-bold">{switchMetrics.timeframes['48h']} switches</p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Last 48h</p>
+              <p className="text-lg sm:text-xl font-bold">{switchMetrics.timeframes['48h']}</p>
             </div>
             <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Last 5d</p>
-              <p className="text-xl font-bold">{switchMetrics.timeframes['5d']} switches</p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Last 5d</p>
+              <p className="text-lg sm:text-xl font-bold">{switchMetrics.timeframes['5d']}</p>
             </div>
             <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Last 7d</p>
-              <p className="text-xl font-bold">{switchMetrics.timeframes['7d']} switches</p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Last 7d</p>
+              <p className="text-lg sm:text-xl font-bold">{switchMetrics.timeframes['7d']}</p>
             </div>
-            <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Last 30d</p>
-              <p className="text-xl font-bold">{switchMetrics.timeframes['30d']} switches</p>
+            <div className="p-3 bg-white dark:bg-gray-800 rounded shadow col-span-2 sm:col-span-1">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Last 30d</p>
+              <p className="text-lg sm:text-xl font-bold">{switchMetrics.timeframes['30d']}</p>
             </div>
           </div>
           
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
             <h3 className="font-medium mb-2">Average Switch Frequency</h3>
-            <p className="text-2xl font-bold">{switchMetrics.avg_switches_per_day.toFixed(1)} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">switches per day</span></p>
+            <p className="text-xl sm:text-2xl font-bold">{switchMetrics.avg_switches_per_day.toFixed(1)} <span className="text-xs sm:text-sm font-normal text-gray-500 dark:text-gray-400">switches per day</span></p>
             
             <div className="mt-4">
               <p className="text-sm text-gray-600 dark:text-gray-300">
