@@ -1,3 +1,39 @@
+/*
+MIT License
+
+Copyright (c) 2025 Clove Twilight
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+/* ============================================================================
+ * DOUGHMINATION SYSTEM SERVER - MAIN APP COMPONENT
+ *
+ * This is the root component of the application that handles:
+ * - Routing between different views/pages
+ * - User authentication state
+ * - Theme toggling (light/dark mode)
+ * - PluralKit API data fetching
+ * - Mobile navigation with hamburger menu
+ * ============================================================================
+ */
+
 import React, { useEffect, useState } from "react";
 import { Link, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import useTheme from './useTheme';
@@ -11,19 +47,30 @@ import UserProfile from './UserProfile.jsx';
 import UserEdit from './UserEdit.jsx';
 
 function App() {
-  const [members, setMembers] = useState([]);
-  const [fronting, setFronting] = useState({ members: [] });
-  const [theme, toggleTheme] = useTheme();
-  const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token"));
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  /* ============================================================================
+   * STATE MANAGEMENT
+   * Application-wide state variables
+   * ============================================================================
+   */
+  const [members, setMembers] = useState([]); // All system members
+  const [fronting, setFronting] = useState({ members: [] }); // Currently fronting members
+  const [theme, toggleTheme] = useTheme(); // Light/dark mode state
+  const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token")); // Authentication state
+  const [isAdmin, setIsAdmin] = useState(false); // Admin privileges state
+  const [loading, setLoading] = useState(true); // Initial data loading state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Mobile menu toggle state
+  const navigate = useNavigate(); // React Router navigation hook
 
+  // Default avatar for members without one
   const defaultAvatar = "https://clovetwilight3.co.uk/system.png";
 
+  /* ============================================================================
+   * DATA FETCHING AND INITIALIZATION
+   * Initial data loading from PluralKit API and user authentication check
+   * ============================================================================
+   */
   useEffect(() => {
-    // Fetch public data (members and fronters)
+    // Function to fetch public data (members and fronters)
     const fetchPublicData = async () => {
       try {
         // Fetch members data
@@ -59,7 +106,7 @@ function App() {
       }
     };
 
-    // Check if user is admin when logged in
+    // Function to check admin status when logged in
     const checkAdminStatus = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -109,6 +156,11 @@ function App() {
     initialize();
   }, []);
 
+  /* ============================================================================
+   * FRONTING MEMBER UPDATES
+   * Updates favicon, title, and meta tags based on who's fronting
+   * ============================================================================
+   */
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
       const frontingMember = fronting.members[0];
@@ -151,10 +203,20 @@ function App() {
     }
   }, [fronting, defaultAvatar]);
 
-  // Close mobile menu when navigating
+  /* ============================================================================
+   * MOBILE MENU HANDLING
+   * Close mobile menu when navigating to a new page
+   * ============================================================================
+   */
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [navigate]);
+  
+  /* ============================================================================
+   * HELPER FUNCTIONS
+   * Utility functions for various tasks
+   * ============================================================================
+   */
   
   // Function to update meta tags for better link sharing
   const updateMetaTags = (frontingMember = null) => {
@@ -204,6 +266,7 @@ function App() {
     if (twitterDesc) twitterDesc.setAttribute('content', metaDesc.getAttribute('content'));
   };
 
+  // Logout handler
   function handleLogout() {
     localStorage.removeItem("token");
     setLoggedIn(false);
@@ -211,21 +274,27 @@ function App() {
     navigate('/');
   }
 
-  // Handle toggling the mobile menu
+  // Toggle mobile menu
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  // Show loading state while initializing
   if (loading) return <div className="text-black dark:text-white p-10 text-center">Loading...</div>;
 
+  /* ============================================================================
+   * COMPONENT RENDER
+   * Main application layout and routing
+   * ============================================================================
+   */
   return (
     <div className="max-w-6xl mx-auto text-black dark:text-white">
-      {/* Updated navbar with improved hamburger menu */}
+      {/* ========== NAVIGATION BAR WITH HAMBURGER MENU ========== */}
       <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Link to="/" className="text-lg font-semibold z-10">Doughmination System</Link>
           
-          {/* Improved Mobile menu button - more visible */}
+          {/* Mobile menu hamburger button - Only visible on mobile */}
           <button 
             className="md:hidden flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             onClick={toggleMobileMenu}
@@ -240,7 +309,7 @@ function App() {
             </svg>
           </button>
           
-          {/* Desktop navigation */}
+          {/* Desktop navigation - Hidden on mobile */}
           <nav className="hidden md:block">
             <ul className="flex items-center gap-3">
               <li>
@@ -306,7 +375,7 @@ function App() {
           </nav>
         </div>
         
-        {/* Improved Mobile navigation menu - with better styling and only on mobile */}
+        {/* Mobile navigation dropdown menu - Only visible on mobile when toggled */}
         <div 
           className={`md:hidden absolute w-full bg-white dark:bg-gray-800 shadow-md transition-all duration-300 ease-in-out z-5 ${
             mobileMenuOpen ? 'max-h-[500px] opacity-100 py-4 border-t border-gray-200 dark:border-gray-700' : 'max-h-0 py-0 opacity-0 overflow-hidden border-none'
@@ -379,18 +448,19 @@ function App() {
         </div>
       </header>
 
-      {/* Clear space for the fixed header */}
+      {/* Space for fixed header */}
       <div className="pt-16"></div>
 
+      {/* ========== MAIN CONTENT AREA ========== */}
       <main className="container mx-auto px-4 pt-4">
-        {/* Welcome component - will only display when logged in */}
+        {/* Welcome banner - only shown when logged in */}
         <Welcome loggedIn={loggedIn} isAdmin={isAdmin} />
         
         <h1 className="text-2xl font-bold mt-8 mb-6 text-center text-black dark:text-white">
           System Members: 
         </h1> 
         
-        {/* Fronting */}
+        {/* Currently Fronting Section */}
         {fronting && fronting.members && fronting.members.length > 0 && (
           <div className="mb-6 p-4 border-b dark:border-gray-700">
             <h2 className="text-lg font-semibold mb-3 text-center">Currently Fronting:</h2>
@@ -409,9 +479,9 @@ function App() {
           </div>
         )}
 
-        {/* Routes */}
+        {/* ========== ROUTING SETUP ========== */}
         <Routes>
-          {/* Public Routes */}
+          {/* Home Page - Member Grid */}
           <Route path="/" element={
             <div className="mt-6">
               <h2 className="text-lg font-semibold mb-4 text-center">Members:</h2>
@@ -445,7 +515,10 @@ function App() {
             </div>
           } />
           
+          {/* Member Detail Page */}
           <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
+          
+          {/* Authentication */}
           <Route path="/admin/login" element={<Login onLogin={() => {
             setLoggedIn(true);
             // After login, check if user is admin
@@ -469,7 +542,7 @@ function App() {
             });
           }} />} />
           
-          {/* User Profile Routes */}
+          {/* User Profile Routes (protected, but no admin required) */}
           <Route path="/admin/user" element={
             <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
               <UserProfile />
@@ -482,14 +555,14 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Protected Admin Routes */}
+          {/* Admin Dashboard (protected, admin required) */}
           <Route path="/admin/dashboard" element={
             <ProtectedRoute adminRequired={true} isAdmin={isAdmin} isLoggedIn={loggedIn}>
               <AdminDashboard fronting={fronting} />
             </ProtectedRoute>
           } />
           
-          {/* Metrics Route */}
+          {/* Metrics Page (protected, but no admin required) */}
           <Route path="/admin/metrics" element={
             <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
               <Metrics />
@@ -501,7 +574,7 @@ function App() {
         </Routes>
       </main>
       
-      {/* GitHub Footer */}
+      {/* ========== FOOTER ========== */}
       <footer className="github-footer">
         <div className="flex flex-col items-center gap-2">
           <a href="https://github.com/clovetwilight3/plural-web" target="_blank" rel="noopener noreferrer" className="github-button">
