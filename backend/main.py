@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from models import UserCreate, UserResponse, UserUpdate
 from users import get_users, create_user, delete_user, initialize_admin_user, update_user
 from typing import List
+from metrics import get_fronting_time_metrics, get_switch_frequency_metrics
 
 load_dotenv()
 
@@ -165,3 +166,22 @@ async def update_user_info(user_id: str, user_update: UserUpdate, current_user =
         display_name=updated_user.display_name,
         is_admin=updated_user.is_admin
     )
+
+# Add metric information
+@app.get("/api/metrics/fronting-time")
+async def fronting_time_metrics(days: int = 30, user = Depends(get_current_user)):
+    """Get fronting time metrics for each member over different timeframes"""
+    try:
+        metrics = await get_fronting_time_metrics(days)
+        return metrics
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch fronting metrics: {str(e)}")
+
+@app.get("/api/metrics/switch-frequency")
+async def switch_frequency_metrics(days: int = 30, user = Depends(get_current_user)):
+    """Get switch frequency metrics over different timeframes"""
+    try:
+        metrics = await get_switch_frequency_metrics(days)
+        return metrics
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch switch frequency metrics: {str(e)}")

@@ -5,7 +5,8 @@ import MemberDetails from './MemberDetails.jsx';
 import Login from './Login.jsx';
 import AdminDashboard from './AdminDashboard.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
-import Welcome from './Welcome.jsx'; // Import the Welcome component
+import Welcome from './Welcome.jsx';
+import Metrics from './Metrics.jsx'; // Import the Metrics component
 
 function App() {
   const [members, setMembers] = useState([]);
@@ -150,6 +151,16 @@ function App() {
                   {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
                 </button>
               </li>
+              {loggedIn && (
+                <li>
+                  <Link 
+                    to="/admin/metrics"
+                    className="px-3 py-2 bg-purple-500 text-white rounded-lg text-sm"
+                  >
+                    Metrics
+                  </Link>
+                </li>
+              )}
               {loggedIn ? (
                 <>
                   {isAdmin && (
@@ -278,6 +289,13 @@ function App() {
           <Route path="/admin/dashboard" element={
             <ProtectedRoute adminRequired={true} isAdmin={isAdmin} isLoggedIn={loggedIn}>
               <AdminDashboard fronting={fronting} />
+            </ProtectedRoute>
+          } />
+          
+          {/* Metrics Route */}
+          <Route path="/admin/metrics" element={
+            <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
+              <Metrics />
             </ProtectedRoute>
           } />
           
