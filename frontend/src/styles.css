@@ -751,3 +751,67 @@ html.dark .github-button:hover {
     padding-top: calc(60px + env(safe-area-inset-top));
   }
 }
+
+/* ===== BUTTON SIZE STANDARDIZATION ===== */
+
+/* Standard button size and styling for all buttons in the navbar */
+header.fixed nav button,
+header.fixed nav a.px-3,
+header.fixed nav .px-3.py-2,
+header.fixed nav a[class*="bg-"] {
+  min-width: 110px; /* Fixed width for all buttons */
+  height: 40px;     /* Fixed height for all buttons */
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Make sure all header buttons have consistent look */
+header.fixed nav .bg-blue-500,
+header.fixed nav .bg-purple-500,
+header.fixed nav .bg-green-500,
+header.fixed nav .bg-red-500 {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+/* Hover effects for header buttons */
+header.fixed nav .bg-blue-500:hover,
+header.fixed nav .bg-purple-500:hover,
+header.fixed nav .bg-green-500:hover,
+header.fixed nav .bg-red-500:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* For mobile devices, adjust the button sizes to fit smaller screens */
+@media (max-width: 768px) {
+  header.fixed nav button,
+  header.fixed nav a.px-3,
+  header.fixed nav .px-3.py-2,
+  header.fixed nav a[class*="bg-"] {
+    min-width: 90px;
+    font-size: 0.75rem;
+  }
+  
+  /* Adjust spacing between buttons */
+  nav ul.flex {
+    gap: 0.25rem;
+  }
+}
+
+/* Fix any flex issues in the navbar */
+header.fixed nav ul {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+header.fixed nav ul li {
+  display: flex;
+}
