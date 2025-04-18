@@ -1,23 +1,77 @@
 # Doughmination System Server
 
-This is a personal project built for our own system's use — a lightweight frontend that interfaces with the Pluralkit API to display our system members, current fronters, and individual member profiles in a clean and simple way. It includes a light/dark mode toggle and minimal UI for clarity.
+A lightweight web application that interfaces with the PluralKit API to display system members, current fronters, and individual member profiles in a clean and simple interface. Features a light/dark mode toggle and minimal UI for clarity.
+
+## Features
+
+- 🌗 Light and dark mode support with auto-detection
+- 👥 Display current fronting members with automatic favicon and title updates
+- 👤 View individual member profiles with detailed information
+- 🔒 Admin dashboard for system management (password protected)
+- 📊 Fronting metrics and switch frequency statistics
+- 👥 User management with multiple accounts support
+- 📱 Responsive design for mobile and desktop
+
+## Hosting
 
 The site is hosted at [https://friends.clovetwilight3.co.uk](https://friends.clovetwilight3.co.uk)
 
 ## This is for:
 
-- Displaying our own Pluralkit system members in a user-friendly interface
-- Showing who’s fronting, with automatic favicon and title updates
+- Displaying your PluralKit system members in a user-friendly interface
+- Showing who's fronting, with automatic favicon and title updates
 - Viewing individual member details like pronouns and descriptions
 - Switching between dark and light themes depending on vibes
-- Adding an Admin interface to switch users while in a call or similar situations.
+- Managing front switching through the Admin interface
+- Tracking fronting time and switch metrics
+
+## Technical Stack
+
+### Backend
+- FastAPI (Python)
+- JWT Authentication
+- PluralKit API integration
+
+### Frontend
+- Modern web interface with responsive design
+- Tailwind CSS for styling
+
+## Installation & Setup
+
+### Backend
+```bash
+cd backend
+pip install -r requirements.txt
+cp .env.example .env  # Create and edit your environment variables
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev  # Development server
+npm run build  # Production build
+```
+
+### Environment Variables
+
+Create a `.env` file in the `backend` directory with:
+
+```
+SYSTEM_TOKEN=your_pluralkit_token
+JWT_SECRET=your_secure_random_jwt_secret
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your_secure_password
+ADMIN_DISPLAY_NAME=Administrator
+```
 
 ## Notes:
 
-This is a personalized project. It’s open-source in case others who are familiar with Pluralkit and self-hosting want to use or adapt it — but it’s not built to be a plug-and-play solution or official tool.
+This is a personalized project. It's open-source in case others who are familiar with PluralKit and self-hosting want to use or adapt it — but it's not built to be a plug-and-play solution or official tool.
 
-If you know what you’re doing and want to tweak it for your own system, feel free to fork it!
+If you know what you're doing and want to tweak it for your own system, feel free to fork it!
 
 ---
 
-Made with ✨ by and for our system.
+Made with ✨ by and for the Doughmination System.
