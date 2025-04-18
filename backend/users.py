@@ -97,26 +97,45 @@ def initialize_admin_user():
     """Creates the admin user from environment variables if no users exist"""
     import os
     from dotenv import load_dotenv
+    import re
     
     load_dotenv()
     
     users = get_users()
     if not users:
         admin_username = os.getenv("ADMIN_USERNAME", "admin")
-        admin_password = os.getenv("ADMIN_PASSWORD")
+        admin_password_or_hash = os.getenv("ADMIN_PASSWORD")
         admin_display_name = os.getenv("ADMIN_DISPLAY_NAME", "Administrator")
         
-        if not admin_password:
+        if not admin_password_or_hash:
             print("Warning: No ADMIN_PASSWORD set in environment. Using default password 'admin'")
-            admin_password = "admin"
+            admin_password_or_hash = "admin"
         
         try:
-            create_user(UserCreate(
-                username=admin_username,
-                password=admin_password,
-                display_name=admin_display_name,
-                is_admin=True
-            ))
-            print(f"Created admin user: {admin_username} (Display name: {admin_display_name})")
+            # Check if the password is already a bcrypt hash
+            # Bcrypt hashes typically start with $2a$, $2b$, or $2y$
+            is_hash = bool(re.match(r'^\$2[aby]\$\d+\$.+', admin_password_or_hash))
+            
+            if is_hash:
+                # If it's already a hash, create the user directly
+                new_user = User(
+                    id=str(uuid.uuid4()),
+                    username=admin_username,
+                    password_hash=admin_password_or_hash,
+                    display_name=admin_display_name,
+                    is_admin=True
+                )
+                users.append(new_user)
+                save_users(users)
+                print(f"Created admin user with provided hash: {admin_username} (Display name: {admin_display_name})")
+            else:
+                # If it's not a hash, create the user normally which will hash the password
+                create_user(UserCreate(
+                    username=admin_username,
+                    password=admin_password_or_hash,
+                    display_name=admin_display_name,
+                    is_admin=True
+                ))
+                print(f"Created admin user: {admin_username} (Display name: {admin_display_name})")
         except Exception as e:
             print(f"Error creating admin user: {e}")
