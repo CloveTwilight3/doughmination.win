@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const Welcome = ({ loggedIn, isAdmin }) => {
   const [displayName, setDisplayName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   
   useEffect(() => {
     if (loggedIn) {
@@ -18,6 +19,7 @@ const Welcome = ({ loggedIn, isAdmin }) => {
           if (response.ok) {
             const data = await response.json();
             setDisplayName(data.display_name || data.username);
+            setAvatarUrl(data.avatar_url || '');
           } else {
             // If API call fails, try to extract username from JWT token
             try {
@@ -29,6 +31,7 @@ const Welcome = ({ loggedIn, isAdmin }) => {
                 const decodedPayload = JSON.parse(atob(payload));
                 // Extract display_name or username from the payload
                 setDisplayName(decodedPayload.display_name || decodedPayload.sub || 'User');
+                setAvatarUrl(decodedPayload.avatar_url || '');
               }
             } catch (error) {
               console.error('Error parsing token:', error);
@@ -49,10 +52,21 @@ const Welcome = ({ loggedIn, isAdmin }) => {
   
   return (
     <div className="welcome-message py-2 px-4 mb-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-      <p className="text-lg">
-        Welcome, <span className="font-bold">{displayName}</span>
-        {isAdmin && !displayName.includes('Admin') && <span className="ml-2 text-purple-500 dark:text-purple-400"> (Admin)</span>}
-      </p>
+      <div className="flex items-center gap-3">
+        {avatarUrl && (
+          <div className="w-10 h-10 rounded-full overflow-hidden">
+            <img 
+              src={avatarUrl} 
+              alt={displayName} 
+              className="w-full h-full object-cover" 
+            />
+          </div>
+        )}
+        <p className="text-lg">
+          Welcome, <span className="font-bold">{displayName}</span>
+          {isAdmin && !displayName.includes('Admin') && <span className="ml-2 text-purple-500 dark:text-purple-400"> (Admin)</span>}
+        </p>
+      </div>
     </div>
   );
 };
