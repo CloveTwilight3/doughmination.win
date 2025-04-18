@@ -1,4 +1,3 @@
-// frontend/src/Metrics.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -205,11 +204,13 @@ const Metrics = () => {
                     <div key={member.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                       <div className="flex items-center mb-2">
                         {member.avatar_url && (
-                          <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full overflow-hidden mr-3 flex-shrink-0"
+                               style={{ width: '2rem', height: '2rem', minWidth: '2rem' }}>
                             <img 
                               src={member.avatar_url} 
                               alt={member.name}
                               className="w-full h-full object-cover"
+                              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                             />
                           </div>
                         )}
@@ -299,11 +300,13 @@ const Metrics = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {member.avatar_url && (
-                            <div className="w-8 h-8 rounded-full overflow-hidden mr-3 flex-shrink-0">
+                            <div className="rounded-full overflow-hidden mr-3 flex-shrink-0" 
+                                 style={{ width: '2rem', height: '2rem', minWidth: '2rem' }}>
                               <img 
                                 src={member.avatar_url} 
                                 alt={member.name}
                                 className="w-full h-full object-cover"
+                                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                               />
                             </div>
                           )}
