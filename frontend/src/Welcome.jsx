@@ -51,7 +51,7 @@ const Welcome = ({ loggedIn, isAdmin }) => {
     <div className="welcome-message py-2 px-4 mb-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       <p className="text-lg">
         Welcome, <span className="font-bold">{displayName}</span>
-        {isAdmin && !displayName.includes(' Admin') && <span className="ml-2 text-purple-500 dark:text-purple-400">(Admin)</span>}
+        {isAdmin && !displayName.includes('Admin') && <span className="ml-2 text-purple-500 dark:text-purple-400">(Admin)</span>}
       </p>
     </div>
   );
