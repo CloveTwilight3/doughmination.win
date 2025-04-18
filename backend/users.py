@@ -48,7 +48,8 @@ def create_user(user_create: UserCreate) -> User:
         username=user_create.username,
         password_hash=bcrypt.hash(user_create.password),
         display_name=user_create.display_name,
-        is_admin=user_create.is_admin
+        is_admin=user_create.is_admin,
+        avatar_url=None
     )
     
     users.append(new_user)
@@ -135,7 +136,8 @@ def initialize_admin_user():
                     username=admin_username,
                     password_hash=admin_password_or_hash,
                     display_name=admin_display_name,
-                    is_admin=True
+                    is_admin=True,
+                    avatar_url=None
                 )
                 users.append(new_user)
                 save_users(users)

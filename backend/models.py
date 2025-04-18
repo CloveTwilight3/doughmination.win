@@ -7,6 +7,7 @@ class User(BaseModel):
     password_hash: str
     display_name: Optional[str] = None
     is_admin: bool = False
+    avatar_url: Optional[str] = None
 
 class UserCreate(BaseModel):
     username: str
@@ -19,6 +20,7 @@ class UserResponse(BaseModel):
     username: str
     display_name: Optional[str] = None
     is_admin: bool = False
+    avatar_url: Optional[str] = None
 
 class UserUpdate(BaseModel):
     display_name: Optional[str] = None

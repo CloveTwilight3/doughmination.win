@@ -61,6 +61,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         "id": user.id,
         "display_name": user.display_name,
         "admin": user.is_admin,
+        "avatar_url": getattr(user, 'avatar_url', None),  # Include avatar_url in the token
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }, JWT_SECRET, algorithm=ALGORITHM)
 
@@ -87,5 +88,6 @@ def get_user_info(user = Depends(get_current_user)):
         id=user.id,
         username=user.username,
         display_name=user.display_name,
-        is_admin=user.is_admin
+        is_admin=user.is_admin,
+        avatar_url=getattr(user, 'avatar_url', None)  # Include avatar_url in the response
     )

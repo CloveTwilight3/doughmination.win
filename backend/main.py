@@ -1,29 +1,24 @@
 from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile
-from typing import Optional
-import uuid
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
-from auth import router as auth_router, get_current_user
+from auth import router as auth_router, get_current_user, oauth2_scheme
+import os
 import shutil
 import aiofiles
-import os
+import uuid
 from fastapi.security import SecurityScopes
 from jose import JWTError
 from dotenv import load_dotenv
 from models import UserCreate, UserResponse, UserUpdate
-from users import get_users, create_user, delete_user, initialize_admin_user, update_user
-from typing import List
+from users import get_users, create_user, delete_user, initialize_admin_user, update_user, get_user_by_id
+from typing import List, Optional
 from metrics import get_fronting_time_metrics, get_switch_frequency_metrics
 from pathlib import Path
 
 load_dotenv()
 
 app = FastAPI()
-
-# Create upload directory if it doesn't exist
-UPLOAD_DIR = Path("avatars")
-UPLOAD_DIR.mkdir(exist_ok=True)
 
 # Initialize the admin user if no users exist
 initialize_admin_user()
@@ -39,6 +34,10 @@ app.add_middleware(
 
 # Include login route
 app.include_router(auth_router)
+
+# Create upload directory for avatars if it doesn't exist
+UPLOAD_DIR = Path("avatars")
+UPLOAD_DIR.mkdir(exist_ok=True)
 
 # Optional authentication function for public endpoints
 async def get_optional_user(token: str = Security(oauth2_scheme, scopes=[])):
@@ -129,7 +128,13 @@ async def list_users(current_user = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Admin privileges required")
     
     users = get_users()
-    return [UserResponse(id=user.id, username=user.username, is_admin=user.is_admin) for user in users]
+    return [UserResponse(
+        id=user.id, 
+        username=user.username, 
+        display_name=user.display_name, 
+        is_admin=user.is_admin,
+        avatar_url=getattr(user, 'avatar_url', None)
+    ) for user in users]
 
 @app.post("/api/users", response_model=UserResponse)
 async def add_user(user_create: UserCreate, current_user = Depends(get_current_user)):
@@ -138,7 +143,13 @@ async def add_user(user_create: UserCreate, current_user = Depends(get_current_u
     
     try:
         new_user = create_user(user_create)
-        return UserResponse(id=new_user.id, username=new_user.username, is_admin=new_user.is_admin)
+        return UserResponse(
+            id=new_user.id, 
+            username=new_user.username, 
+            display_name=new_user.display_name, 
+            is_admin=new_user.is_admin,
+            avatar_url=getattr(new_user, 'avatar_url', None)
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -165,35 +176,20 @@ async def update_user_info(user_id: str, user_update: UserUpdate, current_user =
     if not current_user.is_admin and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="Not authorized to update this user")
     
-    updated_user = update_user(user_id, user_update)
-    if not updated_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return UserResponse(
-        id=updated_user.id,
-        username=updated_user.username,
-        display_name=updated_user.display_name,
-        is_admin=updated_user.is_admin
-    )
-
-# Add metric information
-@app.get("/api/metrics/fronting-time")
-async def fronting_time_metrics(days: int = 30, user = Depends(get_current_user)):
-    """Get fronting time metrics for each member over different timeframes"""
     try:
-        metrics = await get_fronting_time_metrics(days)
-        return metrics
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch fronting metrics: {str(e)}")
-
-@app.get("/api/metrics/switch-frequency")
-async def switch_frequency_metrics(days: int = 30, user = Depends(get_current_user)):
-    """Get switch frequency metrics over different timeframes"""
-    try:
-        metrics = await get_switch_frequency_metrics(days)
-        return metrics
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch switch frequency metrics: {str(e)}")
+        updated_user = update_user(user_id, user_update)
+        if not updated_user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return UserResponse(
+            id=updated_user.id,
+            username=updated_user.username,
+            display_name=updated_user.display_name,
+            is_admin=updated_user.is_admin,
+            avatar_url=getattr(updated_user, 'avatar_url', None)
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/users/{user_id}/avatar")
 async def upload_user_avatar(
@@ -252,7 +248,6 @@ async def upload_user_avatar(
         print(f"Error saving avatar: {e}")
         raise HTTPException(status_code=500, detail=f"Error uploading avatar: {str(e)}")
 
-# Add a route to serve avatar files
 @app.get("/avatars/{filename}")
 async def get_avatar(filename: str):
     file_path = UPLOAD_DIR / filename
@@ -260,3 +255,22 @@ async def get_avatar(filename: str):
         raise HTTPException(status_code=404, detail="Avatar not found")
     
     return FileResponse(file_path)
+
+# Add metric information
+@app.get("/api/metrics/fronting-time")
+async def fronting_time_metrics(days: int = 30, user = Depends(get_current_user)):
+    """Get fronting time metrics for each member over different timeframes"""
+    try:
+        metrics = await get_fronting_time_metrics(days)
+        return metrics
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch fronting metrics: {str(e)}")
+
+@app.get("/api/metrics/switch-frequency")
+async def switch_frequency_metrics(days: int = 30, user = Depends(get_current_user)):
+    """Get switch frequency metrics over different timeframes"""
+    try:
+        metrics = await get_switch_frequency_metrics(days)
+        return metrics
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch switch frequency metrics: {str(e)}")
