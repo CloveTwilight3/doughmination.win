@@ -766,6 +766,97 @@ html.dark .github-button:hover {
   }
 }
 
+/* ===== HAMBURGER MENU STYLES ===== */
+
+/* Button styling */
+.md\:hidden.flex.items-center.justify-center.p-2 {
+  margin-right: 0.25rem;
+  background-color: rgba(243, 244, 246, 0.8);
+  border-radius: 0.375rem;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Dark mode button styling */
+html.dark .md\:hidden.flex.items-center.justify-center.p-2 {
+  background-color: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+/* Hover effect */
+.md\:hidden.flex.items-center.justify-center.p-2:hover {
+  background-color: rgba(229, 231, 235, 0.9);
+  transform: translateY(-1px);
+}
+
+html.dark .md\:hidden.flex.items-center.justify-center.p-2:hover {
+  background-color: rgba(55, 65, 81, 0.9);
+}
+
+/* Active effect */
+.md\:hidden.flex.items-center.justify-center.p-2:active {
+  transform: translateY(1px);
+}
+
+/* Mobile menu animation and positioning */
+.md\:hidden.absolute.w-full {
+  left: 0;
+  right: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+} Better padding for mobile containers */
+  .container, 
+  .max-w-4xl,
+  .max-w-2xl {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  /* Fix member name text */
+  .member-name {
+    font-size: 0.7rem;
+    line-height: 1.2;
+    margin-top: 0.4rem;
+  }
+  
+  /* More compact headings */
+  h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  /* More compact margins */
+  .mb-6 {
+    margin-bottom: 1rem;
+  }
+  
+  .mt-8 {
+    margin-top: 1.5rem;
+  }
+  
+  /* Better switch metrics display on mobile */
+  .grid.grid-cols-2 > div,
+  .grid.grid-cols-3 > div {
+    padding: 0.5rem;
+  }
+  
+  /* Improve form elements on mobile */
+  input, select, textarea {
+    font-size: 16px !important; /* Prevent iOS zoom on focus */
+  }
+
 /* ===== iOS ENHANCEMENT STYLES ===== */
 
 /* Improved responsive padding to account for iOS notches and UI elements */
