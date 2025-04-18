@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile
 from typing import Optional
 import uuid
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
-from auth import router as auth_router, get_current_user, 
+from auth import router as auth_router, get_current_user
 import shutil
 import aiofiles
 import os
@@ -194,3 +194,69 @@ async def switch_frequency_metrics(days: int = 30, user = Depends(get_current_us
         return metrics
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch switch frequency metrics: {str(e)}")
+
+@app.post("/api/users/{user_id}/avatar")
+async def upload_user_avatar(
+    user_id: str,
+    avatar: UploadFile = File(...),
+    current_user = Depends(get_current_user)
+):
+    # Only admins or the user themselves can update their avatar
+    if not current_user.is_admin and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this user")
+    
+    # Verify user exists
+    user = get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Validate file type
+    valid_types = ["image/jpeg", "image/png", "image/gif"]
+    if avatar.content_type not in valid_types:
+        raise HTTPException(status_code=400, detail="Invalid file type. Only JPEG, PNG, and GIF are allowed.")
+    
+    # Generate unique filename
+    file_ext = avatar.filename.split(".")[-1]
+    unique_filename = f"{user_id}_{uuid.uuid4()}.{file_ext}"
+    file_path = UPLOAD_DIR / unique_filename
+    
+    # Save file
+    try:
+        # If there's an existing avatar, try to remove it
+        users = get_users()
+        for i, u in enumerate(users):
+            if u.id == user_id and hasattr(u, 'avatar_url') and u.avatar_url:
+                old_filename = u.avatar_url.split("/")[-1]
+                old_path = UPLOAD_DIR / old_filename
+                try:
+                    if os.path.exists(old_path):
+                        os.remove(old_path)
+                except Exception as e:
+                    print(f"Error removing old avatar: {e}")
+        
+        # Save the new file
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            content = await avatar.read()
+            await out_file.write(content)
+        
+        # Update user with avatar URL
+        avatar_url = f"/avatars/{unique_filename}"
+        user_update = UserUpdate(avatar_url=avatar_url)
+        updated_user = update_user(user_id, user_update)
+        
+        if not updated_user:
+            raise HTTPException(status_code=500, detail="Failed to update user with avatar URL")
+        
+        return {"success": True, "avatar_url": avatar_url}
+    except Exception as e:
+        print(f"Error saving avatar: {e}")
+        raise HTTPException(status_code=500, detail=f"Error uploading avatar: {str(e)}")
+
+# Add a route to serve avatar files
+@app.get("/avatars/{filename}")
+async def get_avatar(filename: str):
+    file_path = UPLOAD_DIR / filename
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Avatar not found")
+    
+    return FileResponse(file_path)
