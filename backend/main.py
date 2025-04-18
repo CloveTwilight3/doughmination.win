@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
 from auth import router as auth_router, get_current_user, oauth2_scheme
 import os
