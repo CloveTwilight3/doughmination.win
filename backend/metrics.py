@@ -1,11 +1,12 @@
 # backend/metrics.py
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import httpx
 import os
 from dotenv import load_dotenv
 from cache import get_from_cache, set_in_cache
 from typing import List, Dict, Any, Optional
 import traceback
+import re
 
 load_dotenv()
 
@@ -16,6 +17,27 @@ CACHE_TTL = int(os.getenv("CACHE_TTL", 30))
 HEADERS = {
     "Authorization": TOKEN
 }
+
+def parse_timestamp(timestamp_str: str) -> datetime:
+    """Parse timestamp string into datetime with proper timezone handling"""
+    # Check if timestamp has the problematic microsecond format
+    microsecond_match = re.match(r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{5,6})(\+\d{2}:\d{2})', timestamp_str)
+    if microsecond_match:
+        # Truncate microseconds to 6 digits and rebuild the string
+        timestamp_str = f"{microsecond_match.group(1)[:26]}{microsecond_match.group(2)}"
+    
+    # Handle Z timezone
+    if timestamp_str.endswith('Z'):
+        timestamp_str = timestamp_str[:-1] + '+00:00'
+    
+    # Create offset-aware datetime
+    dt = datetime.fromisoformat(timestamp_str)
+    
+    # Ensure it's timezone-aware
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    
+    return dt
 
 async def get_switches(limit: int = 1000) -> List[Dict[str, Any]]:
     """Get recent switches from PluralKit"""
@@ -47,7 +69,7 @@ async def get_fronting_time_metrics(days: int = 30) -> Dict[str, Any]:
         print(f"Retrieved {len(switches)} switches")
         
         # Get current time and calculate the cutoff time
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         cutoff_time = now - timedelta(days=days)
         print(f"Cutoff time: {cutoff_time.isoformat()}")
         
@@ -71,14 +93,12 @@ async def get_fronting_time_metrics(days: int = 30) -> Dict[str, Any]:
         filtered_switches = []
         for switch in switches:
             try:
-                # Check if timestamp contains 'Z' and handle it
-                timestamp_str = switch["timestamp"]
-                if timestamp_str.endswith('Z'):
-                    timestamp_str = timestamp_str[:-1] + '+00:00'
-                timestamp = datetime.fromisoformat(timestamp_str)
-                
+                timestamp = parse_timestamp(switch["timestamp"])
                 if timestamp >= cutoff_time:
-                    filtered_switches.append(switch)
+                    filtered_switches.append({
+                        **switch,
+                        "_parsed_timestamp": timestamp  # Store the parsed timestamp
+                    })
             except Exception as e:
                 print(f"Error parsing timestamp {switch.get('timestamp', 'unknown')}: {str(e)}")
                 continue
@@ -86,7 +106,7 @@ async def get_fronting_time_metrics(days: int = 30) -> Dict[str, Any]:
         print(f"Filtered to {len(filtered_switches)} switches within time period")
         
         # Sort switches by timestamp (oldest first)
-        filtered_switches.sort(key=lambda x: x["timestamp"])
+        filtered_switches.sort(key=lambda x: x["_parsed_timestamp"])
         
         # Calculate fronting time for each member
         fronting_times = {}
@@ -110,7 +130,8 @@ async def get_fronting_time_metrics(days: int = 30) -> Dict[str, Any]:
         current_members = filtered_switches[-1]["members"]
         filtered_switches.append({
             "timestamp": now.isoformat(),
-            "members": current_members
+            "members": current_members,
+            "_parsed_timestamp": now
         })
         
         # Calculate total time for each member
@@ -120,17 +141,9 @@ async def get_fronting_time_metrics(days: int = 30) -> Dict[str, Any]:
             curr_switch = filtered_switches[i]
             
             try:
-                # Parse timestamps with proper handling
-                prev_time_str = prev_switch["timestamp"]
-                curr_time_str = curr_switch["timestamp"]
-                
-                if prev_time_str.endswith('Z'):
-                    prev_time_str = prev_time_str[:-1] + '+00:00'
-                if curr_time_str.endswith('Z'):
-                    curr_time_str = curr_time_str[:-1] + '+00:00'
-                
-                prev_time = datetime.fromisoformat(prev_time_str)
-                curr_time = datetime.fromisoformat(curr_time_str)
+                # Use the parsed timestamps
+                prev_time = prev_switch["_parsed_timestamp"]
+                curr_time = curr_switch["_parsed_timestamp"]
                 
                 # Calculate duration in seconds
                 duration_seconds = (curr_time - prev_time).total_seconds()
@@ -248,21 +261,19 @@ async def get_switch_frequency_metrics(days: int = 30) -> Dict[str, Any]:
         switches = await get_switches(1000)  # Get a large number of switches
         
         # Get current time and calculate the cutoff time
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         cutoff_time = now - timedelta(days=days)
         
         # Filter switches to only include those within the specified period
         filtered_switches = []
         for switch in switches:
             try:
-                # Handle Z in timestamp
-                timestamp_str = switch["timestamp"]
-                if timestamp_str.endswith('Z'):
-                    timestamp_str = timestamp_str[:-1] + '+00:00'
-                timestamp = datetime.fromisoformat(timestamp_str)
-                
+                timestamp = parse_timestamp(switch["timestamp"])
                 if timestamp >= cutoff_time:
-                    filtered_switches.append(switch)
+                    filtered_switches.append({
+                        **switch,
+                        "_parsed_timestamp": timestamp
+                    })
             except Exception as e:
                 print(f"Error parsing timestamp in switch_frequency: {str(e)}")
                 continue
@@ -281,12 +292,7 @@ async def get_switch_frequency_metrics(days: int = 30) -> Dict[str, Any]:
         
         for switch in filtered_switches:
             try:
-                # Handle Z in timestamp
-                timestamp_str = switch["timestamp"]
-                if timestamp_str.endswith('Z'):
-                    timestamp_str = timestamp_str[:-1] + '+00:00'
-                timestamp = datetime.fromisoformat(timestamp_str)
-                
+                timestamp = switch["_parsed_timestamp"]
                 time_ago = (now - timestamp).total_seconds()
                 
                 if time_ago <= 24 * 3600:  # 24 hours
