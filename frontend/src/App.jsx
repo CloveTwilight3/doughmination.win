@@ -150,6 +150,11 @@ function App() {
       updateMetaTags();
     }
   }, [fronting, defaultAvatar]);
+
+  // Close mobile menu when navigating
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [navigate]);
   
   // Function to update meta tags for better link sharing
   const updateMetaTags = (frontingMember = null) => {
@@ -206,15 +211,37 @@ function App() {
     navigate('/');
   }
 
+  // Handle toggling the mobile menu
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   if (loading) return <div className="text-black dark:text-white p-10 text-center">Loading...</div>;
 
   return (
     <div className="max-w-6xl mx-auto text-black dark:text-white">
-      {/* IMPORTANT: Updated navbar structure */}
+      {/* Updated navbar with hamburger menu */}
       <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <Link to="/" className="text-lg font-semibold">Doughmination System</Link>
-          <nav>
+          <Link to="/" className="text-lg font-semibold z-10">Doughmination System</Link>
+          
+          {/* Mobile menu button */}
+          <button 
+            className="md:hidden p-2 text-gray-700 dark:text-gray-200 focus:outline-none"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+          
+          {/* Desktop navigation */}
+          <nav className="hidden md:block">
             <ul className="flex items-center gap-3">
               <li>
                 <button
@@ -277,6 +304,77 @@ function App() {
               )}
             </ul>
           </nav>
+        </div>
+        
+        {/* Mobile navigation menu - slides down when open */}
+        <div 
+          className={`md:hidden absolute w-full bg-white dark:bg-gray-800 shadow-md transition-all duration-300 ease-in-out z-5 ${
+            mobileMenuOpen ? 'max-h-96 py-3 opacity-100' : 'max-h-0 py-0 opacity-0 overflow-hidden'
+          }`}
+        >
+          <div className="container mx-auto px-4">
+            <ul className="flex flex-col gap-2">
+              <li>
+                <button
+                  onClick={toggleTheme}
+                  className="w-full px-3 py-2 bg-blue-500 text-white rounded-lg text-sm text-center"
+                >
+                  {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                </button>
+              </li>
+              {loggedIn && (
+                <li>
+                  <Link 
+                    to="/admin/metrics"
+                    className="block w-full px-3 py-2 bg-purple-500 text-white rounded-lg text-sm text-center"
+                  >
+                    Metrics
+                  </Link>
+                </li>
+              )}
+              {loggedIn && (
+                <li>
+                  <Link 
+                    to="/admin/user"
+                    className="block w-full px-3 py-2 bg-purple-500 text-white rounded-lg text-sm text-center"
+                  >
+                    My Profile
+                  </Link>
+                </li>
+              )}
+              {loggedIn ? (
+                <>
+                  {isAdmin && (
+                    <li>
+                      <Link 
+                        to="/admin/dashboard"
+                        className="block w-full px-3 py-2 bg-purple-500 text-white rounded-lg text-sm text-center"
+                      >
+                        Admin Panel
+                      </Link>
+                    </li>
+                  )}
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-3 py-2 bg-red-500 text-white rounded-lg text-sm text-center"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <li>
+                  <Link 
+                    to="/admin/login"
+                    className="block w-full px-3 py-2 bg-green-500 text-white rounded-lg text-sm text-center"
+                  >
+                    Login
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
       </header>
 
