@@ -15,6 +15,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token"));
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const defaultAvatar = "https://clovetwilight3.co.uk/system.png";
@@ -104,32 +105,129 @@ function App() {
     };
 
     initialize();
-  }, []);
+    
+    // Add event listener to close menu when clicking outside
+    const handleClickOutside = (e) => {
+      if (mobileMenuOpen && !e.target.closest('.mobile-menu-container') && !e.target.closest('.mobile-menu-button')) {
+        setMobileMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    // Close mobile menu when route changes
+    const closeMenu = () => setMobileMenuOpen(false);
+    window.addEventListener('popstate', closeMenu);
+    
+    // Lock body scroll when mobile menu is open
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('popstate', closeMenu);
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
       const frontingMember = fronting.members[0];
       document.title = `Currently Fronting: ${frontingMember.display_name || frontingMember.name || 'Unknown'}`;
       const frontingAvatar = frontingMember.webhook_avatar_url || frontingMember.avatar_url || defaultAvatar;
+      
+      // Update favicon
       const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
       link.type = 'image/x-icon';
       link.rel = 'icon';
       link.href = frontingAvatar;
       document.head.appendChild(link);
+      
+      // Update apple-touch-icon for iOS
+      const touchIcon = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
+      touchIcon.rel = 'apple-touch-icon';
+      touchIcon.href = frontingAvatar;
+      document.head.appendChild(touchIcon);
+      
+      // Update meta tags for better link sharing
+      updateMetaTags(frontingMember);
     } else {
       document.title = "Doughmination System Server";
+      
+      // Reset favicon
       const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
       link.type = 'image/x-icon';
       link.rel = 'icon';
       link.href = defaultAvatar;
       document.head.appendChild(link);
+      
+      // Reset apple-touch-icon
+      const touchIcon = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
+      touchIcon.rel = 'apple-touch-icon';
+      touchIcon.href = defaultAvatar;
+      document.head.appendChild(touchIcon);
+      
+      // Reset meta tags
+      updateMetaTags();
     }
   }, [fronting, defaultAvatar]);
+  
+  // Function to update meta tags for better link sharing
+  const updateMetaTags = (frontingMember = null) => {
+    // Update Open Graph title
+    let metaTitle = document.querySelector('meta[property="og:title"]');
+    if (!metaTitle) {
+      metaTitle = document.createElement('meta');
+      metaTitle.setAttribute('property', 'og:title');
+      document.head.appendChild(metaTitle);
+    }
+    
+    // Update Open Graph image
+    let metaImage = document.querySelector('meta[property="og:image"]');
+    if (!metaImage) {
+      metaImage = document.createElement('meta');
+      metaImage.setAttribute('property', 'og:image');
+      document.head.appendChild(metaImage);
+    }
+    
+    // Update description
+    let metaDesc = document.querySelector('meta[property="og:description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.setAttribute('property', 'og:description');
+      document.head.appendChild(metaDesc);
+    }
+    
+    if (frontingMember) {
+      // Custom meta data for current fronter
+      metaTitle.setAttribute('content', `Currently Fronting: ${frontingMember.display_name || frontingMember.name}`);
+      metaImage.setAttribute('content', frontingMember.webhook_avatar_url || frontingMember.avatar_url || defaultAvatar);
+      metaDesc.setAttribute('content', `Learn more about ${frontingMember.display_name || frontingMember.name} and other system members`);
+    } else {
+      // Default meta data
+      metaTitle.setAttribute('content', 'Doughmination System');
+      metaImage.setAttribute('content', defaultAvatar);
+      metaDesc.setAttribute('content', 'View current fronters and members of the Doughmination system.');
+    }
+    
+    // Also update Twitter card tags
+    let twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    let twitterImage = document.querySelector('meta[name="twitter:image"]');
+    let twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    
+    if (twitterTitle) twitterTitle.setAttribute('content', metaTitle.getAttribute('content'));
+    if (twitterImage) twitterImage.setAttribute('content', metaImage.getAttribute('content'));
+    if (twitterDesc) twitterDesc.setAttribute('content', metaDesc.getAttribute('content'));
+  };
 
   function handleLogout() {
     localStorage.removeItem("token");
     setLoggedIn(false);
     setIsAdmin(false);
+    setMobileMenuOpen(false);
     navigate('/');
   }
 
@@ -137,11 +235,28 @@ function App() {
 
   return (
     <div className="max-w-6xl mx-auto text-black dark:text-white">
-      {/* IMPORTANT: Updated navbar structure */}
+      {/* Mobile-friendly header */}
       <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Link to="/" className="text-lg font-semibold">Doughmination System</Link>
-          <nav>
+          
+          {/* Mobile menu button - only visible on small screens */}
+          <button 
+            className="md:hidden flex items-center justify-center p-2 mobile-menu-button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+          
+          {/* Desktop navigation - hidden on small screens */}
+          <nav className="hidden md:block">
             <ul className="flex items-center gap-3">
               <li>
                 <button
@@ -197,6 +312,73 @@ function App() {
         </div>
       </header>
 
+      {/* Mobile menu overlay - only visible when mobile menu is open */}
+      <div 
+        className={`mobile-menu-overlay ${mobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+      ></div>
+      
+      {/* Mobile menu - slides in from the right on small screens */}
+      <div className={`mobile-menu-container ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className="flex flex-col h-full">
+          <div className="mb-6 pb-4 border-b dark:border-gray-700">
+            <button
+              onClick={toggleTheme}
+              className="w-full px-3 py-2 bg-blue-500 text-white rounded-lg text-sm mb-3"
+            >
+              {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+            </button>
+            
+            {loggedIn && (
+              <Link 
+                to="/admin/metrics"
+                className="block w-full text-center px-3 py-2 mt-2 bg-purple-500 text-white rounded-lg text-sm"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Metrics
+              </Link>
+            )}
+          </div>
+          
+          {loggedIn ? (
+            <div>
+              {isAdmin && (
+                <Link 
+                  to="/admin/dashboard"
+                  className="block w-full text-center px-3 py-2 mb-3 bg-purple-500 text-white rounded-lg text-sm"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin Panel
+                </Link>
+              )}
+              <button
+                onClick={handleLogout}
+                className="block w-full px-3 py-2 mb-3 bg-red-500 text-white rounded-lg text-sm"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link 
+              to="/admin/login"
+              className="block w-full text-center px-3 py-2 mb-3 bg-green-500 text-white rounded-lg text-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Login
+            </Link>
+          )}
+          
+          <div className="mt-auto pt-4 border-t dark:border-gray-700">
+            <button 
+              onClick={() => setMobileMenuOpen(false)}
+              className="block w-full px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm"
+            >
+              Close Menu
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Clear space for the fixed header */}
       <div className="pt-16"></div>
 
@@ -217,6 +399,7 @@ function App() {
                 <img
                   src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
                   alt="Fronting member"
+                  loading="eager"
                 />
               </div>
               <span className="fronting-member-name">
@@ -240,12 +423,14 @@ function App() {
                         <Link 
                           to={`/${member.name.toLowerCase()}`} 
                           className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 transform transition-all duration-300"
+                          onClick={() => setMobileMenuOpen(false)}
                         >
                           <div className="flex flex-col items-center justify-center h-full p-3">
                             <div className="avatar-container">
                               <img
                                 src={member.avatar_url || defaultAvatar}
                                 alt={member.name}
+                                loading="lazy"
                               />
                             </div>
                             <span className="member-name">{member.display_name || member.name}</span>
