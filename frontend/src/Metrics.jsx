@@ -1,3 +1,4 @@
+// frontend/src/Metrics.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -6,8 +7,8 @@ const Metrics = () => {
   const [switchMetrics, setSwitchMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [timeframe, setTimeframe] = useState('30d');
   const [days, setDays] = useState(30);
+  const [activeTab, setActiveTab] = useState('summary'); // 'summary', 'detail', or 'switches'
 
   useEffect(() => {
     fetchMetrics();
@@ -84,10 +85,6 @@ const Metrics = () => {
     setDays(newDays);
   };
   
-  const handleTimeframeChange = (newTimeframe) => {
-    setTimeframe(newTimeframe);
-  };
-  
   if (loading) {
     return (
       <div className="p-8 text-center">
@@ -121,11 +118,15 @@ const Metrics = () => {
   
   // Sort members by fronting time for the selected timeframe
   const sortedMembers = Object.values(frontingMetrics.members).sort((a, b) => {
-    return b[timeframe] - a[timeframe];
+    return b[`${days === 1 ? '24h' : days === 2 ? '48h' : days === 5 ? '5d' : days === 7 ? '7d' : '30d'}`] - 
+           a[`${days === 1 ? '24h' : days === 2 ? '48h' : days === 5 ? '5d' : days === 7 ? '7d' : '30d'}`];
   });
   
+  // Get current timeframe key
+  const timeframeKey = days === 1 ? '24h' : days === 2 ? '48h' : days === 5 ? '5d' : days === 7 ? '7d' : '30d';
+  
   return (
-    <div className="max-w-5xl mx-auto mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div className="max-w-4xl mx-auto mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6 text-center">System Metrics</h1>
       
       {/* Time Range Selector */}
@@ -165,172 +166,204 @@ const Metrics = () => {
         </div>
       </div>
       
-      {/* Timeframe Selector for Display */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">Display Timeframe:</label>
-        <div className="flex flex-wrap gap-2">
-          <button 
-            onClick={() => handleTimeframeChange('24h')}
-            className={`px-3 py-1 rounded ${timeframe === '24h' ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
-          >
-            24 Hours
-          </button>
-          <button 
-            onClick={() => handleTimeframeChange('48h')}
-            className={`px-3 py-1 rounded ${timeframe === '48h' ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
-          >
-            48 Hours
-          </button>
-          <button 
-            onClick={() => handleTimeframeChange('5d')}
-            className={`px-3 py-1 rounded ${timeframe === '5d' ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
-          >
-            5 Days
-          </button>
-          <button 
-            onClick={() => handleTimeframeChange('7d')}
-            className={`px-3 py-1 rounded ${timeframe === '7d' ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
-          >
-            7 Days
-          </button>
-          <button 
-            onClick={() => handleTimeframeChange('30d')}
-            className={`px-3 py-1 rounded ${timeframe === '30d' ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}
-          >
-            30 Days
-          </button>
-        </div>
+      {/* Tabs */}
+      <div className="flex border-b mb-6">
+        <button 
+          onClick={() => setActiveTab('summary')} 
+          className={`px-4 py-2 font-medium ${activeTab === 'summary' ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
+        >
+          Summary
+        </button>
+        <button 
+          onClick={() => setActiveTab('detail')} 
+          className={`px-4 py-2 font-medium ${activeTab === 'detail' ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
+        >
+          Detailed Stats
+        </button>
+        <button 
+          onClick={() => setActiveTab('switches')} 
+          className={`px-4 py-2 font-medium ${activeTab === 'switches' ? 'border-b-2 border-purple-500 text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`}
+        >
+          Switch Data
+        </button>
       </div>
       
-      {/* Switch Frequency Stats */}
-      <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h2 className="text-xl font-semibold mb-3">Switch Frequency</h2>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Last 24h</p>
-            <p className="text-xl font-bold">{switchMetrics.timeframes['24h']} switches</p>
+      {/* Summary Tab */}
+      {activeTab === 'summary' && (
+        <div>
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-4">Fronting Time Overview</h2>
+            
+            {sortedMembers.length > 0 ? (
+              <div className="space-y-4">
+                {sortedMembers.slice(0, 5).map(member => {
+                  // Calculate percentage for this timeframe
+                  const timeframeSeconds = Object.values(frontingMetrics.timeframes[timeframeKey]).reduce((sum, val) => sum + val, 0);
+                  const percentage = timeframeSeconds > 0 ? (member[timeframeKey] / timeframeSeconds) * 100 : 0;
+                  
+                  return (
+                    <div key={member.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                      <div className="flex items-center mb-2">
+                        {member.avatar_url && (
+                          <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
+                            <img 
+                              src={member.avatar_url} 
+                              alt={member.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div>
+                          <h3 className="font-semibold">{member.display_name}</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{member.name}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5 mb-2">
+                        <div 
+                          className="bg-purple-500 h-2.5 rounded-full" 
+                          style={{ width: `${Math.max(percentage, 0.5)}%` }}
+                        ></div>
+                      </div>
+                      
+                      <div className="flex justify-between text-sm">
+                        <span>{formatTime(member[timeframeKey])}</span>
+                        <span>{percentage.toFixed(1)}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+                
+                {sortedMembers.length > 5 && (
+                  <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    <button 
+                      onClick={() => setActiveTab('detail')}
+                      className="text-purple-500 hover:underline"
+                    >
+                      + {sortedMembers.length - 5} more members
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-center py-4">No fronting data available for this timeframe.</p>
+            )}
           </div>
-          <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Last 48h</p>
-            <p className="text-xl font-bold">{switchMetrics.timeframes['48h']} switches</p>
-          </div>
-          <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Last 5d</p>
-            <p className="text-xl font-bold">{switchMetrics.timeframes['5d']} switches</p>
-          </div>
-          <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Last 7d</p>
-            <p className="text-xl font-bold">{switchMetrics.timeframes['7d']} switches</p>
-          </div>
-          <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Last 30d</p>
-            <p className="text-xl font-bold">{switchMetrics.timeframes['30d']} switches</p>
-          </div>
-        </div>
-        <div className="mt-4">
-          <p className="text-sm">
-            <span className="font-medium">Average:</span> {switchMetrics.avg_switches_per_day.toFixed(2)} switches per day
-          </p>
-        </div>
-      </div>
-      
-      {/* Fronting Time */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Fronting Time ({timeframe})</h2>
-        
-        {sortedMembers.length > 0 ? (
-          <div className="space-y-4">
-            {sortedMembers.map(member => {
-              // Calculate percentage for this timeframe
-              const timeframeSeconds = Object.values(frontingMetrics.timeframes[timeframe]).reduce((sum, val) => sum + val, 0);
-              const percentage = timeframeSeconds > 0 ? (member[timeframe] / timeframeSeconds) * 100 : 0;
+          
+          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <h2 className="text-xl font-semibold mb-3">Switch Stats</h2>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Total Switches</p>
+                <p className="text-xl font-bold">{switchMetrics.timeframes[timeframeKey]}</p>
+              </div>
               
-              return (
-                <div key={member.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <div className="flex items-center mb-2">
-                    {member.avatar_url && (
-                      <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
-                        <img 
-                          src={member.avatar_url} 
-                          alt={member.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <h3 className="font-semibold">{member.display_name}</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{member.name}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5 mb-2">
-                    <div 
-                      className="bg-purple-500 h-2.5 rounded-full" 
-                      style={{ width: `${Math.max(percentage, 0.5)}%` }}
-                    ></div>
-                  </div>
-                  
-                  <div className="flex justify-between text-sm">
-                    <span>{formatTime(member[timeframe])}</span>
-                    <span>{percentage.toFixed(1)}%</span>
-                  </div>
-                </div>
-              );
-            })}
+              <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Avg. Per Day</p>
+                <p className="text-xl font-bold">{switchMetrics.avg_switches_per_day.toFixed(1)}</p>
+              </div>
+              
+              <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Active Members</p>
+                <p className="text-xl font-bold">{sortedMembers.filter(m => m[timeframeKey] > 0).length}</p>
+              </div>
+            </div>
           </div>
-        ) : (
-          <p className="text-center py-4">No fronting data available for this timeframe.</p>
-        )}
-      </div>
+        </div>
+      )}
       
-      {/* All Timeframes Data */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-700">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Member</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">24h</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">48h</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">5d</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">7d</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">30d</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Total</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {sortedMembers.map(member => (
-              <tr key={member.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    {member.avatar_url && (
-                      <div className="w-8 h-8 rounded-full overflow-hidden mr-3 flex-shrink-0">
-                        <img 
-                          src={member.avatar_url} 
-                          alt={member.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <div className="font-medium">{member.display_name}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">{member.name}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{formatTime(member['24h'])}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{formatTime(member['48h'])}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{formatTime(member['5d'])}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{formatTime(member['7d'])}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{formatTime(member['30d'])}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="font-medium">{formatTime(member.total_seconds)}</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">({member.total_percent.toFixed(1)}%)</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Detail Tab */}
+      {activeTab === 'detail' && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Detailed Member Stats</h2>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Member</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Time</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Percentage</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {sortedMembers.map(member => {
+                  // Calculate percentage for this timeframe
+                  const timeframeSeconds = Object.values(frontingMetrics.timeframes[timeframeKey]).reduce((sum, val) => sum + val, 0);
+                  const percentage = timeframeSeconds > 0 ? (member[timeframeKey] / timeframeSeconds) * 100 : 0;
+                  
+                  if (member[timeframeKey] <= 0) return null;
+                  
+                  return (
+                    <tr key={member.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {member.avatar_url && (
+                            <div className="w-8 h-8 rounded-full overflow-hidden mr-3 flex-shrink-0">
+                              <img 
+                                src={member.avatar_url} 
+                                alt={member.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-medium">{member.display_name}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{member.name}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right font-medium">{formatTime(member[timeframeKey])}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">{percentage.toFixed(1)}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      
+      {/* Switches Tab */}
+      {activeTab === 'switches' && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Switch Frequency</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+            <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Last 24h</p>
+              <p className="text-xl font-bold">{switchMetrics.timeframes['24h']} switches</p>
+            </div>
+            <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Last 48h</p>
+              <p className="text-xl font-bold">{switchMetrics.timeframes['48h']} switches</p>
+            </div>
+            <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Last 5d</p>
+              <p className="text-xl font-bold">{switchMetrics.timeframes['5d']} switches</p>
+            </div>
+            <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Last 7d</p>
+              <p className="text-xl font-bold">{switchMetrics.timeframes['7d']} switches</p>
+            </div>
+            <div className="p-3 bg-white dark:bg-gray-800 rounded shadow">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Last 30d</p>
+              <p className="text-xl font-bold">{switchMetrics.timeframes['30d']} switches</p>
+            </div>
+          </div>
+          
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+            <h3 className="font-medium mb-2">Average Switch Frequency</h3>
+            <p className="text-2xl font-bold">{switchMetrics.avg_switches_per_day.toFixed(1)} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">switches per day</span></p>
+            
+            <div className="mt-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Based on {switchMetrics.total_switches} switches over the past {days} days.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="mt-6 pt-4 border-t dark:border-gray-700">
         <Link to="/" className="text-blue-500 dark:text-blue-400">
