@@ -1,17 +1,54 @@
+/*
+MIT License
+
+Copyright (c) 2025 Clove Twilight
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+/* 
+ * AdminDashboard.jsx
+ * 
+ * This component provides an administrative interface for managing the PluralKit system.
+ * It includes:
+ * - Display of currently fronting member
+ * - Ability to switch fronting members
+ * - User management interface (via the UserManagement component)
+ * 
+ * The component handles API communication for fetching members and updating fronting status.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import UserManagement from './UserManagement'; // Import the new component
+import UserManagement from './UserManagement'; // Import user management component
 
 export default function AdminDashboard({ fronting }) {
-  const [newFront, setNewFront] = useState("");
-  const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState(null);
+  // State management
+  const [newFront, setNewFront] = useState(""); // ID of the member to set as front
+  const [members, setMembers] = useState([]); // All system members
+  const [loading, setLoading] = useState(true); // Loading state
+  const [message, setMessage] = useState(null); // Feedback message for user actions
 
-  // Fetch members on component mount
+  // Fetch members from API on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) return; // Early return if not authenticated
     
     fetch("/api/members", {
       headers: {
@@ -23,7 +60,7 @@ export default function AdminDashboard({ fronting }) {
         return res.json();
       })
       .then(data => {
-        // Sort members alphabetically
+        // Sort members alphabetically by name
         const sortedMembers = [...data].sort((a, b) => {
           const nameA = (a.display_name || a.name).toLowerCase();
           const nameB = (b.display_name || b.name).toLowerCase();
@@ -31,6 +68,7 @@ export default function AdminDashboard({ fronting }) {
         });
         
         setMembers(sortedMembers || []);
+        // Set the first member as default selection if none is already selected
         if (sortedMembers && sortedMembers.length > 0 && !newFront) {
           setNewFront(sortedMembers[0].id);
         }
@@ -40,10 +78,14 @@ export default function AdminDashboard({ fronting }) {
         console.error("Error fetching members:", err);
         setLoading(false);
       });
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
 
+  /**
+   * Handle switching to a new fronting member
+   * Makes API call to set the new fronting member
+   */
   function handleSwitchFront() {
-    if (!newFront) return;
+    if (!newFront) return; // Early return if no member selected
     
     const token = localStorage.getItem("token");
     if (!token) {
@@ -54,6 +96,7 @@ export default function AdminDashboard({ fronting }) {
     setMessage(null); // Clear previous message
     setLoading(true);
     
+    // Call the API to switch fronting member
     fetch("/api/switch_front", {
       method: "POST",
       headers: {
@@ -74,7 +117,10 @@ export default function AdminDashboard({ fronting }) {
           window.location.reload();
         }, 1500);
       } else {
-        setMessage({ type: "error", content: data.message || "Failed to switch fronting member." });
+        setMessage({ 
+          type: "error", 
+          content: data.message || "Failed to switch fronting member." 
+        });
       }
     })
     .catch((err) => {
@@ -86,23 +132,31 @@ export default function AdminDashboard({ fronting }) {
     });
   }
 
+  // Show loading indicator when fetching initial data
   if (loading && members.length === 0) {
     return <div className="text-center p-8">Loading...</div>;
   }
 
+  // Get the first currently fronting member (if any)
   const currentFronting = fronting?.members?.[0];
 
   return (
     <div className="max-w-4xl mx-auto mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6 text-center">Admin Dashboard</h1>
       
+      {/* Display feedback messages */}
       {message && (
-        <div className={`mb-4 p-3 rounded ${message.type === "success" ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100" : "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"}`}>
+        <div className={`mb-4 p-3 rounded ${
+          message.type === "success" 
+            ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100" 
+            : "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
+        }`}>
           {message.content}
         </div>
       )}
       
       <div className="space-y-6">
+        {/* Currently Fronting Section */}
         <div className="border-b pb-4 dark:border-gray-700">
           <h2 className="text-xl font-semibold mb-2">Currently Fronting</h2>
           {currentFronting ? (
@@ -121,6 +175,7 @@ export default function AdminDashboard({ fronting }) {
           )}
         </div>
         
+        {/* Switch Fronting Member Section */}
         <div>
           <h2 className="text-xl font-semibold mb-3">Switch Fronting Member</h2>
           <div className="space-y-4">
@@ -155,9 +210,10 @@ export default function AdminDashboard({ fronting }) {
         </div>
       </div>
       
-      {/* User Management Section */}
+      {/* User Management Section - Rendered from imported component */}
       <UserManagement />
       
+      {/* Navigation back to home */}
       <div className="mt-6 pt-4 border-t dark:border-gray-700">
         <Link to="/" className="text-blue-500 dark:text-blue-400">
           ← Back to Home
