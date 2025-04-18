@@ -24,6 +24,9 @@ app = FastAPI()
 # Initialize the admin user if no users exist
 initialize_admin_user()
 
+# Default fallback avatar URL
+DEFAULT_AVATAR = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/75bff394-4f86-45a8-a923-e26223aa74cb/de901o7-d61b3bfb-f1b1-453b-8268-9200130bbc65.png"
+
 # File size limit middleware
 class FileSizeLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -277,8 +280,11 @@ async def upload_user_avatar(
         async with aiofiles.open(file_path, 'wb') as out_file:
             await out_file.write(content)
         
+        # Get the base URL from environment variables or request
+        host = os.getenv("BASE_URL", "")
+        
         # Update user with avatar URL
-        avatar_url = f"/avatars/{unique_filename}"
+        avatar_url = f"{host}/avatars/{unique_filename}"
         user_update = UserUpdate(avatar_url=avatar_url)
         updated_user = update_user(user_id, user_update)
         
@@ -293,10 +299,11 @@ async def upload_user_avatar(
 @app.get("/avatars/{filename}")
 async def get_avatar(filename: str):
     file_path = UPLOAD_DIR / filename
-    if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="Avatar not found")
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
     
-    return FileResponse(file_path)
+    # If not found locally, redirect to default avatar
+    return JSONResponse({"url": DEFAULT_AVATAR})
 
 # Add metric information
 @app.get("/api/metrics/fronting-time")

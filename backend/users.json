@@ -1,0 +1,10 @@
+[
+  {
+    "id": "b6917147-2f39-4a0a-b61c-7673a18cfe00",
+    "username": "admin",
+    "password_hash": "$2b$12$WCiTbQyLvDM.EiWGWf4CWeunwfaDQJ5bMZvYynbaQti3jIvFOOxSi",
+    "display_name": "Administrator",
+    "is_admin": true,
+    "avatar_url": null
+  }
+]
