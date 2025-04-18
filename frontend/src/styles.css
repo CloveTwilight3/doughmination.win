@@ -1,11 +1,22 @@
-/* ==== CONSOLIDATED CSS FILE ==== */
-/* Based on App.css, index.css, and fix-styles.css */
+/* ============================================================================
+   DOUGHMINATION SYSTEM SERVER - MAIN STYLESHEET
+   
+   This is the main CSS file for the Doughmination System Server application.
+   It contains styling for all components, responsive design, and theme support.
+   ============================================================================ */
 
-/* ===== GLOBAL RESET & BASE STYLES ===== */
+/* ============================================================================
+   TAILWIND DIRECTIVES
+   Required for Tailwind CSS processing
+   ============================================================================ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================================
+   GLOBAL RESET & BASE STYLES
+   Basic styling that applies to all elements
+   ============================================================================ */
 * {
   margin: 0;
   padding: 0;
@@ -18,7 +29,7 @@ body {
   max-width: 100vw;
 }
 
-/* Pink to white gradient for light mode */
+/* Light mode theme - Pink to white gradient */
 body {
   font-family: 'Inter', sans-serif;
   background: linear-gradient(135deg, #fbcfe8 0%, #ffffff 100%);
@@ -29,7 +40,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Purple to black gradient for dark mode */
+/* Dark mode theme - Purple to black gradient */
 html.dark body {
   background: linear-gradient(135deg, #8b5cf6 0%, #1e1b4b 35%, #000000 100%);
   background-attachment: fixed;
@@ -38,7 +49,10 @@ html.dark body {
   color: #fff;
 }
 
-/* ===== ROOT CONTAINER ===== */
+/* ============================================================================
+   CONTAINER STYLES
+   Layout containers and structure
+   ============================================================================ */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -47,7 +61,6 @@ html.dark body {
   overflow-x: hidden;
 }
 
-/* ===== CONTAINER STYLES ===== */
 .container {
   width: 100%;
   max-width: 1280px;
@@ -66,7 +79,7 @@ main.container {
   overflow-x: hidden;
 }
 
-/* Adjust card backgrounds for better contrast with the new gradients */
+/* Card backgrounds with blur effect for better readability */
 .bg-white {
   background-color: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
@@ -90,7 +103,11 @@ html.dark .card {
   backdrop-filter: blur(10px);
 }
 
-/* Light mode text color fixes */
+/* ============================================================================
+   TEXT COLOR OVERRIDES
+   Ensures text remains readable in both light and dark modes
+   ============================================================================ */
+/* Light mode text colors */
 html:not(.dark) .bg-white,
 html:not(.dark) .member-grid-item a,
 html:not(.dark) .rounded-lg,
@@ -98,7 +115,6 @@ html:not(.dark) .border {
   color: #111827 !important; /* Black text for light mode */
 }
 
-/* Fix text colors throughout light mode */
 html:not(.dark) h1,
 html:not(.dark) h2,
 html:not(.dark) h3,
@@ -108,7 +124,6 @@ html:not(.dark) div:not([class*="bg-"]) {
   color: #111827;
 }
 
-/* Text color overrides for containers in light mode */
 html:not(.dark) .max-w-2xl,
 html:not(.dark) .max-w-md {
   color: #111827;
@@ -118,13 +133,15 @@ html:not(.dark) .text-black {
   color: #111827 !important;
 }
 
-/* Ensure buttons maintain proper contrast in light mode */
 html:not(.dark) button:not(.bg-blue-500):not(.bg-purple-500):not(.bg-green-500):not(.bg-red-500),
 html:not(.dark) a:not(.bg-blue-500):not(.bg-purple-500):not(.bg-green-500):not(.bg-red-500) {
   color: #111827;
 }
 
-/* ===== LINK STYLES ===== */
+/* ============================================================================
+   LINK STYLES
+   Default link styling
+   ============================================================================ */
 a {
   text-decoration: none;
   display: inline-block;
@@ -138,7 +155,11 @@ html.dark a {
   color: #fff;
 }
 
-/* ===== NAVIGATION BAR ===== */
+/* ============================================================================
+   NAVIGATION BAR
+   Header and navigation styling
+   ============================================================================ */
+/* Fixed header positioning */
 header.fixed {
   width: 100%;
   max-width: 100%;
@@ -152,12 +173,14 @@ header.fixed {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+/* Dark mode header */
 html.dark header.fixed {
   background-color: #1f2937;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Header container layout */
 header.fixed .container {
   display: flex;
   flex-direction: row;
@@ -169,6 +192,7 @@ header.fixed .container {
   padding: 0.75rem 1rem;
 }
 
+/* Navigation list styling */
 nav ul {
   list-style: none;
   margin: 0;
@@ -184,43 +208,115 @@ nav ul li {
   display: flex;
 }
 
+/* Space for fixed header */
 .pt-16 {
   padding-top: 4rem;
 }
 
-/* Mobile Navigation Improvements */
-/* Hamburger menu styles */
-.md\:hidden.p-2 {
-  background: none;
-  border: none;
+/* ============================================================================
+   HAMBURGER MENU STYLES
+   Mobile navigation menu toggle and dropdown
+   ============================================================================ */
+/* Hamburger button styling */
+.md\:hidden.flex.items-center.justify-center.p-2 {
+  margin-right: 0.25rem;
+  background-color: rgba(243, 244, 246, 0.8);
+  border-radius: 0.375rem;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* Mobile menu transition */
-.max-h-0 {
+/* Dark mode hamburger button */
+html.dark .md\:hidden.flex.items-center.justify-center.p-2 {
+  background-color: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+/* Hover effect for hamburger button */
+.md\:hidden.flex.items-center.justify-center.p-2:hover {
+  background-color: rgba(229, 231, 235, 0.9);
+  transform: translateY(-1px);
+}
+
+html.dark .md\:hidden.flex.items-center.justify-center.p-2:hover {
+  background-color: rgba(55, 65, 81, 0.9);
+}
+
+/* Active state for hamburger button */
+.md\:hidden.flex.items-center.justify-center.p-2:active {
+  transform: translateY(1px);
+}
+
+/* Mobile menu dropdown container */
+.md\:hidden.absolute.w-full {
+  left: 0;
+  right: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease-in-out;
+  overflow: hidden;
 }
 
-.max-h-96 {
-  transition: all 0.5s ease-in-out;
+/* Animation for opening/closing menu */
+.max-h-\[500px\] {
+  transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out, padding 0.2s ease-in-out;
 }
 
-/* Fix for the mobile menu positioning */
-@media (max-width: 768px) {
-  header.fixed .container {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+.max-h-0 {
+  transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out, padding 0.2s ease-in-out;
+}
+
+/* Mobile menu items styling */
+.md\:hidden.absolute.w-full .flex.flex-col.gap-3 li {
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
+/* Mobile menu button styling */
+.md\:hidden.absolute.w-full .flex.flex-col.gap-3 li a,
+.md\:hidden.absolute.w-full .flex.flex-col.gap-3 li button {
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+/* Special case for landscape orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+  .md\:hidden.absolute.w-full .flex.flex-col.gap-3 li a,
+  .md\:hidden.absolute.w-full .flex.flex-col.gap-3 li button {
+    height: 2.5rem;
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
   }
   
-  .md\:hidden.absolute.w-full {
-    top: calc(100% - 1px);
-    left: 0;
-    right: 0;
-    z-index: 40;
+  .md\:hidden.absolute.w-full .flex.flex-col.gap-3 {
+    gap: 0.375rem;
   }
 }
 
-/* ===== BUTTONS & INTERACTIVE ELEMENTS ===== */
+/* Hide mobile menu on desktop */
+@media (min-width: 768px) {
+  .md\:hidden.flex.items-center.justify-center.p-2,
+  .md\:hidden.absolute.w-full {
+    display: none !important;
+  }
+}
+
+/* ============================================================================
+   BUTTONS & INTERACTIVE ELEMENTS
+   Styling for buttons, links and interactive components
+   ============================================================================ */
+/* Basic button styling */
 button,
 a[class*="px-"],
 a.px-3.py-2,
@@ -239,7 +335,7 @@ nav a,
   padding: 0.6rem 1rem;
 }
 
-/* Enhanced button styling - Standardized with purple theme */
+/* Standard button styling - Purple theme */
 .px-3.py-2,
 .rounded-lg,
 button[type="submit"],
@@ -264,7 +360,7 @@ button[type="submit"],
   padding: 0.6rem 1rem;
 }
 
-/* Login button - Green */
+/* Green button styling - for login/success */
 .bg-green-500,
 .bg-green-600 {
   position: relative;
@@ -282,7 +378,7 @@ button[type="submit"],
   padding: 0.6rem 1rem;
 }
 
-/* Logout button - Red */
+/* Red button styling - for logout/danger */
 .bg-red-500 {
   position: relative;
   overflow: hidden;
@@ -299,7 +395,7 @@ button[type="submit"],
   padding: 0.6rem 1rem;
 }
 
-/* Active states */
+/* Active button states */
 .px-3.py-2:active,
 .rounded-lg:active,
 button[type="submit"]:active,
@@ -316,7 +412,7 @@ button[type="submit"]:active,
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Dark mode adjustments */
+/* Dark mode button adjustments */
 html.dark .px-3.py-2,
 html.dark .rounded-lg,
 html.dark button[type="submit"],
@@ -341,7 +437,7 @@ html.dark .bg-red-500 {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Fix disabled button states */
+/* Disabled button states */
 .disabled\:bg-blue-300:disabled,
 .bg-blue-600:disabled,
 button[type="submit"]:disabled {
@@ -359,7 +455,11 @@ html.dark button[type="submit"]:disabled {
   color: #94a3b8 !important;
 }
 
-/* ===== AVATARS & MEMBER STYLING ===== */
+/* ============================================================================
+   AVATARS & MEMBER STYLING
+   User and member avatar display
+   ============================================================================ */
+/* Base avatar container */
 .avatar-container {
   position: relative;
   width: 4.5rem;
@@ -374,6 +474,7 @@ html.dark button[type="submit"]:disabled {
   box-sizing: border-box;
 }
 
+/* Avatar image styling */
 .avatar-container img {
   width: 100%;
   height: 100%;
@@ -385,6 +486,7 @@ html.dark button[type="submit"]:disabled {
   left: auto;
 }
 
+/* Specific avatar sizes */
 .fronting-avatar {
   width: 4.5rem;
   height: 4.5rem;
@@ -395,12 +497,13 @@ html.dark button[type="submit"]:disabled {
   height: 6rem;
 }
 
+/* Dark mode avatar styling */
 html.dark .avatar-container {
   background-color: #374151;
   border-color: #4b5563;
 }
 
-/* Fix for current fronting avatar in admin panel */
+/* Admin panel member avatar fix */
 .flex.items-center .w-12.h-12.rounded-full {
   overflow: hidden;
   position: relative;
@@ -415,7 +518,7 @@ html.dark .avatar-container {
   left: 0;
 }
 
-/* Fix for the main fronting avatar at the top of the screen */
+/* Fix for the main fronting avatar */
 .fronting-member .avatar-container,
 .fronting-member .fronting-avatar {
   position: relative;
@@ -440,7 +543,11 @@ html.dark .avatar-container {
   object-position: center;
 }
 
-/* ===== MEMBER GRID LAYOUT ===== */
+/* ============================================================================
+   MEMBER GRID LAYOUT
+   Grid display for showing multiple members
+   ============================================================================ */
+/* Grid container */
 .member-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -451,6 +558,7 @@ html.dark .avatar-container {
   box-sizing: border-box;
 }
 
+/* Individual grid items */
 .member-grid-item {
   overflow: visible;
   display: flex;
@@ -458,7 +566,7 @@ html.dark .avatar-container {
   align-items: center;
 }
 
-/* Enhanced card styles for member items */
+/* Card styling for member items */
 .member-grid-item a {
   padding: 0.75rem;
   display: flex;
@@ -474,12 +582,14 @@ html.dark .avatar-container {
   transition: all 0.3s ease;
 }
 
+/* Dark mode card styling */
 html.dark .member-grid-item a {
   background: rgba(30, 27, 75, 0.7);
   border-color: rgba(139, 92, 246, 0.3);
   backdrop-filter: blur(10px);
 }
 
+/* Hover effects for member cards */
 .member-grid-item a:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
@@ -491,6 +601,7 @@ html.dark .member-grid-item a:hover {
   border-color: rgba(139, 92, 246, 0.7);
 }
 
+/* Member name styling */
 .member-name {
   font-size: 0.9rem;
   margin-top: 0.75rem;
@@ -500,7 +611,10 @@ html.dark .member-grid-item a:hover {
   text-align: center;
 }
 
-/* ===== FRONTING MEMBER SECTION ===== */
+/* ============================================================================
+   FRONTING MEMBER SECTION
+   Currently fronting member display
+   ============================================================================ */
 .fronting-member {
   display: flex;
   flex-direction: column;
@@ -533,7 +647,10 @@ html.dark .member-grid-item a:hover {
   overflow-wrap: break-word;
 }
 
-/* ===== DIVIDERS & SEPARATORS ===== */
+/* ============================================================================
+   DIVIDERS & SEPARATORS
+   Section dividers and borders
+   ============================================================================ */
 .mb-6.p-4.border-b,
 div[class*="border-b"] {
   width: 100%;
@@ -563,7 +680,10 @@ html.dark div[class*="border-b"] {
   width: 100%;
 }
 
-/* ===== FLEX CONTAINER FIXES ===== */
+/* ============================================================================
+   FLEX CONTAINER FIXES
+   Ensures flex containers display correctly
+   ============================================================================ */
 .flex.flex-col.items-center {
   display: flex;
   flex-direction: column;
@@ -575,7 +695,10 @@ html.dark div[class*="border-b"] {
   display: flex;
 }
 
-/* ===== GITHUB FOOTER ===== */
+/* ============================================================================
+   GITHUB FOOTER
+   Footer with GitHub link
+   ============================================================================ */
 .github-footer {
   margin-top: 3rem;
   padding: 1.5rem 0;
@@ -618,8 +741,10 @@ html.dark .github-button:hover {
   fill: white;
 }
 
-/* ===== IMPROVED MOBILE EXPERIENCE ===== */
-
+/* ============================================================================
+   IMPROVED MOBILE EXPERIENCE
+   Better scrolling and mobile UI enhancements
+   ============================================================================ */
 /* Improved table scrolling on mobile */
 .overflow-x-auto {
   -webkit-overflow-scrolling: touch;
@@ -644,13 +769,13 @@ html.dark .github-button:hover {
   border-radius: 10px;
 }
 
-/* Improved scrolling for time range selector */
+/* Time range selector scrolling */
 .overflow-x-auto.pb-2 .flex.flex-nowrap {
   -webkit-overflow-scrolling: touch;
   padding-bottom: 4px;  /* Space for scrollbar */
 }
 
-/* Fix tab overflow issues */
+/* Tab overflow fixes */
 .flex.mb-6.overflow-x-auto.border-b {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
@@ -666,8 +791,12 @@ html.dark .github-button:hover {
   margin-right: 1rem;
 }
 
-/* ===== MOBILE RESPONSIVE ADJUSTMENTS ===== */
+/* ============================================================================
+   MOBILE RESPONSIVE ADJUSTMENTS
+   Styling specific to mobile devices
+   ============================================================================ */
 @media (max-width: 640px) {
+  /* Header layout fixes */
   header.fixed .container {
     flex-wrap: wrap;
   }
@@ -677,11 +806,13 @@ html.dark .github-button:hover {
     margin-top: 0.5rem;
   }
   
+  /* Smaller member grid for mobile */
   .member-grid {
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 0.5rem;
   }
   
+  /* Smaller avatars on mobile */
   .avatar-container,
   .fronting-avatar {
     width: 3.5rem;
@@ -692,7 +823,7 @@ html.dark .github-button:hover {
     font-size: 0.8rem;
   }
   
-  /* Better tap targets for mobile */
+  /* Better touch targets for mobile */
   button, 
   a.px-3.py-2,
   .px-3.py-2,
@@ -706,7 +837,7 @@ html.dark .github-button:hover {
     justify-content: center;
   }
   
-  /* Allow text truncation in tables */
+  /* Text truncation in tables */
   td .truncate {
     max-width: 150px;
     white-space: nowrap;
@@ -714,12 +845,12 @@ html.dark .github-button:hover {
     text-overflow: ellipsis;
   }
   
-  /* Fix table padding on small screens */
+  /* Table padding adjustments */
   th, td {
     padding: 0.5rem 0.5rem;
   }
   
-  /* Better padding for mobile containers */
+  /* Container padding for mobile */
   .container, 
   .max-w-4xl,
   .max-w-2xl {
@@ -727,7 +858,7 @@ html.dark .github-button:hover {
     padding-right: 0.5rem;
   }
   
-  /* Fix member name text */
+  /* Member name text adjustments */
   .member-name {
     font-size: 0.7rem;
     line-height: 1.2;
@@ -754,112 +885,23 @@ html.dark .github-button:hover {
     margin-top: 1.5rem;
   }
   
-  /* Better switch metrics display on mobile */
+  /* Metrics grid adjustments */
   .grid.grid-cols-2 > div,
   .grid.grid-cols-3 > div {
     padding: 0.5rem;
   }
   
-  /* Improve form elements on mobile */
+  /* Prevent iOS zoom on focus */
   input, select, textarea {
-    font-size: 16px !important; /* Prevent iOS zoom on focus */
+    font-size: 16px !important;
   }
 }
 
-/* ===== HAMBURGER MENU STYLES ===== */
-
-/* Button styling */
-.md\:hidden.flex.items-center.justify-center.p-2 {
-  margin-right: 0.25rem;
-  background-color: rgba(243, 244, 246, 0.8);
-  border-radius: 0.375rem;
-  border: 1px solid rgba(229, 231, 235, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* Dark mode button styling */
-html.dark .md\:hidden.flex.items-center.justify-center.p-2 {
-  background-color: rgba(31, 41, 55, 0.8);
-  border: 1px solid rgba(75, 85, 99, 0.5);
-}
-
-/* Hover effect */
-.md\:hidden.flex.items-center.justify-center.p-2:hover {
-  background-color: rgba(229, 231, 235, 0.9);
-  transform: translateY(-1px);
-}
-
-html.dark .md\:hidden.flex.items-center.justify-center.p-2:hover {
-  background-color: rgba(55, 65, 81, 0.9);
-}
-
-/* Active effect */
-.md\:hidden.flex.items-center.justify-center.p-2:active {
-  transform: translateY(1px);
-}
-
-/* Mobile menu animation and positioning */
-.md\:hidden.absolute.w-full {
-  left: 0;
-  right: 0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease-in-out;
-  overflow: hidden;
-} Better padding for mobile containers */
-  .container, 
-  .max-w-4xl,
-  .max-w-2xl {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
-  
-  /* Fix member name text */
-  .member-name {
-    font-size: 0.7rem;
-    line-height: 1.2;
-    margin-top: 0.4rem;
-  }
-  
-  /* More compact headings */
-  h1 {
-    font-size: 1.5rem !important;
-    margin-bottom: 1rem !important;
-  }
-  
-  h2 {
-    font-size: 1.25rem !important;
-    margin-bottom: 0.75rem !important;
-  }
-  
-  /* More compact margins */
-  .mb-6 {
-    margin-bottom: 1rem;
-  }
-  
-  .mt-8 {
-    margin-top: 1.5rem;
-  }
-  
-  /* Better switch metrics display on mobile */
-  .grid.grid-cols-2 > div,
-  .grid.grid-cols-3 > div {
-    padding: 0.5rem;
-  }
-  
-  /* Improve form elements on mobile */
-  input, select, textarea {
-    font-size: 16px !important; /* Prevent iOS zoom on focus */
-  }
-
-/* ===== iOS ENHANCEMENT STYLES ===== */
-
-/* Improved responsive padding to account for iOS notches and UI elements */
+/* ============================================================================
+   iOS SPECIFIC ENHANCEMENTS
+   Handling notches, dynamic islands, and safe areas
+   ============================================================================ */
+/* Basic safe area support */
 @supports (padding: max(0px)) {
   body, header.fixed {
     padding-left: max(1rem, env(safe-area-inset-left));
@@ -892,13 +934,31 @@ html.dark .md\:hidden.flex.items-center.justify-center.p-2:hover {
     padding-top: calc(60px + env(safe-area-inset-top));
   }
   
-  /* Adjust padding for bottom of iOS */
+  /* Bottom safe area for iOS */
   footer.github-footer {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
-/* ===== LOGO ANIMATIONS ===== */
+/* Mobile menu positioning fix */
+@media (max-width: 768px) {
+  header.fixed .container {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .md\:hidden.absolute.w-full {
+    top: calc(100% - 1px);
+    left: 0;
+    right: 0;
+    z-index: 40;
+  }
+}
+
+/* ============================================================================
+   ANIMATION EFFECTS
+   Logo animations and other visual effects
+   ============================================================================ */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -908,10 +968,6 @@ html.dark .md\:hidden.flex.items-center.justify-center.p-2:hover {
 
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
 @keyframes logo-spin {
