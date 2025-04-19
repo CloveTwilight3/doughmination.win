@@ -34,8 +34,6 @@ ADMIN_DISPLAY_NAME=Administrator
 # Cache TTL in seconds (optional, default: 30)
 CACHE_TTL=30
 
-# Base URL for avatar links (optional)
-BASE_URL=https://your-domain.com
 ```
 
 3. Run the server:
