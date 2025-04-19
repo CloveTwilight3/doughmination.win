@@ -72,6 +72,10 @@ This is a personalized project. It's open-source in case others who are familiar
 
 If you know what you're doing and want to tweak it for your own system, feel free to fork it!
 
+## License
+This project is licensed under the [MIT License.](https://github.com/CloveTwilight3/plural-web?tab=MIT-1-ov-file)
+Feel free to use, modify, and share it as long as the license notice is preserved.
+
 ---
 
 Made with ✨ by and for the Doughmination System.
