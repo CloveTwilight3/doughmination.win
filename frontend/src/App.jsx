@@ -30,7 +30,8 @@ SOFTWARE.
  * - User authentication state
  * - Theme toggling (light/dark mode)
  * - PluralKit API data fetching
- * - Mobile navigation with hamburger menu
+ * - Navigation menu with hamburger button for all devices
+ * - Member search functionality
  * ============================================================================
  */
 
@@ -53,12 +54,14 @@ function App() {
    * ============================================================================
    */
   const [members, setMembers] = useState([]); // All system members
+  const [filteredMembers, setFilteredMembers] = useState([]); // Filtered members for search
+  const [searchQuery, setSearchQuery] = useState(""); // Search query for members
   const [fronting, setFronting] = useState({ members: [] }); // Currently fronting members
   const [theme, toggleTheme] = useTheme(); // Light/dark mode state
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token")); // Authentication state
   const [isAdmin, setIsAdmin] = useState(false); // Admin privileges state
   const [loading, setLoading] = useState(true); // Initial data loading state
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Mobile menu toggle state
+  const [menuOpen, setMenuOpen] = useState(false); // Menu toggle state for all devices
   const navigate = useNavigate(); // React Router navigation hook
 
   // Default avatar for members without one
@@ -86,6 +89,7 @@ function App() {
             return nameA.localeCompare(nameB);
           });
           setMembers(sortedMembers);
+          setFilteredMembers(sortedMembers);
         } else {
           console.error("Error fetching members:", membersRes.status);
         }
@@ -157,6 +161,28 @@ function App() {
   }, []);
 
   /* ============================================================================
+   * SEARCH FUNCTIONALITY
+   * Filter members based on search query
+   * ============================================================================
+   */
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredMembers(members);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = members.filter(member => {
+        const name = member.name.toLowerCase();
+        const displayName = (member.display_name || "").toLowerCase();
+        const pronouns = (member.pronouns || "").toLowerCase();
+        return name.includes(query) || 
+               displayName.includes(query) || 
+               pronouns.includes(query);
+      });
+      setFilteredMembers(filtered);
+    }
+  }, [searchQuery, members]);
+
+  /* ============================================================================
    * FRONTING MEMBER UPDATES
    * Updates favicon, title, and meta tags based on who's fronting
    * ============================================================================
@@ -204,19 +230,51 @@ function App() {
   }, [fronting, defaultAvatar]);
 
   /* ============================================================================
-   * MOBILE MENU HANDLING
-   * Close mobile menu when navigating to a new page
+   * MENU HANDLING
+   * Close menu when navigating to a new page and handle body scrolling
    * ============================================================================
    */
   useEffect(() => {
-    setMobileMenuOpen(false);
+    if (menuOpen) {
+      setMenuOpen(false);
+      document.body.style.overflow = '';
+    }
   }, [navigate]);
+  
+  // Cleanup function to ensure body scroll is restored when component unmounts
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
   
   /* ============================================================================
    * HELPER FUNCTIONS
    * Utility functions for various tasks
    * ============================================================================
    */
+  
+  // Toggle menu function
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+    
+    // Control body scrolling when menu is open/closed
+    if (!menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  };
+  
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+  
+  // Clear search query
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
   
   // Function to update meta tags for better link sharing
   const updateMetaTags = (frontingMember = null) => {
@@ -274,11 +332,6 @@ function App() {
     navigate('/');
   }
 
-  // Toggle mobile menu
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
   // Show loading state while initializing
   if (loading) return <div className="text-black dark:text-white p-10 text-center">Loading...</div>;
 
@@ -294,158 +347,104 @@ function App() {
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Link to="/" className="text-lg font-semibold z-10">Doughmination System</Link>
           
-          {/* Mobile menu hamburger button - Only visible on mobile */}
+          {/* Hamburger menu button - for ALL devices */}
           <button 
-            className="md:hidden flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            onClick={toggleMobileMenu}
+            className="flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            onClick={toggleMenu}
             aria-label="Toggle menu"
+            aria-expanded={menuOpen}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {mobileMenuOpen ? (
+              {menuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               )}
             </svg>
           </button>
-          
-          {/* Desktop navigation - Hidden on mobile */}
-          <nav className="hidden md:block">
-            <ul className="flex items-center gap-3">
-              <li>
-                <button
-                  onClick={toggleTheme}
-                  className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm"
-                >
-                  {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-                </button>
-              </li>
-              {loggedIn && (
-                <li>
-                  <Link 
-                    to="/admin/metrics"
-                    className="px-3 py-2 bg-purple-500 text-white rounded-lg text-sm"
-                  >
-                    Metrics
-                  </Link>
-                </li>
-              )}
-              {loggedIn && (
-                <li>
-                  <Link 
-                    to="/admin/user"
-                    className="px-3 py-2 bg-purple-500 text-white rounded-lg text-sm"
-                  >
-                    My Profile
-                  </Link>
-                </li>
-              )}
-              {loggedIn ? (
-                <>
-                  {isAdmin && (
-                    <li>
-                      <Link 
-                        to="/admin/dashboard"
-                        className="px-3 py-2 bg-purple-500 text-white rounded-lg text-sm"
-                      >
-                        Admin Panel
-                      </Link>
-                    </li>
-                  )}
-                  <li>
-                    <button
-                      onClick={handleLogout}
-                      className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm"
-                    >
-                      Logout
-                    </button>
-                  </li>
-                </>
-              ) : (
-                <li>
-                  <Link 
-                    to="/admin/login"
-                    className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm"
-                  >
-                    Login
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </nav>
         </div>
         
-        {/* Mobile navigation dropdown menu - Only visible on mobile when toggled */}
-        <div 
-          className={`md:hidden absolute w-full bg-white dark:bg-gray-800 shadow-md transition-all duration-300 ease-in-out z-5 ${
-            mobileMenuOpen ? 'max-h-[500px] opacity-100 py-4 border-t border-gray-200 dark:border-gray-700' : 'max-h-0 py-0 opacity-0 overflow-hidden border-none'
-          }`}
-          style={{ top: '100%' }}
-        >
-          <div className="container mx-auto px-4">
-            <ul className="flex flex-col gap-3">
-              <li>
-                <button
-                  onClick={toggleTheme}
-                  className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
-                >
-                  {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-                </button>
-              </li>
-              {loggedIn && (
+        {/* Navigation overlay for all devices */}
+        {menuOpen && (
+          <div className="fixed inset-0 z-30 bg-black bg-opacity-50" onClick={toggleMenu}>
+            <div 
+              className="absolute right-0 top-[61px] w-64 max-w-[80vw] h-screen bg-white dark:bg-gray-800 shadow-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ul className="flex flex-col p-4 gap-3">
                 <li>
-                  <Link 
-                    to="/admin/metrics"
-                    className="block w-full px-4 py-3 bg-purple-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
+                  <button
+                    onClick={() => {
+                      toggleTheme();
+                      toggleMenu();
+                    }}
+                    className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg text-sm flex justify-center"
                   >
-                    Metrics
-                  </Link>
+                    {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                  </button>
                 </li>
-              )}
-              {loggedIn && (
-                <li>
-                  <Link 
-                    to="/admin/user"
-                    className="block w-full px-4 py-3 bg-purple-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
-                  >
-                    My Profile
-                  </Link>
-                </li>
-              )}
-              {loggedIn ? (
-                <>
-                  {isAdmin && (
-                    <li>
-                      <Link 
-                        to="/admin/dashboard"
-                        className="block w-full px-4 py-3 bg-purple-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
-                      >
-                        Admin Panel
-                      </Link>
-                    </li>
-                  )}
+                {loggedIn && (
                   <li>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full px-4 py-3 bg-red-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
+                    <Link 
+                      to="/admin/metrics"
+                      className="block w-full px-4 py-3 bg-purple-500 text-white rounded-lg text-sm text-center"
+                      onClick={toggleMenu}
                     >
-                      Logout
-                    </button>
+                      Metrics
+                    </Link>
                   </li>
-                </>
-              ) : (
-                <li>
-                  <Link 
-                    to="/admin/login"
-                    className="block w-full px-4 py-3 bg-green-500 text-white rounded-lg text-sm text-center flex justify-center items-center"
-                  >
-                    Login
-                  </Link>
-                </li>
-              )}
-            </ul>
+                )}
+                {loggedIn && (
+                  <li>
+                    <Link 
+                      to="/admin/user"
+                      className="block w-full px-4 py-3 bg-purple-500 text-white rounded-lg text-sm text-center"
+                      onClick={toggleMenu}
+                    >
+                      My Profile
+                    </Link>
+                  </li>
+                )}
+                {loggedIn ? (
+                  <>
+                    {isAdmin && (
+                      <li>
+                        <Link 
+                          to="/admin/dashboard"
+                          className="block w-full px-4 py-3 bg-purple-500 text-white rounded-lg text-sm text-center"
+                          onClick={toggleMenu}
+                        >
+                          Admin Panel
+                        </Link>
+                      </li>
+                    )}
+                    <li>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          toggleMenu();
+                        }}
+                        className="w-full px-4 py-3 bg-red-500 text-white rounded-lg text-sm text-center"
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  </>
+                ) : (
+                  <li>
+                    <Link 
+                      to="/admin/login"
+                      className="block w-full px-4 py-3 bg-green-500 text-white rounded-lg text-sm text-center"
+                      onClick={toggleMenu}
+                    >
+                      Login
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
           </div>
-        </div>
+        )}
       </header>
 
       {/* Space for fixed header */}
@@ -481,13 +480,42 @@ function App() {
 
         {/* ========== ROUTING SETUP ========== */}
         <Routes>
-          {/* Home Page - Member Grid */}
+          {/* Home Page - Member Grid with Search */}
           <Route path="/" element={
             <div className="mt-6">
               <h2 className="text-lg font-semibold mb-4 text-center">Members:</h2>
-              {members.length > 0 ? (
+              
+              {/* Search Bar */}
+              <div className="relative max-w-md mx-auto mb-6">
+                <div className="flex items-center border rounded-lg overflow-hidden bg-white dark:bg-gray-700 shadow-sm">
+                  <input
+                    type="text"
+                    placeholder="Search members..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="w-full p-3 bg-transparent outline-none text-black dark:text-white"
+                  />
+                  {searchQuery && (
+                    <button 
+                      onClick={clearSearch}
+                      className="flex-shrink-0 p-3 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                  <div className="flex-shrink-0 p-3 text-gray-500 dark:text-gray-300">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              
+              {filteredMembers.length > 0 ? (
                 <div className="grid member-grid gap-5">
-                  {members.map((member) => (
+                  {filteredMembers.map((member) => (
                     <div key={member.id} className="member-grid-item">
                       <div className="h-full w-full p-2">
                         <Link 
@@ -509,6 +537,8 @@ function App() {
                     </div>
                   ))}
                 </div>
+              ) : searchQuery ? (
+                <p className="text-center mt-8">No members found matching "{searchQuery}"</p>
               ) : (
                 <p className="text-center mt-8">No members found. Please check your connection.</p>
               )}
