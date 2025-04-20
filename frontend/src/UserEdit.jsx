@@ -39,7 +39,11 @@ const UserEdit = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
+  const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
+  
+  // Default avatar for fallback
+  const defaultAvatar = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/75bff394-4f86-45a8-a923-e26223aa74cb/de901o7-d61b3bfb-f1b1-453b-8268-9200130bbc65.png";
 
   useEffect(() => {
     fetchUserData();
@@ -48,6 +52,7 @@ const UserEdit = () => {
   const fetchUserData = async () => {
     setLoading(true);
     setError(null);
+    setImageError(false);
     
     const token = localStorage.getItem('token');
     if (!token) {
@@ -85,6 +90,13 @@ const UserEdit = () => {
     }
   };
 
+  // Handle image error
+  const handleImageError = () => {
+    console.error('Failed to load avatar image');
+    setImageError(true);
+    setAvatarPreview(defaultAvatar);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({
@@ -104,7 +116,18 @@ const UserEdit = () => {
         return;
       }
       
+      // Check file extension
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+      
+      if (!allowedExtensions.includes(fileExtension)) {
+        setError(`Invalid file type. Allowed types are: ${allowedExtensions.join(', ')}`);
+        e.target.value = ''; // Clear the file input
+        return;
+      }
+      
       setAvatar(file);
+      setImageError(false);
       
       // Create a preview URL
       const reader = new FileReader();
@@ -207,6 +230,12 @@ const UserEdit = () => {
           }
           throw new Error(`Failed to upload avatar: ${avatarResponse.status}`);
         }
+        
+        // Update avatar URL
+        const avatarData = await avatarResponse.json();
+        if (avatarData.avatar_url) {
+          setAvatarPreview(avatarData.avatar_url);
+        }
       }
       
       setMessage('Profile updated successfully');
@@ -288,18 +317,19 @@ const UserEdit = () => {
           <h2 className="text-lg font-semibold mb-4">Profile Picture</h2>
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-600 flex-shrink-0">
-              {avatarPreview ? (
+              {avatarPreview && !imageError ? (
                 <img 
                   src={avatarPreview} 
                   alt="Avatar preview" 
                   className="w-full h-full object-cover"
+                  onError={handleImageError}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
+                <img 
+                  src={defaultAvatar} 
+                  alt="Default avatar"
+                  className="w-full h-full object-cover"
+                />
               )}
             </div>
             
@@ -307,7 +337,7 @@ const UserEdit = () => {
               <label className="block text-sm font-medium mb-2">Upload new picture</label>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/gif"
                 onChange={handleAvatarChange}
                 className="block w-full text-sm text-gray-500 dark:text-gray-400
                           file:mr-4 file:py-2 file:px-4
