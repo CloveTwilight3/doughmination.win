@@ -23,7 +23,7 @@ SOFTWARE.
 """
 
 from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from pluralkit import get_system, get_members, get_fronters, set_front
@@ -49,7 +49,7 @@ app = FastAPI()
 initialize_admin_user()
 
 # Default fallback avatar URL
-DEFAULT_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"
+DEFAULT_AVATAR = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/75bff394-4f86-45a8-a923-e26223aa74cb/de901o7-d61b3bfb-f1b1-453b-8268-9200130bbc65.png"
 
 # File size limit middleware
 class FileSizeLimitMiddleware(BaseHTTPMiddleware):
@@ -256,38 +256,46 @@ async def upload_user_avatar(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Validate file type
-    valid_types = ["image/jpeg", "image/png", "image/gif"]
-    if avatar.content_type not in valid_types:
-        raise HTTPException(status_code=400, detail="Invalid file type. Only JPEG, PNG, and GIF are allowed.")
+    # Only allow specific file extensions
+    allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+    
+    # Get file extension and convert to lowercase
+    _, file_ext = os.path.splitext(avatar.filename)
+    file_ext = file_ext.lower()
+    
+    if file_ext not in allowed_extensions:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed types are: {', '.join(allowed_extensions)}"
+        )
     
     # Validate file size (2MB limit)
-    MAX_SIZE = 2 * 1024 * 1024  # 2MB in bytes
+    MAX_SIZE = 2 * 1024 * 1024  # 2MB
     
-    # Check content-length header first for quick rejection
+    # First check content-length header
     content_length = int(avatar.headers.get("content-length", 0))
     if content_length > MAX_SIZE:
-        raise HTTPException(status_code=413, detail="File size exceeds the limit of 2MB")
+        raise HTTPException(
+            status_code=413, 
+            detail="File size exceeds the limit of 2MB"
+        )
     
-    # Read the file in chunks to validate size
-    file_size = 0
-    content = b""
-    
-    chunk = await avatar.read(1024)
-    while chunk:
-        content += chunk
-        file_size += len(chunk)
-        if file_size > MAX_SIZE:
-            raise HTTPException(status_code=413, detail="File size exceeds the limit of 2MB")
-        chunk = await avatar.read(1024)
-    
-    # Generate unique filename
-    file_ext = avatar.filename.split(".")[-1].lower()
-    unique_filename = f"{user_id}_{uuid.uuid4()}.{file_ext}"
-    file_path = UPLOAD_DIR / unique_filename
-    
-    # Save file
     try:
+        # Read the file content
+        contents = await avatar.read()
+        file_size = len(contents)
+        
+        # Double-check file size
+        if file_size > MAX_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail="File size exceeds the limit of 2MB"
+            )
+        
+        # Generate unique filename
+        unique_filename = f"{user_id}_{uuid.uuid4()}{file_ext}"
+        file_path = UPLOAD_DIR / unique_filename
+        
         # If there's an existing avatar, try to remove it
         users = get_users()
         for i, u in enumerate(users):
@@ -302,13 +310,18 @@ async def upload_user_avatar(
         
         # Save the new file
         async with aiofiles.open(file_path, 'wb') as out_file:
-            await out_file.write(content)
+            await out_file.write(contents)
         
-        # Get the base URL from environment variables or request
-        host = os.getenv("BASE_URL", "")
+        # Get the base URL from environment variables
+        base_url = os.getenv("BASE_URL", "").rstrip('/')
+        if not base_url:
+            # Fallback to a default URL
+            base_url = "https://friends.clovetwilight3.co.uk"
+        
+        # Construct full avatar URL
+        avatar_url = f"{base_url}/avatars/{unique_filename}"
         
         # Update user with avatar URL
-        avatar_url = f"{host}/avatars/{unique_filename}"
         user_update = UserUpdate(avatar_url=avatar_url)
         updated_user = update_user(user_id, user_update)
         
@@ -316,18 +329,35 @@ async def upload_user_avatar(
             raise HTTPException(status_code=500, detail="Failed to update user with avatar URL")
         
         return {"success": True, "avatar_url": avatar_url}
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
         print(f"Error saving avatar: {e}")
         raise HTTPException(status_code=500, detail=f"Error uploading avatar: {str(e)}")
 
 @app.get("/avatars/{filename}")
 async def get_avatar(filename: str):
+    """Serve avatar images with proper content type handling"""
     file_path = UPLOAD_DIR / filename
-    if os.path.exists(file_path):
-        return FileResponse(file_path)
+    
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        # Set the appropriate media type based on file extension
+        media_type = None
+        if filename.lower().endswith(('.jpg', '.jpeg')):
+            media_type = "image/jpeg"
+        elif filename.lower().endswith('.png'):
+            media_type = "image/png"
+        elif filename.lower().endswith('.gif'):
+            media_type = "image/gif"
+        
+        return FileResponse(
+            path=file_path,
+            media_type=media_type,
+            filename=filename
+        )
     
     # If not found locally, redirect to default avatar
-    return JSONResponse({"url": DEFAULT_AVATAR})
+    return RedirectResponse(url=DEFAULT_AVATAR)
 
 # Add metric information
 @app.get("/api/metrics/fronting-time")
