@@ -27,6 +27,10 @@ import React, { useState, useEffect } from 'react';
 const Welcome = ({ loggedIn, isAdmin }) => {
   const [displayName, setDisplayName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [imageError, setImageError] = useState(false);
+  
+  // Default avatar for fallback
+  const defaultAvatar = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/75bff394-4f86-45a8-a923-e26223aa74cb/de901o7-d61b3bfb-f1b1-453b-8268-9200130bbc65.png";
   
   useEffect(() => {
     if (loggedIn) {
@@ -44,6 +48,7 @@ const Welcome = ({ loggedIn, isAdmin }) => {
             const data = await response.json();
             setDisplayName(data.display_name || data.username);
             setAvatarUrl(data.avatar_url || '');
+            setImageError(false);
           } else {
             // If API call fails, try to extract username from JWT token
             try {
@@ -72,17 +77,32 @@ const Welcome = ({ loggedIn, isAdmin }) => {
     }
   }, [loggedIn]);
   
+  // Handle image error
+  const handleImageError = () => {
+    console.error('Failed to load avatar image in Welcome component');
+    setImageError(true);
+  };
+  
   if (!loggedIn) return null;
   
   return (
     <div className="welcome-message py-2 px-4 mb-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       <div className="flex items-center gap-3">
-        {avatarUrl && (
+        {avatarUrl && !imageError ? (
           <div className="w-10 h-10 rounded-full overflow-hidden">
             <img 
               src={avatarUrl} 
               alt={displayName} 
-              className="w-full h-full object-cover" 
+              className="w-full h-full object-cover"
+              onError={handleImageError}
+            />
+          </div>
+        ) : (
+          <div className="w-10 h-10 rounded-full overflow-hidden">
+            <img 
+              src={defaultAvatar} 
+              alt="Default avatar"
+              className="w-full h-full object-cover"
             />
           </div>
         )}
