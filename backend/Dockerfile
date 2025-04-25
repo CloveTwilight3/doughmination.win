@@ -15,11 +15,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create directory for avatars with proper permissions
-RUN mkdir -p avatars && chmod 777 avatars
+# Create data directory and set permissions
+RUN mkdir -p data/avatars && chmod -R 777 data
 
 # Create an empty users.json file if it doesn't exist
-RUN touch users.json && chmod 666 users.json
+RUN touch data/users.json && chmod 666 data/users.json
 
 # Add a healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
@@ -29,4 +29,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 EXPOSE 8000
 
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

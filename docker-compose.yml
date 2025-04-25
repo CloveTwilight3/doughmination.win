@@ -1,13 +1,12 @@
 services:
   backend:
-    image: python:3.11-slim
+    build: ./backend
     container_name: doughmination-backend
-    working_dir: /app
-    command: bash -c "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-    volumes:
-      - ./backend:/app
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - backend_data:/app/data
     environment:
       - SYSTEM_TOKEN=${SYSTEM_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
@@ -15,22 +14,24 @@ services:
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - ADMIN_DISPLAY_NAME=${ADMIN_DISPLAY_NAME}
       - CACHE_TTL=${CACHE_TTL:-30}
-      - BASE_URL=${BASE_URL:-http://localhost:5173}
+      - BASE_URL=${BASE_URL:-http://localhost:8080}
+    # Using development mode with reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
-    image: node:20
+    build: ./frontend
     container_name: doughmination-frontend
-    working_dir: /app
-    command: bash -c "npm install && npm run dev"
+    ports:
+      - "8080:8080"
     volumes:
       - ./frontend:/app
-    ports:
-      - "5173:5173"
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://backend:8000/api
     depends_on:
       - backend
-    environment:
-      - VITE_API_URL=http://localhost:8000/api
+    # Development mode
+    command: npm run dev
 
-networks:
-  default:
-    name: doughmination-network
+volumes:
+  backend_data:
