@@ -1,3 +1,4 @@
 .env
 gen-hash.py
 users.json
+venv/*

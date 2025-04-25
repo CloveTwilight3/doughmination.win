@@ -71,12 +71,14 @@ class FileSizeLimitMiddleware(BaseHTTPMiddleware):
         return response
 
 # CORS
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:8080",              # Local development
         "http://127.0.0.1:8080",              # Alternative local address
         "https://friends.clovetwilight3.co.uk", # Production domain
+        "http://friends.clovetwilight3.co.uk",  # HTTP version of production domain
         "http://frontend",                    # Docker service name
         "http://frontend:80",                 # Docker service with port
     ],
