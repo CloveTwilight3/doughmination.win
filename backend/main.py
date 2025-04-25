@@ -70,14 +70,21 @@ class FileSizeLimitMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
-# CORS - Updated for local development
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://104.219.236.52:8000", "https://friends.clovetwilight3.co.uk:8000", "http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:8080",              # Local development
+        "http://127.0.0.1:8080",              # Alternative local address
+        "https://friends.clovetwilight3.co.uk", # Production domain
+        "http://frontend",                    # Docker service name
+        "http://frontend:80",                 # Docker service with port
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Add the file size limit middleware
 app.add_middleware(FileSizeLimitMiddleware)

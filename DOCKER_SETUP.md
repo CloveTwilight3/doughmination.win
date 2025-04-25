@@ -1,105 +1,140 @@
-# Docker Setup for Doughmination System Server
+# Docker Setup Instructions for Doughmination System Server
 
-This document provides instructions for setting up the Doughmination System Server using Docker.
+This guide provides step-by-step instructions for setting up and running the Doughmination System Server using Docker.
 
 ## Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
-- PluralKit system token
+- [Docker](https://docs.docker.com/get-docker/) installed
+- [Docker Compose](https://docs.docker.com/compose/install/) installed
+- A valid PluralKit system token
+- Git installed (for cloning the repository)
 
-## Getting Started
+## Setup Steps
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/CloveTwilight3/plural-web.git
-   cd plural-web
-   ```
-
-2. Create an environment file:
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Edit the `.env` file and fill in your configuration values:
-   ```
-   SYSTEM_TOKEN=your_pluralkit_token
-   JWT_SECRET=your_secure_random_string
-   ADMIN_USERNAME=admin
-   ADMIN_PASSWORD=your_secure_password
-   ADMIN_DISPLAY_NAME=Administrator
-   BASE_URL=https://your-domain.com
-   ```
-
-4. Build and start the Docker containers:
-   ```bash
-   docker-compose up -d
-   ```
-
-## Configuration Options
-
-### Environment Variables
-
-- `SYSTEM_TOKEN`: Your PluralKit system token (required)
-- `JWT_SECRET`: A secure random string used for JWT authentication (required)
-- `ADMIN_USERNAME`: Username for the admin account (default: admin)
-- `ADMIN_PASSWORD`: Password for the admin account (default: admin)
-- `ADMIN_DISPLAY_NAME`: Display name for the admin account (default: Administrator)
-- `CACHE_TTL`: Cache time-to-live in seconds (default: 30)
-- `BASE_URL`: Base URL for avatar links (default: https://friends.clovetwilight3.co.uk)
-
-## Volumes
-
-- `backend-data`: Persistent storage for user avatars
-- `./backend/users.json:/app/users.json`: User account data that persists between container restarts
-
-## HTTPS Configuration
-
-For production deployments, it's recommended to set up HTTPS. There are several approaches:
-
-### Option 1: Using a reverse proxy (recommended)
-
-Use a reverse proxy like Nginx or Traefik to handle SSL termination.
-
-### Option 2: Configuring HTTPS directly in the container
-
-1. Update the nginx.conf to include SSL settings
-2. Mount your SSL certificates into the container
-3. Update the docker-compose.yml to expose port 443
-
-## Maintenance
-
-### Viewing Logs
+### 1. Clone the Repository
 
 ```bash
-# All services
+git clone https://github.com/CloveTwilight3/plural-web.git
+cd plural-web
+```
+
+### 2. Set Up Environment Variables
+
+Create a `.env` file based on the example:
+
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file with your actual values:
+- Add your PluralKit system token
+- Set a secure JWT secret
+- Configure admin credentials
+- Set the correct BASE_URL (use `http://localhost:8080` for local development)
+
+### 3. Build and Start the Containers
+
+```bash
+docker-compose up --build
+```
+
+To run in detached mode (background):
+
+```bash
+docker-compose up --build -d
+```
+
+### 4. Access the Application
+
+- Frontend: http://localhost:8080
+- Backend API: http://localhost:8000/api
+
+### 5. Check Container Logs
+
+If you need to see the logs:
+
+```bash
+# View all logs
 docker-compose logs
 
-# Specific service
+# View specific service logs
 docker-compose logs backend
 docker-compose logs frontend
+
+# Follow logs in real-time
+docker-compose logs -f
 ```
 
-### Updating
-
-To update to the latest version:
+### 6. Stop the Containers
 
 ```bash
-git pull
+docker-compose down
+```
+
+## Troubleshooting Tips
+
+### 1. Container Connectivity Issues
+
+If the frontend can't connect to the backend:
+
+- Ensure both containers are running:
+  ```bash
+  docker-compose ps
+  ```
+- Check the logs for errors:
+  ```bash
+  docker-compose logs backend
+  ```
+- Verify that the backend is accessible:
+  ```bash
+  curl http://localhost:8000/api/system
+  ```
+
+### 2. Permission Issues with Volumes
+
+If you encounter permission issues with mounted volumes:
+
+```bash
+# Reset permissions on users.json
+chmod 666 backend/users.json
+
+# Reset permissions on avatars directory
+mkdir -p backend/avatars
+chmod 777 backend/avatars
+```
+
+### 3. CORS Errors
+
+If you see CORS errors in the browser console:
+
+- Check that your backend CORS configuration includes the correct frontend URL
+- Ensure you're accessing the frontend using the same protocol, domain and port as configured in CORS
+
+### 4. JWT Authentication Issues
+
+If authentication fails:
+
+- Verify your JWT_SECRET in the .env file
+- Check the backend logs for authentication errors
+- Try regenerating the JWT secret and updating it in the .env file
+
+### 5. Container Rebuild
+
+If you've made significant changes and need to rebuild everything:
+
+```bash
 docker-compose down
 docker-compose build --no-cache
-docker-compose up -d
+docker-compose up
 ```
 
-### Backup
+## Development Setup
 
-Regularly backup the following files:
-
-- `users.json`: Contains user account information
-- `avatars` directory: Contains user avatar images
+For active development with hot reloading:
 
 ```bash
-# Example backup command
-cp users.json users.json.backup
-tar -czf avatars-backup.tar.gz avatars/
+# Start with the override file that mounts code volumes
+docker-compose -f docker-compose.yml -f docker-compose.override.yml up
 ```
+
+This will mount your local code directories into the containers so changes are reflected immediately.

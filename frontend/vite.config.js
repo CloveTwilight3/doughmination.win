@@ -29,11 +29,21 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   server: {
     host: '0.0.0.0',  // Listen on all network interfaces
-    port: 8080,        // The port the UI runs on
-    hmr: {
-      protocol: 'wss',
-      host: 'friends.clovetwilight3.co.uk',  // Domain for WebSocket connections
-    },
+    port: 8080,       // The port the UI runs on
+    proxy: {
+      // Proxy API requests to backend during development
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+      // Proxy avatar requests 
+      '/avatars': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   },
   plugins: [react()],
   // Build configuration
