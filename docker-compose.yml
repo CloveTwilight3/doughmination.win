@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: doughmination-backend
+    restart: unless-stopped
+    environment:
+      - SYSTEM_TOKEN=${SYSTEM_TOKEN}
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - ADMIN_DISPLAY_NAME=${ADMIN_DISPLAY_NAME:-Administrator}
+      - CACHE_TTL=${CACHE_TTL:-30}
+      - BASE_URL=${BASE_URL:-https://friends.clovetwilight3.co.uk}
+    volumes:
+      - backend-data:/app/avatars
+      - ./backend/users.json:/app/users.json
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: doughmination-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"  # For HTTPS if configured
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  backend-data:
+    driver: local
