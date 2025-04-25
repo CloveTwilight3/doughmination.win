@@ -27,13 +27,21 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
+<<<<<<< HEAD
         - VITE_API_URL=/api  # Use relative path for API
+=======
+        - VITE_API_URL=
+>>>>>>> 46b74ca7f4f8381ebf0c6738530572bed28a10a6
     container_name: doughmination-frontend
     restart: unless-stopped
     depends_on:
       - backend
     ports:
+<<<<<<< HEAD
       - "8080:80"  # Expose on host port 8080
+=======
+      - "8080:80"
+>>>>>>> 46b74ca7f4f8381ebf0c6738530572bed28a10a6
     networks:
       - app-network
 
