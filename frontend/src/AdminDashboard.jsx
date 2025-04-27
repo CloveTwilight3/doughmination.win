@@ -163,12 +163,21 @@ export default function AdminDashboard({ fronting }) {
             <div className="flex items-center">
               <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
                 <img 
-                  src={currentFronting.avatar_url || "https://clovetwilight3.co.uk/system.png"} 
+                  src={currentFronting.is_private ? "https://clovetwilight3.co.uk/system.png" : (currentFronting.avatar_url || "https://clovetwilight3.co.uk/system.png")}
                   alt={currentFronting.name}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${currentFronting.is_private ? "private-avatar" : ""}`}
                 />
               </div>
-              <span className="text-lg">{currentFronting.display_name || currentFronting.name}</span>
+              <span className="text-lg flex items-center">
+                {currentFronting.is_private ? (
+                  <>
+                    <span className="private-text">PRIVATE</span>
+                    <span className="ml-2 text-sm text-red-500">(Alex)</span>
+                  </>
+                ) : (
+                  currentFronting.display_name || currentFronting.name
+                )}
+              </span>
             </div>
           ) : (
             <p>No one is currently fronting</p>
@@ -193,7 +202,7 @@ export default function AdminDashboard({ fronting }) {
                 
                 {members.map((member) => (
                   <option key={member.id} value={member.id}>
-                    {member.display_name || member.name}
+                    {member.is_private ? `${member.name} (Private)` : (member.display_name || member.name)}
                   </option>
                 ))}
               </select>

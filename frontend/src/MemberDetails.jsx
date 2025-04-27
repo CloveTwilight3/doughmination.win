@@ -125,33 +125,43 @@ const MemberDetails = ({ members, defaultAvatar }) => {
       <div className="flex flex-col items-center mb-6">
         <div className="avatar-container member-details-avatar">
           <img
-            src={memberData.avatar_url || defaultAvatar}
-            alt={memberData.name}
+            src={memberData.is_private ? defaultAvatar : (memberData.avatar_url || defaultAvatar)}
+            alt={memberData.is_private ? "Private Member" : memberData.name}
           />
         </div>
         <h1 className="text-2xl font-bold mt-2 text-black dark:text-white">
-          {memberData.display_name || memberData.name}
+          {memberData.is_private ? "PRIVATE" : (memberData.display_name || memberData.name)}
         </h1>
       </div>
       
-      {/* Member details arranged in a grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {/* Description section - only shown if there is a description */}
-        {memberData.description && (
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-2 text-black dark:text-white">About</h2>
-            <p className="text-base text-black dark:text-white">{memberData.description}</p>
-          </div>
-        )}
-        
-        {/* Pronouns section - only shown if there are pronouns */}
-        {memberData.pronouns && (
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-2 text-black dark:text-white">Pronouns</h2>
-            <p className="text-base text-black dark:text-white">{memberData.pronouns}</p>
-          </div>
-        )}
-      </div>
+      {/* Member details arranged in a grid - only show for non-private members */}
+      {!memberData.is_private ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Description section - only shown if there is a description */}
+          {memberData.description && (
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+              <h2 className="text-xl font-semibold mb-2 text-black dark:text-white">About</h2>
+              <p className="text-base text-black dark:text-white">{memberData.description}</p>
+            </div>
+          )}
+          
+          {/* Pronouns section - only shown if there are pronouns */}
+          {memberData.pronouns && (
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+              <h2 className="text-xl font-semibold mb-2 text-black dark:text-white">Pronouns</h2>
+              <p className="text-base text-black dark:text-white">{memberData.pronouns}</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* For private members, show privacy notice */
+        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h2 className="text-xl font-semibold mb-2 text-black dark:text-white">Privacy Notice</h2>
+          <p className="text-base text-black dark:text-white">
+            This member's information is private.
+          </p>
+        </div>
+      )}
       
       {/* Back button to return to members list */}
       <div className="mt-6 text-center">

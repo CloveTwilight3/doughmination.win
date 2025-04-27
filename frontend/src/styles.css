@@ -1300,3 +1300,61 @@ button.flex.items-center.justify-center.p-2.rounded-md:hover {
     transform: none !important;
   }
 }
+
+/* ============================================================================
+   PRIVATE MEMBER STYLING
+   Styling for private members like Alex
+   ============================================================================ */
+/* Private member badge */
+.private-member-badge {
+  background-color: #f87171;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+html.dark .private-member-badge {
+  background-color: #ef4444;
+}
+
+/* Privacy notice box */
+.privacy-notice {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+html.dark .privacy-notice {
+  background-color: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* Avatar styling for private members */
+.private-avatar {
+  filter: grayscale(1);
+  opacity: 0.7;
+}
+
+/* Blur effect for private member content areas */
+.private-content {
+  filter: blur(5px);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* PRIVATE text styling */
+.private-text {
+  font-weight: bold;
+  color: #ef4444;
+  letter-spacing: 0.05em;
+}
+
+html.dark .private-text {
+  color: #f87171;
+}

@@ -56,7 +56,23 @@ async def get_members():
         resp = await client.get(f"{BASE_URL}/systems/@me/members", headers=HEADERS)
         resp.raise_for_status()
         data = resp.json()
-        # Format data structure to match frontend expectation
+        
+        # Process private members
+        for member in data:
+            # If the member has a privacy field or the name is "Alex"
+            if member.get("privacy") == "private" or member.get("name") == "Alex":
+                # Set fields to indicate privacy
+                member["is_private"] = True
+                member["display_name"] = "PRIVATE"
+                
+                # Clear identifiable information but keep ID for reference
+                if "avatar_url" in member:
+                    member["avatar_url"] = None
+                if "description" in member:
+                    member["description"] = "This member's information is private."
+                if "pronouns" in member:
+                    member["pronouns"] = None
+                    
         set_in_cache(cache_key, data, CACHE_TTL)
         return data
 
@@ -68,6 +84,24 @@ async def get_fronters():
         resp = await client.get(f"{BASE_URL}/systems/@me/fronters", headers=HEADERS)
         resp.raise_for_status()
         data = resp.json()
+        
+        # Process private members in fronters
+        if "members" in data:
+            for member in data["members"]:
+                # If the member has a privacy field or the name is "Alex"
+                if member.get("privacy") == "private" or member.get("name") == "Alex":
+                    # Set fields to indicate privacy
+                    member["is_private"] = True
+                    member["display_name"] = "PRIVATE"
+                    
+                    # Clear identifiable information but keep ID for reference
+                    if "avatar_url" in member:
+                        member["avatar_url"] = None
+                    if "description" in member:
+                        member["description"] = "This member's information is private."
+                    if "pronouns" in member:
+                        member["pronouns"] = None
+        
         set_in_cache(cache_key, data, CACHE_TTL)
         return data
 

@@ -190,24 +190,50 @@ function App() {
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
       const frontingMember = fronting.members[0];
-      document.title = `Currently Fronting: ${frontingMember.display_name || frontingMember.name || 'Unknown'}`;
-      const frontingAvatar = frontingMember.webhook_avatar_url || frontingMember.avatar_url || defaultAvatar;
-      
-      // Update favicon
-      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-      link.type = 'image/x-icon';
-      link.rel = 'icon';
-      link.href = frontingAvatar;
-      document.head.appendChild(link);
-      
-      // Update apple-touch-icon for iOS
-      const touchIcon = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
-      touchIcon.rel = 'apple-touch-icon';
-      touchIcon.href = frontingAvatar;
-      document.head.appendChild(touchIcon);
-      
-      // Update meta tags for better link sharing
-      updateMetaTags(frontingMember);
+      // If the fronting member is private (Alex)
+      if (frontingMember.is_private) {
+        document.title = `Currently Fronting: PRIVATE`;
+        
+        // Update favicon to default avatar for private members
+        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'icon';
+        link.href = defaultAvatar;
+        document.head.appendChild(link);
+        
+        // Update apple-touch-icon for iOS
+        const touchIcon = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
+        touchIcon.rel = 'apple-touch-icon';
+        touchIcon.href = defaultAvatar;
+        document.head.appendChild(touchIcon);
+        
+        // Update meta tags with generic information
+        updateMetaTags({
+          display_name: "PRIVATE",
+          name: "PRIVATE",
+          avatar_url: defaultAvatar
+        });
+      } else {
+        // Original code for non-private members
+        document.title = `Currently Fronting: ${frontingMember.display_name || frontingMember.name || 'Unknown'}`;
+        const frontingAvatar = frontingMember.webhook_avatar_url || frontingMember.avatar_url || defaultAvatar;
+        
+        // Update favicon
+        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'icon';
+        link.href = frontingAvatar;
+        document.head.appendChild(link);
+        
+        // Update apple-touch-icon for iOS
+        const touchIcon = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
+        touchIcon.rel = 'apple-touch-icon';
+        touchIcon.href = frontingAvatar;
+        document.head.appendChild(touchIcon);
+        
+        // Update meta tags for better link sharing
+        updateMetaTags(frontingMember);
+      }
     } else {
       document.title = "Doughmination System Server";
       
@@ -465,14 +491,23 @@ function App() {
             <h2 className="text-lg font-semibold mb-3 text-center">Currently Fronting:</h2>
             <div className="fronting-member">
               <div className="avatar-container fronting-avatar">
-                <img
-                  src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
-                  alt="Fronting member"
-                  loading="eager"
-                />
+                {fronting.members[0]?.is_private ? (
+                  // Display default avatar for private members (Alex)
+                  <img
+                    src={defaultAvatar} 
+                    alt="Private member"
+                    loading="eager"
+                  />
+                ) : (
+                  <img
+                    src={fronting.members[0]?.webhook_avatar_url || fronting.members[0]?.avatar_url || defaultAvatar}
+                    alt="Fronting member"
+                    loading="eager"
+                  />
+                )}
               </div>
               <span className="fronting-member-name">
-                {fronting.members[0]?.display_name || fronting.members[0]?.name || "Unknown"}
+                {fronting.members[0]?.is_private ? "PRIVATE" : (fronting.members[0]?.display_name || fronting.members[0]?.name || "Unknown")}
               </span>
             </div>
           </div>
@@ -516,25 +551,28 @@ function App() {
               {filteredMembers.length > 0 ? (
                 <div className="grid member-grid gap-5">
                   {filteredMembers.map((member) => (
-                    <div key={member.id} className="member-grid-item">
-                      <div className="h-full w-full p-2">
-                        <Link 
-                          to={`/${member.name.toLowerCase()}`} 
-                          className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 transform transition-all duration-300"
-                        >
-                          <div className="flex flex-col items-center justify-center h-full p-3">
-                            <div className="avatar-container">
-                              <img
-                                src={member.avatar_url || defaultAvatar}
-                                alt={member.name}
-                                loading="lazy"
-                              />
+                    // Skip private members in the grid
+                    member.is_private ? null : (
+                      <div key={member.id} className="member-grid-item">
+                        <div className="h-full w-full p-2">
+                          <Link 
+                            to={`/${member.name.toLowerCase()}`} 
+                            className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 transform transition-all duration-300"
+                          >
+                            <div className="flex flex-col items-center justify-center h-full p-3">
+                              <div className="avatar-container">
+                                <img
+                                  src={member.avatar_url || defaultAvatar}
+                                  alt={member.name}
+                                  loading="lazy"
+                                />
+                              </div>
+                              <span className="member-name">{member.display_name || member.name}</span>
                             </div>
-                            <span className="member-name">{member.display_name || member.name}</span>
-                          </div>
-                        </Link>
+                          </Link>
+                        </div>
                       </div>
-                    </div>
+                    )
                   ))}
                 </div>
               ) : searchQuery ? (
