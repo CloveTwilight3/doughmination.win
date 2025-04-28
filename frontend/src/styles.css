@@ -1358,3 +1358,188 @@ html.dark .privacy-notice {
 html.dark .private-text {
   color: #f87171;
 }
+
+/* ============================================================================
+   AVATAR SIZING FIXES
+   Strict size constraints for avatars to prevent overflow
+   ============================================================================ */
+/* Avatar Size and Container Fixes */
+.avatar-container,
+.fronting-avatar,
+.w-10.h-10.rounded-full {
+  position: relative;
+  width: 3rem !important;
+  height: 3rem !important;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  max-width: 3rem !important;
+  max-height: 3rem !important;
+  background-color: #f3f4f6;
+  border: 2px solid #e5e7eb;
+  margin: 0 auto;
+}
+
+/* Avatar image containment */
+.avatar-container img,
+.fronting-avatar img,
+.w-10.h-10.rounded-full img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Special sizes for specific components */
+.member-details-avatar {
+  width: 5rem !important;
+  height: 5rem !important;
+  max-width: 5rem !important;
+  max-height: 5rem !important;
+}
+
+.w-24.h-24.rounded-full {
+  width: 6rem !important;
+  height: 6rem !important;
+  max-width: 6rem !important;
+  max-height: 6rem !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.w-24.h-24.rounded-full img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+.w-8.h-8.rounded-full {
+  width: 2rem !important;
+  height: 2rem !important;
+  max-width: 2rem !important;
+  max-height: 2rem !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.w-8.h-8.rounded-full img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* ============================================================================
+   ENHANCED MOBILE FIXES
+   Additional mobile fixes for better user experience
+   ============================================================================ */
+@media (max-width: 640px) {
+  /* Fix hamburger menu header alignment */
+  header.fixed .container {
+    padding: 0.5rem 1rem;
+  }
+  
+  /* Improve mobile grid layout */
+  .member-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+    padding: 0.5rem;
+  }
+  
+  /* Prevent horizontal overflow */
+  .overflow-x-hidden {
+    overflow-x: hidden;
+  }
+  
+  body, html, #root {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+  }
+  
+  /* Fix table scrolling on mobile */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    max-width: 100vw;
+    position: relative;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Fix content padding on mobile */
+  .max-w-4xl,
+  .max-w-2xl,
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Improve search bar on mobile */
+  .relative.max-w-md.mx-auto.mb-6 {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Fix buttons on mobile */
+  button,
+  a.px-3.py-2,
+  .px-4.py-2 {
+    white-space: normal;
+  }
+}
+
+/* ============================================================================
+   WELCOME COMPONENT FIXES
+   Fix avatar sizing in the welcome component
+   ============================================================================ */
+/* Welcome component fixes */
+.welcome-message {
+  overflow: hidden;
+}
+
+.welcome-message .flex {
+  align-items: center;
+}
+
+.welcome-message .w-10.h-10 {
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 0;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+/* Ensure avatar dimensions are strictly enforced */
+.rounded-full,
+.rounded-full img,
+.avatar-container,
+.avatar-container img {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Fix for admin panel avatars */
+.flex.items-center .w-12.h-12.rounded-full {
+  width: 3rem !important;
+  height: 3rem !important;
+  min-width: 0;
+  min-height: 0;
+  max-width: 3rem !important;
+  max-height: 3rem !important;
+}
