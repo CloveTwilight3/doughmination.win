@@ -508,6 +508,12 @@ function App() {
               </div>
               <span className="fronting-member-name">
                 {fronting.members[0]?.is_private ? "PRIVATE" : (fronting.members[0]?.display_name || fronting.members[0]?.name || "Unknown")}
+                {/* Add Host label for Clove when fronting */}
+                {fronting.members[0] && 
+                (fronting.members[0].name === "Clove" || fronting.members[0].display_name === "Clove") && 
+                !fronting.members[0].is_private && (
+                  <span className="host-badge ml-2">Host</span>
+                )}
               </span>
             </div>
           </div>
@@ -551,8 +557,8 @@ function App() {
               {filteredMembers.length > 0 ? (
                 <div className="grid member-grid gap-5">
                   {filteredMembers.map((member) => (
-                    // Skip private members in the grid
-                    member.is_private ? null : (
+                    // Skip private members and Sleeping in the grid
+                    member.is_private || member.name === "Sleeping" ? null : (
                       <div key={member.id} className="member-grid-item">
                         <div className="h-full w-full p-2">
                           <Link 
@@ -567,7 +573,13 @@ function App() {
                                   loading="lazy"
                                 />
                               </div>
-                              <span className="member-name">{member.display_name || member.name}</span>
+                              <span className="member-name">
+                                {member.display_name || member.name}
+                                {/* Add "Host" label for Clove */}
+                                {(member.name === "Clove" || member.display_name === "Clove") && (
+                                  <span className="host-badge">Host</span>
+                                )}
+                              </span>
                             </div>
                           </Link>
                         </div>

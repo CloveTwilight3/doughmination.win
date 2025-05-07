@@ -131,6 +131,10 @@ const MemberDetails = ({ members, defaultAvatar }) => {
         </div>
         <h1 className="text-2xl font-bold mt-2 text-black dark:text-white">
           {memberData.is_private ? "PRIVATE" : (memberData.display_name || memberData.name)}
+          {/* Add Host label for Clove */}
+          {(memberData.name === "Clove" || memberData.display_name === "Clove") && (
+            <span className="host-badge ml-2">Host</span>
+          )}
         </h1>
       </div>
       

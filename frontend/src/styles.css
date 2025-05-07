@@ -1543,3 +1543,39 @@ html.dark .private-text {
   max-width: 3rem !important;
   max-height: 3rem !important;
 }
+
+/* Host badge styling */
+.host-badge {
+  display: inline-block;
+  background-color: #8b5cf6; /* Purple color to match the theme */
+  color: white;
+  font-size: 0.6rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+html.dark .host-badge {
+  background-color: #a78bfa; /* Lighter purple for dark mode */
+}
+
+/* Mobile responsiveness for badges */
+@media (max-width: 640px) {
+  .host-badge {
+    font-size: 0.5rem;
+    padding: 0.05rem 0.3rem;
+    margin-left: 0.3rem;
+  }
+  
+  /* Fix for member name with badge */
+  .member-name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+  }
+}
