@@ -33,12 +33,14 @@ SOFTWARE.
  * - Navigation menu with hamburger button for all devices
  * - Member search functionality
  * - Mental state display
+ * - Real-time updates via WebSocket
  * ============================================================================
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import useTheme from './useTheme';
+import useWebSocket from './hooks/useWebSocket';
 import MemberDetails from './MemberDetails.jsx';
 import Login from './Login.jsx';
 import AdminDashboard from './AdminDashboard.jsx';
@@ -68,6 +70,62 @@ function App() {
 
   // Default avatar for members without one
   const defaultAvatar = "https://alextlm.co.uk/system.png";
+
+  // WebSocket message handler
+  const handleWebSocketMessage = useCallback(async (message) => {
+    console.log('WebSocket message received:', message);
+    
+    switch (message.type) {
+      case 'fronting_update':
+        // Update fronting data
+        console.log('Updating fronting with:', message.data);
+        setFronting(message.data || { members: [] });
+        break;
+        
+      case 'mental_state_update':
+        // Update mental state
+        console.log('Updating mental state with:', message.data);
+        if (message.data) {
+          setMentalState({
+            ...message.data,
+            updated_at: message.data.updated_at
+          });
+        }
+        break;
+        
+      case 'members_update':
+        // Update members list
+        console.log('Updating members with:', message.data);
+        if (message.data?.members) {
+          const sortedMembers = [...message.data.members].sort((a, b) => {
+            const nameA = (a.display_name || a.name).toLowerCase();
+            const nameB = (b.display_name || b.name).toLowerCase();
+            return nameA.localeCompare(nameB);
+          });
+          setMembers(sortedMembers);
+          setFilteredMembers(sortedMembers);
+        }
+        break;
+        
+      case 'force_refresh':
+        // Force refresh the entire page
+        console.log('Force refresh requested');
+        window.location.reload();
+        break;
+        
+      default:
+        console.log('Unknown message type:', message.type);
+    }
+  }, []);
+
+  // WebSocket error handler
+  const handleWebSocketError = useCallback((error) => {
+    console.error('WebSocket error:', error);
+    // You could add user notification here if desired
+  }, []);
+
+  // Initialize WebSocket connection
+  const { isConnected } = useWebSocket(handleWebSocketMessage, handleWebSocketError);
 
   /* ============================================================================
    * DATA FETCHING AND INITIALIZATION
@@ -403,6 +461,17 @@ function App() {
    */
   return (
     <div className="max-w-6xl mx-auto text-black dark:text-white">
+      {/* WebSocket connection status indicator */}
+      <div className="fixed top-16 right-4 z-50">
+        <div className={`px-2 py-1 rounded text-xs transition-all duration-300 ${
+          isConnected 
+            ? 'bg-green-500 text-white opacity-75 hover:opacity-100' 
+            : 'bg-red-500 text-white opacity-100'
+        }`}>
+          {isConnected ? 'Live Updates Active' : 'Connecting...'}
+        </div>
+      </div>
+      
       {/* ========== NAVIGATION BAR WITH HAMBURGER MENU ========== */}
       <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">

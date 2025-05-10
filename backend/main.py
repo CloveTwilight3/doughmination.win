@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile
+from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -33,13 +33,15 @@ import shutil
 import aiofiles
 import uuid
 import json
+import asyncio
+import weakref
 from datetime import datetime, timezone
 from fastapi.security import SecurityScopes
 from jose import JWTError
 from dotenv import load_dotenv
 from models import UserCreate, UserResponse, UserUpdate, MentalState
 from users import get_users, create_user, delete_user, initialize_admin_user, update_user, get_user_by_id
-from typing import List, Optional
+from typing import List, Optional, Set, Dict
 from metrics import get_fronting_time_metrics, get_switch_frequency_metrics
 from pathlib import Path
 
@@ -88,7 +90,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Add the file size limit middleware
 app.add_middleware(FileSizeLimitMiddleware)
 
@@ -105,6 +106,117 @@ async def get_optional_user(token: str = Security(oauth2_scheme, scopes=[])):
         return await get_current_user(token)
     except (HTTPException, JWTError):
         return None
+
+# ============================================================================
+# WebSocket Connection Manager
+# ============================================================================
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Dict[str, Set[WebSocket]] = {
+            "all": set(),  # All connected clients
+            "authenticated": set()  # Authenticated users
+        }
+        # Use weakref to prevent memory leaks
+        self._weak_connections = weakref.WeakSet()
+
+    async def connect(self, websocket: WebSocket, group: str = "all"):
+        await websocket.accept()
+        self.active_connections[group].add(websocket)
+        self._weak_connections.add(websocket)
+        print(f"Client connected to group: {group}. Total connections: {len(self.active_connections[group])}")
+
+    def disconnect(self, websocket: WebSocket, group: str = "all"):
+        self.active_connections[group].discard(websocket)
+        # Clean up from all groups when disconnecting
+        for group_set in self.active_connections.values():
+            group_set.discard(websocket)
+        print(f"Client disconnected from group: {group}. Remaining connections: {len(self.active_connections[group])}")
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        try:
+            await websocket.send_text(message)
+        except Exception as e:
+            print(f"Error sending personal message: {e}")
+            # Remove the connection if it's broken
+            self.disconnect(websocket)
+
+    async def broadcast(self, message: str, group: str = "all"):
+        """Broadcast message to all connections in a group"""
+        disconnected = set()
+        
+        for connection in self.active_connections[group].copy():
+            try:
+                await connection.send_text(message)
+            except WebSocketDisconnect:
+                disconnected.add(connection)
+            except Exception as e:
+                print(f"Error broadcasting to client: {e}")
+                disconnected.add(connection)
+        
+        # Clean up disconnected clients
+        for conn in disconnected:
+            self.disconnect(conn, group)
+
+    async def broadcast_json(self, data: dict, group: str = "all"):
+        """Broadcast JSON data to all connections in a group"""
+        message = json.dumps(data)
+        await self.broadcast(message, group)
+
+# Create a global connection manager instance
+manager = ConnectionManager()
+
+# ============================================================================
+# WebSocket Endpoint
+# ============================================================================
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    
+    try:
+        while True:
+            # Keep the connection alive
+            data = await websocket.receive_text()
+            
+            # You can handle different message types if needed
+            if data == "ping":
+                await websocket.send_text("pong")
+                
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+        manager.disconnect(websocket)
+
+# ============================================================================
+# WebSocket Broadcast Helpers
+# ============================================================================
+
+async def broadcast_frontend_update(data_type: str, data: dict = None):
+    """Broadcast an update to all connected clients"""
+    message = {
+        "type": data_type,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "data": data or {}
+    }
+    await manager.broadcast_json(message)
+
+async def broadcast_fronting_update(fronters_data: dict):
+    """Broadcast fronting member changes"""
+    await broadcast_frontend_update("fronting_update", fronters_data)
+
+async def broadcast_mental_state_update(mental_state_data: dict):
+    """Broadcast mental state changes"""
+    await broadcast_frontend_update("mental_state_update", mental_state_data)
+
+async def broadcast_member_update(members_data: list):
+    """Broadcast member list changes"""
+    await broadcast_frontend_update("members_update", {"members": members_data})
+
+# ============================================================================
+# API Endpoints (with WebSocket broadcast integration)
+# ============================================================================
 
 @app.get("/api/mental-state")
 async def get_mental_state():
@@ -144,6 +256,9 @@ async def update_mental_state(state: MentalState, user = Depends(get_current_use
         
         with open("mental_state.json", "w") as f:
             json.dump(state_data, f, indent=2)
+        
+        # Broadcast the mental state update
+        await broadcast_mental_state_update(state_data)
         
         return {"success": True, "message": "Mental state updated"}
     except Exception as e:
@@ -212,11 +327,15 @@ async def switch_front(request: Request, user = Depends(get_current_user)):
             raise HTTPException(status_code=400, detail="'members' must be a list of member IDs")
 
         await set_front(member_ids)
+        
+        # Broadcast the fronting update
+        fronters_data = await get_fronters()
+        await broadcast_fronting_update(fronters_data)
+        
         return {"status": "success", "message": "Front updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# New endpoint to match frontend's AdminDashboard component
 @app.post("/api/switch_front")
 async def switch_single_front(request: Request, user = Depends(get_current_user)):
     try:
@@ -228,18 +347,21 @@ async def switch_single_front(request: Request, user = Depends(get_current_user)
 
         result = await set_front([member_id])
 
-        # If result is a successful dict, return it or just say success
+        # After successful switch, broadcast the update
+        if result or True:  # Broadcast even if result is None
+            # Fetch the updated fronters data
+            fronters_data = await get_fronters()
+            await broadcast_fronting_update(fronters_data)
+
         return {"success": True, "message": "Front updated", "data": result}
 
     except HTTPException as http_exc:
         raise http_exc
 
     except Exception as e:
-        # Optionally log and parse pluralkit error responses here
         print("Error in /api/switch_front:", e)
         raise HTTPException(status_code=500, detail=f"Failed to switch front: {str(e)}")
 
-        
 # Add admin check endpoint
 @app.get("/api/is_admin")
 async def check_admin(user = Depends(get_current_user)):
@@ -451,3 +573,20 @@ async def switch_frequency_metrics(days: int = 30, user = Depends(get_current_us
         return metrics
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch switch frequency metrics: {str(e)}")
+
+# Admin refresh endpoint
+@app.post("/api/admin/refresh")
+async def admin_refresh(user = Depends(get_current_user)):
+    """Force refresh all connected clients"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        # Broadcast refresh command
+        await broadcast_frontend_update("force_refresh", {
+            "message": "Admin initiated refresh"
+        })
+        
+        return {"success": True, "message": "Refresh broadcast sent"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to broadcast refresh: {str(e)}")
