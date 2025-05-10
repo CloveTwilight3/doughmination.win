@@ -172,6 +172,7 @@ manager = ConnectionManager()
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    # Accept the WebSocket connection
     await manager.connect(websocket)
     
     try:
@@ -182,7 +183,9 @@ async def websocket_endpoint(websocket: WebSocket):
             # You can handle different message types if needed
             if data == "ping":
                 await websocket.send_text("pong")
-                
+            else:
+                # Handle other message types here if needed
+                pass
     except WebSocketDisconnect:
         manager.disconnect(websocket)
     except Exception as e:

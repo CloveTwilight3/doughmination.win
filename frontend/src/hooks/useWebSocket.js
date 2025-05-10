@@ -22,27 +22,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 const useWebSocket = (onMessage, onError = null) => {
   const ws = useRef(null);
   const reconnectTimer = useRef(null);
   const reconnectAttempts = useRef(0);
+  const [isConnected, setIsConnected] = useState(false);
   
   const maxReconnectAttempts = 5;
   const baseReconnectDelay = 1000; // 1 second
 
   const connect = useCallback(() => {
-    // Get current URL and determine WebSocket protocol
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/ws`;
-    
     try {
+      // Determine the correct WebSocket URL based on current protocol
+      let wsUrl;
+      if (window.location.protocol === 'https:') {
+        // For HTTPS, use WSS and the same domain
+        wsUrl = `wss://${window.location.host}/ws`;
+      } else {
+        // For HTTP (local development), use WS
+        wsUrl = `ws://${window.location.host}/ws`;
+      }
+      
+      console.log('Attempting to connect to WebSocket:', wsUrl);
+      
+      // Clean up any existing connection
+      if (ws.current && ws.current.readyState !== WebSocket.CLOSED) {
+        ws.current.close();
+      }
+      
       ws.current = new WebSocket(wsUrl);
       
       ws.current.onopen = () => {
-        console.log('WebSocket connected');
+        console.log('WebSocket connected successfully');
+        setIsConnected(true);
         reconnectAttempts.current = 0;
         
         // Send a ping to keep the connection alive
@@ -58,6 +72,11 @@ const useWebSocket = (onMessage, onError = null) => {
       
       ws.current.onmessage = (event) => {
         try {
+          // Handle pong responses
+          if (event.data === 'pong') {
+            return; // Just acknowledge the pong, don't pass it to the handler
+          }
+          
           const data = JSON.parse(event.data);
           onMessage(data);
         } catch (err) {
@@ -67,6 +86,7 @@ const useWebSocket = (onMessage, onError = null) => {
       
       ws.current.onclose = (event) => {
         console.log('WebSocket closed:', event.code, event.reason);
+        setIsConnected(false);
         
         // Clear ping interval
         if (ws.current?._pingInterval) {
@@ -92,13 +112,15 @@ const useWebSocket = (onMessage, onError = null) => {
       
       ws.current.onerror = (error) => {
         console.error('WebSocket error:', error);
-        if (onError) {
-          onError(error);
-        }
+        setIsConnected(false);
+        
+        // For connection errors, let the close handler deal with reconnection
+        // Don't call onError here as it might cause duplicate error handling
       };
       
     } catch (error) {
       console.error('Failed to create WebSocket connection:', error);
+      setIsConnected(false);
       if (onError) {
         onError(error);
       }
@@ -136,7 +158,7 @@ const useWebSocket = (onMessage, onError = null) => {
 
   return {
     sendMessage,
-    isConnected: ws.current?.readyState === WebSocket.OPEN
+    isConnected
   };
 };
 
