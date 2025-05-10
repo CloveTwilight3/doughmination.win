@@ -32,6 +32,7 @@ SOFTWARE.
  * - PluralKit API data fetching
  * - Navigation menu with hamburger button for all devices
  * - Member search functionality
+ * - Mental state display
  * ============================================================================
  */
 
@@ -62,6 +63,7 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false); // Admin privileges state
   const [loading, setLoading] = useState(true); // Initial data loading state
   const [menuOpen, setMenuOpen] = useState(false); // Menu toggle state for all devices
+  const [mentalState, setMentalState] = useState(null); // Current mental state
   const navigate = useNavigate(); // React Router navigation hook
 
   // Default avatar for members without one
@@ -102,6 +104,18 @@ function App() {
           setFronting(data || { members: [] });
         } else {
           console.error("Error fetching fronters:", frontingRes.status);
+        }
+
+        // Fetch system info (including mental state)
+        const systemRes = await fetch("/api/system");
+        if (systemRes.ok) {
+          const data = await systemRes.json();
+          console.log("System data:", data);
+          if (data.mental_state) {
+            setMentalState(data.mental_state);
+          }
+        } else {
+          console.error("Error fetching system info:", systemRes.status);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -352,6 +366,33 @@ function App() {
     navigate('/');
   }
 
+  /* ============================================================================
+   * MENTAL STATE FUNCTIONS
+   * Functions for displaying mental state information
+   * ============================================================================
+   */
+  const getMentalStateLabel = (level) => {
+    const labels = {
+      'safe': 'Safe',
+      'unstable': 'Unstable',
+      'idealizing': 'Idealizing',
+      'self-harming': 'Self-Harming',
+      'highly at risk': 'Highly At Risk'
+    };
+    return labels[level] || level;
+  };
+
+  const getMentalStateIcon = (level) => {
+    const icons = {
+      'safe': '✅',
+      'unstable': '⚠️',
+      'idealizing': '❗',
+      'self-harming': '🚨',
+      'highly at risk': '⛔'
+    };
+    return icons[level] || '❓';
+  };
+
   // Show loading state while initializing
   if (loading) return <div className="text-black dark:text-white p-10 text-center">Loading...</div>;
 
@@ -475,6 +516,27 @@ function App() {
         {/* Welcome banner - only shown when logged in */}
         <Welcome loggedIn={loggedIn} isAdmin={isAdmin} />
         
+        {/* Mental State Banner */}
+        {mentalState && (
+          <div className={`mental-state-banner ${mentalState.level.replace(' ', '-')}`}>
+            <div className="flex items-center justify-center gap-3">
+              <span className="mental-state-icon">
+                {getMentalStateIcon(mentalState.level)}
+              </span>
+              <div>
+                <span className="mental-state-label">Current Status: </span>
+                <span className="mental-state-level">{getMentalStateLabel(mentalState.level)}</span>
+                {mentalState.notes && (
+                  <p className="mental-state-notes">{mentalState.notes}</p>
+                )}
+              </div>
+            </div>
+            <small className="mental-state-updated">
+              Last updated: {new Date(mentalState.updated_at).toLocaleString()}
+            </small>
+          </div>
+        )}
+        
         <h1 className="text-2xl font-bold mt-8 mb-6 text-center text-black dark:text-white">
           System Members: 
         </h1> 
@@ -551,9 +613,9 @@ function App() {
               
               {filteredMembers.length > 0 ? (
                 <div className="grid member-grid gap-5">
-                  {filteredMembers.map((member) => (
-                    // Skip private members (none currently, as we removed them from PRIVATE_MEMBERS)
-                    member.is_private ? null : (
+                  {filteredMembers
+                    .filter(member => !member.is_private && !member.is_cofront && !member.is_special) // Hide cofronts and special members
+                    .map((member) => (
                       <div key={member.id} className="member-grid-item">
                         <div className="h-full w-full p-2">
                           <Link 
@@ -574,23 +636,12 @@ function App() {
                                 {(member.name === "Clove" || member.display_name === "Clove") && (
                                   <span className="host-badge">Host</span>
                                 )}
-                                {/* Add "Cofront" label */}
-                                {member.is_cofront && (
-                                  <span className="cofront-badge">Cofront</span>
-                                )}
-                                {/* Add Special label */}
-                                {member.is_special && (
-                                  <span className="special-badge">
-                                    {member.original_name === "system" ? "Unsure" : "Sleeping"}
-                                  </span>
-                                )}
                               </span>
                             </div>
                           </Link>
                         </div>
                       </div>
-                    )
-                  ))}
+                    ))}
                 </div>
               ) : searchQuery ? (
                 <p className="text-center mt-8">No members found matching "{searchQuery}"</p>

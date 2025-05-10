@@ -30,6 +30,7 @@ SOFTWARE.
  * - Display of currently fronting member
  * - Ability to switch fronting members
  * - User management interface (via the UserManagement component)
+ * - Mental state management interface (via the MentalStateAdmin component)
  * 
  * The component handles API communication for fetching members and updating fronting status.
  */
@@ -37,6 +38,7 @@ SOFTWARE.
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserManagement from './UserManagement'; // Import user management component
+import MentalStateAdmin from './MentalStateAdmin'; // Import mental state management component
 
 export default function AdminDashboard({ fronting }) {
   // State management
@@ -233,7 +235,10 @@ export default function AdminDashboard({ fronting }) {
         </div>
       </div>
       
-      {/* User Management Section - Rendered from imported component */}
+      {/* Mental State Management Section */}
+      <MentalStateAdmin />
+      
+      {/* User Management Section */}
       <UserManagement />
       
       {/* Navigation back to home */}

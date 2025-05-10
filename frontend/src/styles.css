@@ -1674,3 +1674,211 @@ SOFTWARE.
      background-color: rgba(55, 65, 81, 0.5);
      border-color: rgba(255, 255, 255, 0.1);
    }
+   
+   /* ============================================================================
+      MENTAL STATE BANNER STYLING
+      Styling for mental state banners and indicators
+      ============================================================================ */
+   
+   /* Mental State Banner Styling */
+   .mental-state-banner {
+     padding: 1rem;
+     margin: 1rem 0;
+     border-radius: 0.5rem;
+     border: 2px solid;
+     position: relative;
+     animation: fadeIn 0.3s ease-in-out;
+   }
+   
+   /* Safe state - green */
+   .mental-state-banner.safe {
+     background-color: rgba(34, 197, 94, 0.1);
+     border-color: rgba(34, 197, 94, 0.5);
+     color: #059669;
+   }
+   
+   html.dark .mental-state-banner.safe {
+     background-color: rgba(34, 197, 94, 0.15);
+     border-color: rgba(34, 197, 94, 0.7);
+     color: #34d399;
+   }
+   
+   /* Unstable state - yellow/orange */
+   .mental-state-banner.unstable {
+     background-color: rgba(251, 191, 36, 0.1);
+     border-color: rgba(251, 191, 36, 0.5);
+     color: #d97706;
+   }
+   
+   html.dark .mental-state-banner.unstable {
+     background-color: rgba(251, 191, 36, 0.15);
+     border-color: rgba(251, 191, 36, 0.7);
+     color: #fbbf24;
+   }
+   
+   /* Idealizing state - orange */
+   .mental-state-banner.idealizing {
+     background-color: rgba(249, 115, 22, 0.1);
+     border-color: rgba(249, 115, 22, 0.5);
+     color: #ea580c;
+   }
+   
+   html.dark .mental-state-banner.idealizing {
+     background-color: rgba(249, 115, 22, 0.15);
+     border-color: rgba(249, 115, 22, 0.7);
+     color: #fb923c;
+   }
+   
+   /* Self-harming state - red */
+   .mental-state-banner.self-harming {
+     background-color: rgba(239, 68, 68, 0.15);
+     border-color: rgba(239, 68, 68, 0.7);
+     color: #dc2626;
+   }
+   
+   html.dark .mental-state-banner.self-harming {
+     background-color: rgba(239, 68, 68, 0.2);
+     border-color: rgba(239, 68, 68, 0.8);
+     color: #ef4444;
+   }
+   
+   /* Highly at risk state - deep red */
+   .mental-state-banner.highly.at.risk,
+   .mental-state-banner.highly-at-risk {
+     background-color: rgba(220, 38, 38, 0.2);
+     border-color: rgba(220, 38, 38, 0.8);
+     color: #991b1b;
+     animation: pulse 2s infinite;
+   }
+   
+   html.dark .mental-state-banner.highly.at.risk,
+   html.dark .mental-state-banner.highly-at-risk {
+     background-color: rgba(220, 38, 38, 0.25);
+     border-color: rgba(220, 38, 38, 0.9);
+     color: #dc2626;
+   }
+   
+   /* Mental state icon */
+   .mental-state-icon {
+     font-size: 1.5rem;
+     margin-right: 0.5rem;
+   }
+   
+   /* Mental state label and text */
+   .mental-state-label {
+     font-weight: 600;
+   }
+   
+   .mental-state-level {
+     font-weight: bold;
+     font-size: 1.1rem;
+     text-transform: capitalize;
+   }
+   
+   .mental-state-notes {
+     font-style: italic;
+     margin-top: 0.5rem;
+     opacity: 0.9;
+     font-size: 0.95rem;
+   }
+   
+   .mental-state-updated {
+     display: block;
+     margin-top: 0.75rem;
+     opacity: 0.7;
+     font-size: 0.85rem;
+   }
+   
+   /* Animation for highly at risk state */
+   @keyframes pulse {
+     0% {
+       box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+     }
+     70% {
+       box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+     }
+     100% {
+       box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+     }
+   }
+   
+   /* Responsive adjustments for mobile */
+   @media (max-width: 640px) {
+     .mental-state-banner {
+       padding: 0.75rem;
+       margin: 0.75rem 0;
+     }
+     
+     .mental-state-icon {
+       font-size: 1.2rem;
+     }
+     
+     .mental-state-level {
+       font-size: 1rem;
+     }
+     
+     .mental-state-notes {
+       font-size: 0.85rem;
+     }
+   }
+   
+   /* Admin mental state management styles */
+   .mental-state-admin-card {
+     background-color: rgba(255, 255, 255, 0.8);
+     backdrop-filter: blur(10px);
+     -webkit-backdrop-filter: blur(10px);
+   }
+   
+   html.dark .mental-state-admin-card {
+     background-color: rgba(30, 27, 75, 0.8);
+   }
+   
+   /* Mental state color classes for admin UI */
+   .border-green-500 {
+     border-color: #22c55e;
+   }
+   
+   .bg-green-50 {
+     background-color: #f0fdf4;
+   }
+   
+   .border-yellow-500 {
+     border-color: #eab308;
+   }
+   
+   .bg-yellow-50 {
+     background-color: #fefce8;
+   }
+   
+   .border-orange-500 {
+     border-color: #f97316;
+   }
+   
+   .bg-orange-50 {
+     background-color: #fff7ed;
+   }
+   
+   .border-red-500 {
+     border-color: #ef4444;
+   }
+   
+   .bg-red-50 {
+     background-color: #fef2f2;
+   }
+   
+   /* Dark mode adjustments for admin colors */
+   html.dark .dark\:bg-green-900 {
+     background-color: rgba(20, 83, 45, 0.2);
+   }
+   
+   html.dark .dark\:bg-yellow-900 {
+     background-color: rgba(133, 77, 14, 0.2);
+   }
+   
+   html.dark .dark\:bg-orange-900 {
+     background-color: rgba(154, 52, 18, 0.2);
+   }
+   
+   html.dark .dark\:bg-red-900 {
+     background-color: rgba(153, 27, 27, 0.2);
+   }

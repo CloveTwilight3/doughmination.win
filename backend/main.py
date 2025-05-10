@@ -32,10 +32,12 @@ import os
 import shutil
 import aiofiles
 import uuid
+import json
+from datetime import datetime, timezone
 from fastapi.security import SecurityScopes
 from jose import JWTError
 from dotenv import load_dotenv
-from models import UserCreate, UserResponse, UserUpdate
+from models import UserCreate, UserResponse, UserUpdate, MentalState
 from users import get_users, create_user, delete_user, initialize_admin_user, update_user, get_user_by_id
 from typing import List, Optional
 from metrics import get_fronting_time_metrics, get_switch_frequency_metrics
@@ -71,7 +73,6 @@ class FileSizeLimitMiddleware(BaseHTTPMiddleware):
         return response
 
 # CORS
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -105,10 +106,74 @@ async def get_optional_user(token: str = Security(oauth2_scheme, scopes=[])):
     except (HTTPException, JWTError):
         return None
 
+@app.get("/api/mental-state")
+async def get_mental_state():
+    """Get current mental state from database"""
+    try:
+        # Check if mental_state.json exists
+        if os.path.exists("mental_state.json"):
+            with open("mental_state.json", "r") as f:
+                state_data = json.load(f)
+                # Convert the string back to datetime
+                state_data["updated_at"] = datetime.fromisoformat(state_data["updated_at"])
+                return MentalState(**state_data)
+        else:
+            # Default state
+            return MentalState(
+                level="safe",
+                updated_at=datetime.now(timezone.utc),
+                notes=None
+            )
+    except Exception as e:
+        print(f"Error loading mental state: {e}")
+        return MentalState(
+            level="safe",
+            updated_at=datetime.now(timezone.utc),
+            notes=None
+        )
+
+@app.post("/api/mental-state")
+async def update_mental_state(state: MentalState, user = Depends(get_current_user)):
+    """Update mental state (admin only)"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        state_data = state.dict()
+        state_data["updated_at"] = state_data["updated_at"].isoformat()
+        
+        with open("mental_state.json", "w") as f:
+            json.dump(state_data, f, indent=2)
+        
+        return {"success": True, "message": "Mental state updated"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update mental state: {str(e)}")
+
 @app.get("/api/system")
 async def system_info():
     try:
-        return await get_system()
+        # Get system data
+        system_data = await get_system()
+        
+        # Get mental state
+        mental_state_data = None
+        if os.path.exists("mental_state.json"):
+            with open("mental_state.json", "r") as f:
+                state_data = json.load(f)
+                # Convert the string back to datetime for the response
+                state_data["updated_at"] = datetime.fromisoformat(state_data["updated_at"])
+                mental_state_data = MentalState(**state_data)
+        else:
+            mental_state_data = MentalState(
+                level="safe",
+                updated_at=datetime.now(timezone.utc),
+                notes=None
+            )
+        
+        # Add mental state to system data
+        system_data["mental_state"] = mental_state_data.dict()
+        
+        return system_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch system info: {str(e)}")
 

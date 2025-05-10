@@ -24,6 +24,7 @@ SOFTWARE.
 
 from pydantic import BaseModel
 from typing import Optional, List
+from datetime import datetime
 
 class User(BaseModel):
     id: str
@@ -51,3 +52,15 @@ class UserUpdate(BaseModel):
     current_password: Optional[str] = None
     new_password: Optional[str] = None
     avatar_url: Optional[str] = None
+
+class MentalState(BaseModel):
+    level: str  # safe, unstable, idealizing, self-harming, highly at risk
+    updated_at: datetime
+    notes: Optional[str] = None
+
+class SystemInfo(BaseModel):
+    id: str
+    name: str
+    description: Optional[str]
+    tag: Optional[str]
+    mental_state: Optional[MentalState] = None
