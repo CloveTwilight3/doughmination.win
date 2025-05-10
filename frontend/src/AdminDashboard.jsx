@@ -132,6 +132,16 @@ export default function AdminDashboard({ fronting }) {
     });
   }
 
+  /**
+   * Gets the appropriate avatar for a member (handling cofronts)
+   */
+  const getMemberAvatar = (member) => {
+    if (member.is_cofront && member.component_avatars && member.component_avatars.length > 0) {
+      return member.component_avatars[0];
+    }
+    return member.avatar_url || "https://clovetwilight3.co.uk/system.png";
+  };
+
   // Show loading indicator when fetching initial data
   if (loading && members.length === 0) {
     return <div className="text-center p-8">Loading...</div>;
@@ -163,19 +173,21 @@ export default function AdminDashboard({ fronting }) {
             <div className="flex items-center">
               <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
                 <img 
-                  src={currentFronting.is_private ? "https://clovetwilight3.co.uk/system.png" : (currentFronting.avatar_url || "https://clovetwilight3.co.uk/system.png")}
+                  src={getMemberAvatar(currentFronting)}
                   alt={currentFronting.name}
-                  className={`w-full h-full object-cover ${currentFronting.is_private ? "private-avatar" : ""}`}
+                  className="w-full h-full object-cover"
                 />
               </div>
               <span className="text-lg flex items-center">
-                {currentFronting.is_private ? (
-                  <>
-                    <span className="private-text">PRIVATE</span>
-                    <span className="ml-2 text-sm text-red-500">(Alex)</span>
-                  </>
-                ) : (
-                  currentFronting.display_name || currentFronting.name
+                {currentFronting.display_name || currentFronting.name}
+                {/* Add badges */}
+                {currentFronting.is_cofront && (
+                  <span className="ml-2 cofront-badge">Cofront</span>
+                )}
+                {currentFronting.is_special && (
+                  <span className="ml-2 special-badge">
+                    {currentFronting.original_name === "system" ? "Unsure" : "Sleeping"}
+                  </span>
                 )}
               </span>
             </div>
@@ -202,7 +214,9 @@ export default function AdminDashboard({ fronting }) {
                 
                 {members.map((member) => (
                   <option key={member.id} value={member.id}>
-                    {member.is_private ? `${member.name} (Private)` : (member.display_name || member.name)}
+                    {member.display_name || member.name}
+                    {member.is_cofront && ' (Cofront)'}
+                    {member.is_special && ` (${member.original_name === "system" ? "Unsure" : "Sleeping"})`}
                   </option>
                 ))}
               </select>

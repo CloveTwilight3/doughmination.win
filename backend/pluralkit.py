@@ -37,6 +37,19 @@ HEADERS = {
     "Authorization": TOKEN
 }
 
+# Cofront/fusion member definitions
+COFRONTS = {
+    "DeadJett": ["Deadlock", "Jett"],
+    "NyaRub": ["Nyara", "Ruby"],
+    "VipRub": ["Viper", "Ruby"]
+}
+
+# Special member display names
+SPECIAL_DISPLAY_NAMES = {
+    "system": "Unsure",
+    "sleeping": "I am sleeping"
+}
+
 async def get_system():
     cache_key = "system"
     if (cached := get_from_cache(cache_key)):
@@ -48,6 +61,13 @@ async def get_system():
         set_in_cache(cache_key, data, CACHE_TTL)
         return data
 
+async def get_member_by_name(members_data, name):
+    """Helper function to find a member by name"""
+    for member in members_data:
+        if member.get("name") == name:
+            return member
+    return None
+
 async def get_members():
     cache_key = "members"
     if (cached := get_from_cache(cache_key)):
@@ -57,24 +77,61 @@ async def get_members():
         resp.raise_for_status()
         data = resp.json()
         
-        # Process private members
+        # Process cofront members and special members
+        processed_members = []
         for member in data:
-            # If the member has a privacy field or the name is "Alex"
-            if member.get("privacy") == "private" or member.get("name") == "Alex":
-                # Set fields to indicate privacy
-                member["is_private"] = True
-                member["display_name"] = "PRIVATE"
+            member_name = member.get("name")
+            
+            # Handle cofronts
+            if member_name in COFRONTS:
+                component_names = COFRONTS[member_name]
+                component_members = []
                 
-                # Clear identifiable information but keep ID for reference
-                if "avatar_url" in member:
-                    member["avatar_url"] = None
-                if "description" in member:
-                    member["description"] = "This member's information is private."
-                if "pronouns" in member:
-                    member["pronouns"] = None
+                # Find the component members
+                for component_name in component_names:
+                    component_member = await get_member_by_name(data, component_name)
+                    if component_member:
+                        component_members.append(component_member)
+                
+                # Create cofront display data
+                if component_members:
+                    # Combine display names
+                    display_names = []
+                    for comp in component_members:
+                        display_names.append(comp.get("display_name", comp.get("name")))
                     
-        set_in_cache(cache_key, data, CACHE_TTL)
-        return data
+                    # Create cofront member data
+                    cofront_member = {
+                        **member,  # Keep original member data
+                        "is_cofront": True,
+                        "component_members": component_members,
+                        "display_name": " + ".join(display_names),
+                        "original_name": member_name,
+                        # Keep the cofront's own avatar if it has one, otherwise we'll handle this in the frontend
+                        "component_avatars": [comp.get("avatar_url") for comp in component_members if comp.get("avatar_url")]
+                    }
+                    processed_members.append(cofront_member)
+                else:
+                    # If we can't find component members, add as normal member
+                    processed_members.append(member)
+            
+            # Handle special display names (system -> Unsure, sleeping -> I am sleeping)
+            elif member_name in SPECIAL_DISPLAY_NAMES:
+                # Update the display name but keep everything else the same
+                special_member = {
+                    **member,
+                    "display_name": SPECIAL_DISPLAY_NAMES[member_name],
+                    "is_special": True,  # Mark as special for identification
+                    "original_name": member_name
+                }
+                processed_members.append(special_member)
+            
+            # Handle normal members
+            else:
+                processed_members.append(member)
+                    
+        set_in_cache(cache_key, processed_members, CACHE_TTL)
+        return processed_members
 
 async def get_fronters():
     cache_key = "fronters"
@@ -85,22 +142,30 @@ async def get_fronters():
         resp.raise_for_status()
         data = resp.json()
         
-        # Process private members in fronters
+        # Process special members and cofronts in fronters
         if "members" in data:
+            # Get all members for reference
+            all_members = await get_members()
+            
+            processed_fronters = []
             for member in data["members"]:
-                # If the member has a privacy field or the name is "Alex"
-                if member.get("privacy") == "private" or member.get("name") == "Alex":
-                    # Set fields to indicate privacy
-                    member["is_private"] = True
-                    member["display_name"] = "PRIVATE"
-                    
-                    # Clear identifiable information but keep ID for reference
-                    if "avatar_url" in member:
-                        member["avatar_url"] = None
-                    if "description" in member:
-                        member["description"] = "This member's information is private."
-                    if "pronouns" in member:
-                        member["pronouns"] = None
+                member_name = member.get("name")
+                
+                # Find the processed member data from our get_members function
+                processed_member = None
+                for m in all_members:
+                    if m.get("id") == member.get("id"):
+                        processed_member = m
+                        break
+                
+                if processed_member:
+                    # Use the processed member data (which includes cofront and special display name handling)
+                    processed_fronters.append(processed_member)
+                else:
+                    # Fallback to original member data
+                    processed_fronters.append(member)
+            
+            data["members"] = processed_fronters
         
         set_in_cache(cache_key, data, CACHE_TTL)
         return data
