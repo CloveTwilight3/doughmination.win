@@ -885,6 +885,18 @@ SOFTWARE.
      position: relative;
      z-index: 10;
      margin-top: 1rem;
+     font-family: 'Caveat', cursive !important;
+     font-weight: 600;
+     font-size: 1.25rem;
+   }
+   
+   /* Ensure all welcome message text elements use Caveat font */
+   .welcome-message *,
+   .welcome-message p,
+   .welcome-message div,
+   .welcome-message span {
+     font-family: 'Caveat', cursive !important;
+     font-weight: 600;
    }
    
    html.dark .welcome-message {
