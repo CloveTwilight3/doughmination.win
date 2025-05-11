@@ -126,6 +126,21 @@ function App() {
 
   // Initialize WebSocket connection
   const { isConnected } = useWebSocket(handleWebSocketMessage, handleWebSocketError);
+  
+  // Auto-hide connection status after 3 seconds when connected
+  const [showConnectionStatus, setShowConnectionStatus] = useState(true);
+  
+  useEffect(() => {
+    if (isConnected) {
+      const timer = setTimeout(() => {
+        setShowConnectionStatus(false);
+      }, 3000); // Hide after 3 seconds when connected
+      
+      return () => clearTimeout(timer);
+    } else {
+      setShowConnectionStatus(true); // Always show when disconnected
+    }
+  }, [isConnected]);
 
   /* ============================================================================
    * DATA FETCHING AND INITIALIZATION
@@ -461,16 +476,22 @@ function App() {
    */
   return (
     <div className="max-w-6xl mx-auto text-black dark:text-white">
-      {/* WebSocket connection status indicator - Fixed positioning */}
-      <div className="fixed top-20 right-4 z-50 sm:top-[75px] sm:right-6">
-        <div className={`px-2 py-1 rounded text-xs transition-all duration-300 backdrop-filter backdrop-blur-sm bg-opacity-90 ${
-          isConnected 
-            ? 'bg-green-500 text-white opacity-75 hover:opacity-100' 
-            : 'bg-red-500 text-white opacity-100'
-        }`}>
-          {isConnected ? 'Live Updates Active' : 'Connecting...'}
+      {/* WebSocket connection status indicator - Fixed positioning with auto-fade */}
+      {(!isConnected || showConnectionStatus) && (
+        <div className="fixed top-16 right-4 z-45 sm:top-[65px] sm:right-6 md:right-8">
+          <div 
+            className={`px-2 py-1 rounded text-xs transition-all duration-500 backdrop-filter backdrop-blur-sm transform
+              ${isConnected 
+                ? 'bg-green-500 text-white opacity-75 hover:opacity-100' 
+                : 'bg-red-500 text-white opacity-100'
+              } 
+              ${menuOpen ? 'scale-0 translate-y-[-20px] opacity-0 pointer-events-none' : ''} 
+              ${!showConnectionStatus && isConnected ? 'websocket-status-exit' : 'websocket-status-enter'}`}
+          >
+            {isConnected ? 'Live Updates Active' : 'Connecting...'}
+          </div>
         </div>
-      </div>
+      )}
       
       {/* ========== NAVIGATION BAR WITH HAMBURGER MENU ========== */}
       <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
@@ -578,7 +599,7 @@ function App() {
       </header>
 
       {/* Space for fixed header */}
-      <div className="pt-16"></div>
+      <div className="h-16 sm:h-14"></div>
 
       {/* ========== MAIN CONTENT AREA ========== */}
       <main className="container mx-auto px-4 pt-4">
