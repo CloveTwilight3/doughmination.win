@@ -256,9 +256,22 @@ SOFTWARE.
      flex: 1;
    }
    
+   /* Ensure main element doesn't have max-width */
+   main {
+     width: 100%;
+     max-width: none !important;
+   }
+   
    /* ============================================================================
       ULTRA-WIDE SCREEN SUPPORT
       ============================================================================ */
+   @media (min-width: 1920px) {
+     .member-grid {
+       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+       gap: 1.75rem;
+     }
+   }
+   
    @media (min-width: 2560px) {
      .member-grid {
        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -268,6 +281,18 @@ SOFTWARE.
      .container {
        padding-left: 4rem;
        padding-right: 4rem;
+     }
+   }
+   
+   @media (min-width: 3440px) {
+     .member-grid {
+       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+       gap: 2.5rem;
+     }
+     
+     .container {
+       padding-left: 6rem;
+       padding-right: 6rem;
      }
    }
    
@@ -442,6 +467,7 @@ SOFTWARE.
      gap: 1.5rem;
      padding: 1rem;
      width: 100%;
+     max-width: none;
      overflow: visible;
      box-sizing: border-box;
    }
@@ -460,6 +486,21 @@ SOFTWARE.
      backdrop-filter: blur(10px);
      -webkit-backdrop-filter: blur(10px);
      transition: all 0.3s ease;
+     text-decoration: none !important;
+   }
+   
+   /* Remove link decorations for member grid */
+   .member-grid-item a,
+   .member-grid-item a:hover,
+   .member-grid-item a:visited,
+   .member-grid-item a:focus {
+     text-decoration: none !important;
+     outline: none;
+   }
+   
+   /* Custom focus state for accessibility */
+   .member-grid-item a:focus {
+     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.5);
    }
    
    html.dark .member-grid-item a {
