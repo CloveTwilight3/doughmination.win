@@ -95,6 +95,115 @@ SOFTWARE.
      letter-spacing: 0.5px;
    }
    
+   /* STANDARDIZED FONT SIZES */
+   /* Main headings */
+   h1 {
+     font-size: 2.5rem;
+   }
+   
+   h2 {
+     font-size: 2rem;
+   }
+   
+   h3 {
+     font-size: 1.75rem;
+   }
+   
+   /* Header title */
+   header.fixed .header-title,
+   header.fixed a,
+   header.fixed .container > a {
+     font-size: 2rem;
+   }
+   
+   /* Member names */
+   .member-name,
+   .fronting-member-name,
+   .member-details-name {
+     font-size: 1.5rem;
+   }
+   
+   /* Mental state elements */
+   .mental-state-label,
+   .mental-state-level {
+     font-size: 1.75rem;
+   }
+   
+   .mental-state-notes {
+     font-size: 1.5rem;
+   }
+   
+   .mental-state-updated {
+     font-size: 1.25rem;
+   }
+   
+   /* Welcome message */
+   .welcome-message {
+     font-size: 1.5rem;
+   }
+   
+   /* Navigation buttons and links */
+   .desktop-nav button,
+   .desktop-nav a {
+     font-size: 1.25rem;
+   }
+   
+   /* General buttons */
+   button,
+   a.px-3.py-2,
+   .px-3.py-2 {
+     font-size: 1.25rem;
+   }
+   
+   /* Footer */
+   .github-button {
+     font-size: 1.5rem;
+   }
+   
+   .github-footer .text-sm {
+     font-size: 1.25rem;
+   }
+   
+   /* STANDARDIZED BUTTON SIZES */
+   /* Navigation buttons */
+   .desktop-nav button,
+   .desktop-nav a {
+     padding: 0.75rem 1.25rem;
+     min-height: 3rem;
+   }
+   
+   /* General buttons */
+   button,
+   a.px-3.py-2,
+   .px-3.py-2 {
+     padding: 0.75rem 1.25rem;
+     min-height: 3rem;
+   }
+   
+   /* Hamburger menu button */
+   button.hamburger-menu,
+   button[aria-label="Toggle menu"],
+   button.flex.items-center.justify-center.p-2.rounded-md {
+     width: 3rem;
+     height: 3rem;
+     min-width: 3rem;
+     min-height: 3rem;
+     padding: 0.5rem;
+   }
+   
+   /* Footer button */
+   .github-button {
+     padding: 1rem 2rem;
+     min-height: 3.5rem;
+   }
+   
+   /* Search bar input */
+   .flex.items-center.border.rounded-lg.overflow-hidden input {
+     padding: 0.75rem 1rem;
+     min-height: 3rem;
+     font-size: 1.25rem;
+   }
+   
    /* Ensure member names with pronouns use Caveat font */
    .member-name,
    .fronting-member-name,
@@ -226,13 +335,10 @@ SOFTWARE.
    
    .desktop-nav button,
    .desktop-nav a {
-     padding: 0.5rem 1rem;
      border-radius: 0.375rem;
      transition: all 0.2s ease;
-     font-size: 0.95rem;
      font-family: 'Caveat', cursive !important;
      font-weight: 600;
-     font-size: 1.1rem;
      min-height: 40px;
      display: inline-flex;
      align-items: center;
@@ -444,7 +550,6 @@ SOFTWARE.
    .member-name,
    .fronting-member-name,
    .member-details-name {
-     font-size: 1.25rem;
      margin-top: 0.75rem;
      font-family: 'Caveat', cursive !important;
      font-weight: 600;
@@ -469,9 +574,14 @@ SOFTWARE.
      }
    }
    
-   h2 {
-     font-size: 1.75rem;
-     margin-bottom: 1rem;
+   .h-16 {
+     height: 68px;
+   }
+   
+   @media (max-width: 640px) {
+     .h-16 {
+       height: 60px;
+     }
    }
    
    /* Button spacing for desktop */
@@ -479,7 +589,6 @@ SOFTWARE.
    a.px-3.py-2,
    .px-3.py-2 {
      display: inline-block;
-     padding: 0.6rem 1rem;
      border-radius: 0.375rem;
      transition: all 0.3s ease;
    }
@@ -688,7 +797,7 @@ SOFTWARE.
      }
      
      header.fixed .header-title {
-       font-size: 1.5rem;
+       font-size: 1.75rem;
      }
      
      /* Show hamburger menu on mobile - override previous hide */
@@ -725,7 +834,7 @@ SOFTWARE.
      
      /* Text sizes for mobile */
      .member-name {
-       font-size: 1rem;
+       font-size: 1.25rem;
      }
      
      h1 {
@@ -733,21 +842,68 @@ SOFTWARE.
      }
      
      h2 {
+       font-size: 1.75rem;
+     }
+     
+     h3 {
        font-size: 1.5rem;
+     }
+     
+     /* Mental state sizes for mobile */
+     .mental-state-label,
+     .mental-state-level {
+       font-size: 1.5rem;
+     }
+     
+     .mental-state-notes {
+       font-size: 1.25rem;
+     }
+     
+     .mental-state-updated {
+       font-size: 1rem;
+     }
+     
+     /* Welcome message for mobile */
+     .welcome-message {
+       font-size: 1.25rem;
+     }
+     
+     /* Navigation for mobile */
+     .desktop-nav button,
+     .desktop-nav a {
+       font-size: 1rem;
      }
      
      /* Button spacing for mobile */
      button,
      a.px-3.py-2,
      .px-3.py-2 {
-       min-height: 44px;
-       padding: 0.6rem 0.8rem;
+       min-height: 2.75rem;
+       padding: 0.6rem 1rem;
+       font-size: 1rem;
+     }
+     
+     /* Footer for mobile */
+     .github-button {
+       font-size: 1.25rem;
+       padding: 0.75rem 1.5rem;
+       min-height: 3rem;
+     }
+     
+     .github-footer .text-sm {
+       font-size: 1rem;
      }
      
      /* Search bar for mobile */
      .relative.max-w-md.mx-auto.mb-6 {
        max-width: 100%;
        width: 100%;
+     }
+     
+     .flex.items-center.border.rounded-lg.overflow-hidden input {
+       font-size: 1rem;
+       padding: 0.6rem 0.75rem;
+       min-height: 2.75rem;
      }
      
      /* Admin dashboard layout for mobile */
@@ -780,8 +936,8 @@ SOFTWARE.
      .special-badge,
      .admin-badge,
      .private-badge {
-       font-size: 0.6rem;
-       padding: 0.1rem 0.4rem;
+       font-size: 0.75rem;
+       padding: 0.125rem 0.5rem;
        margin-left: 0.3rem;
      }
      
@@ -911,6 +1067,39 @@ SOFTWARE.
      border-radius: 0.5rem;
      border: 2px solid;
      position: relative;
+     font-family: 'Caveat', cursive !important;
+     font-weight: 600;
+   }
+   
+   /* Ensure all mental state text elements use Caveat font */
+   .mental-state-banner *,
+   .mental-state-banner .mental-state-label,
+   .mental-state-banner .mental-state-level,
+   .mental-state-banner .mental-state-notes,
+   .mental-state-banner .mental-state-updated,
+   .mental-state-banner p,
+   .mental-state-banner div,
+   .mental-state-banner span,
+   .mental-state-banner small {
+     font-family: 'Caveat', cursive !important;
+     font-weight: 600;
+   }
+   
+   /* Specific font sizes for mental state elements */
+   .mental-state-label {
+     font-size: 1.2rem;
+   }
+   
+   .mental-state-level {
+     font-size: 1.3rem;
+   }
+   
+   .mental-state-notes {
+     font-size: 1.15rem;
+   }
+   
+   .mental-state-updated {
+     font-size: 1rem;
    }
    
    .mental-state-banner.safe {
