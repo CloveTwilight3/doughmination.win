@@ -22,29 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 const useTheme = () => {
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
-    
-    // Dispatch a custom event to notify theme change
-    const event = new CustomEvent('themeChanged', { detail: { theme: newTheme } });
-    document.dispatchEvent(event);
-  };
+  // Theme is now always 'dark'
+  const theme = 'dark';
 
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
+    // Always apply dark theme
+    document.documentElement.classList.add('dark');
+    
+    // Store dark theme in localStorage
+    localStorage.setItem('theme', 'dark');
+    
+    // Dispatch a custom event to notify theme change
+    const event = new CustomEvent('themeChanged', { detail: { theme: 'dark' } });
+    document.dispatchEvent(event);
+  }, []);
+
+  // Return a dummy toggle function that doesn't do anything
+  const toggleTheme = () => {
+    // No operation - dark mode is permanent
+  };
 
   return [theme, toggleTheme];
 };

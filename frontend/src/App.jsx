@@ -28,7 +28,6 @@ SOFTWARE.
  * This is the root component of the application that handles:
  * - Routing between different views/pages
  * - User authentication state
- * - Theme toggling (light/dark mode)
  * - PluralKit API data fetching
  * - Navigation menu with hamburger button for all devices
  * - Member search functionality
@@ -60,7 +59,6 @@ function App() {
   const [filteredMembers, setFilteredMembers] = useState([]); // Filtered members for search
   const [searchQuery, setSearchQuery] = useState(""); // Search query for members
   const [fronting, setFronting] = useState({ members: [] }); // Currently fronting members
-  const [theme, toggleTheme] = useTheme(); // Light/dark mode state
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token")); // Authentication state
   const [isAdmin, setIsAdmin] = useState(false); // Admin privileges state
   const [loading, setLoading] = useState(true); // Initial data loading state
@@ -70,6 +68,9 @@ function App() {
 
   // Default avatar for members without one
   const defaultAvatar = "https://alextlm.co.uk/system.png";
+
+  // Initialize theme (dark mode only)
+  useTheme();
 
   // WebSocket message handler
   const handleWebSocketMessage = useCallback(async (message) => {
@@ -500,13 +501,6 @@ function App() {
           
           {/* Desktop Navigation - Always visible on larger screens */}
           <div className="desktop-nav hidden md:flex items-center gap-3">
-            <button
-              onClick={toggleTheme}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-            </button>
-            
             {loggedIn && (
               <Link 
                 to="/admin/metrics"
@@ -577,17 +571,6 @@ function App() {
               onClick={(e) => e.stopPropagation()}
             >
               <ul className="flex flex-col p-4 gap-3">
-                <li>
-                  <button
-                    onClick={() => {
-                      toggleTheme();
-                      toggleMenu();
-                    }}
-                    className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg text-sm flex justify-center"
-                  >
-                    {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-                  </button>
-                </li>
                 {loggedIn && (
                   <li>
                     <Link 

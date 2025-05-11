@@ -26,14 +26,12 @@ SOFTWARE.
  * main.jsx
  * 
  * This is the application entry point that initializes the React app.
- * It sets up the React root, wraps the app in a router, and adds custom
- * event listeners for enhanced UI effects.
+ * It sets up the React root, wraps the app in a router.
  * 
  * Key features:
  * - React app initialization
  * - BrowserRouter setup for routing
- * - Custom hover effects for UI elements
- * - Theme change detection and handling
+ * - Enhanced UI effects for the dark theme
  */
 
 import React from 'react';
@@ -53,14 +51,10 @@ root.render(
   </BrowserRouter>
 );
 
-// Custom enhancement: Fix for hover effects
-// This adds custom hover effects to buttons and interactive elements
+// Custom enhancement: Enhanced hover effects for dark mode
 document.addEventListener('DOMContentLoaded', function() {
-  // Only apply hover effects in light mode
+  // Apply custom hover effects for dark mode
   function applyHoverEffects() {
-    // Skip if in dark mode
-    if (document.documentElement.classList.contains('dark')) return;
-    
     // Find all buttons and links with color classes
     const elements = document.querySelectorAll('.bg-blue-500, .bg-purple-500, .bg-green-500, .bg-red-500, .bg-blue-600, button[type="submit"], .rounded-lg');
     
@@ -88,17 +82,18 @@ document.addEventListener('DOMContentLoaded', function() {
   // The delay ensures the DOM is fully loaded
   setTimeout(applyHoverEffects, 500);
   
-  // Watch for theme changes (light/dark mode toggle)
-  // This allows hover effects to update when theme changes
+  // Optional: Watch for any DOM changes if you have dynamic content
   const observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
-      // Check if the class attribute of the html element was modified
-      if (mutation.attributeName === 'class' && mutation.target === document.documentElement) {
+      if (mutation.addedNodes.length) {
         applyHoverEffects();
       }
     });
   });
   
-  // Start observing the html element for class changes
-  observer.observe(document.documentElement, { attributes: true });
+  // Start observing for any DOM additions
+  observer.observe(document.body, { 
+    childList: true, 
+    subtree: true 
+  });
 });
