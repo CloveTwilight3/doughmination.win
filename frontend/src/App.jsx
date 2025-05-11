@@ -461,9 +461,9 @@ function App() {
    */
   return (
     <div className="max-w-6xl mx-auto text-black dark:text-white">
-      {/* WebSocket connection status indicator */}
-      <div className="fixed top-16 right-4 z-50">
-        <div className={`px-2 py-1 rounded text-xs transition-all duration-300 ${
+      {/* WebSocket connection status indicator - Fixed positioning */}
+      <div className="fixed top-20 right-4 z-50 sm:top-[75px] sm:right-6">
+        <div className={`px-2 py-1 rounded text-xs transition-all duration-300 backdrop-filter backdrop-blur-sm bg-opacity-90 ${
           isConnected 
             ? 'bg-green-500 text-white opacity-75 hover:opacity-100' 
             : 'bg-red-500 text-white opacity-100'
