@@ -493,14 +493,68 @@ function App() {
         </div>
       )}
       
-      {/* ========== NAVIGATION BAR WITH HAMBURGER MENU ========== */}
+      {/* ========== NAVIGATION BAR WITH DESKTOP AND HAMBURGER MENU ========== */}
       <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-40">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Link to="/" className="text-lg font-semibold z-10">Doughmination System</Link>
           
-          {/* Hamburger menu button - for ALL devices */}
+          {/* Desktop Navigation - Always visible on larger screens */}
+          <div className="desktop-nav hidden md:flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+            </button>
+            
+            {loggedIn && (
+              <Link 
+                to="/admin/metrics"
+                className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+              >
+                Metrics
+              </Link>
+            )}
+            
+            {loggedIn && (
+              <Link 
+                to="/admin/user"
+                className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+              >
+                My Profile
+              </Link>
+            )}
+            
+            {loggedIn ? (
+              <>
+                {isAdmin && (
+                  <Link 
+                    to="/admin/dashboard"
+                    className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link 
+                to="/admin/login"
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                Login
+              </Link>
+            )}
+          </div>
+          
+          {/* Hamburger menu button - for mobile devices */}
           <button 
-            className="flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="hamburger-menu flex md:hidden items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             onClick={toggleMenu}
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
@@ -515,9 +569,9 @@ function App() {
           </button>
         </div>
         
-        {/* Navigation overlay for all devices */}
+        {/* Navigation overlay for mobile devices only */}
         {menuOpen && (
-          <div className="fixed inset-0 z-30 bg-black bg-opacity-50" onClick={toggleMenu}>
+          <div className="mobile-menu-overlay fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden" onClick={toggleMenu}>
             <div 
               className="absolute right-0 top-[61px] w-64 max-w-[80vw] h-screen bg-white dark:bg-gray-800 shadow-lg"
               onClick={(e) => e.stopPropagation()}

@@ -82,10 +82,26 @@ SOFTWARE.
    }
    
    /* Headings use Caveat font for personality */
-   h1, h2, h3, .logo-text, .header-title {
+   h1, h2, h3, .logo-text, .header-title,
+   .mental-state-label,
+   .mental-state-level,
+   label,
+   input,
+   select,
+   textarea,
+   button {
      font-family: 'Caveat', cursive;
      font-weight: 600;
      letter-spacing: 0.5px;
+   }
+   
+   /* Keep specific elements with Inter font */
+   .font-inter,
+   .text-xs,
+   .text-sm,
+   th, td,
+   .member-name {
+     font-family: 'Inter', sans-serif !important;
    }
    
    /* ============================================================================
@@ -168,11 +184,22 @@ SOFTWARE.
      color: inherit;
    }
    
-   /* Desktop navigation - shown by default */
+   /* ============================================================================
+      NAVIGATION STYLES - DESKTOP AND MOBILE
+      ============================================================================ */
+   
+   /* Desktop navigation - shown on larger screens */
    .desktop-nav {
-     display: flex;
+     display: none;
      gap: 1rem;
      align-items: center;
+     margin-left: auto;
+   }
+   
+   @media (min-width: 768px) {
+     .desktop-nav {
+       display: flex;
+     }
    }
    
    .desktop-nav button,
@@ -181,13 +208,26 @@ SOFTWARE.
      border-radius: 0.375rem;
      transition: all 0.2s ease;
      font-size: 0.95rem;
+     font-family: 'Caveat', cursive !important;
+     font-weight: 600;
+     font-size: 1.1rem;
+     min-height: 40px;
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     text-decoration: none;
    }
    
-   /* Hide hamburger menu on desktop */
+   .desktop-nav button:hover,
+   .desktop-nav a:hover {
+     transform: translateY(-1px);
+   }
+   
+   /* Hamburger menu button - hidden on desktop, shown on mobile */
    button.hamburger-menu,
    button[aria-label="Toggle menu"],
    button.flex.items-center.justify-center.p-2.rounded-md {
-     display: none;
+     display: flex;
      width: 40px;
      height: 40px;
      min-width: 40px;
@@ -198,6 +238,16 @@ SOFTWARE.
      border: 1px solid rgba(229, 231, 235, 0.5);
      transition: all 0.2s ease;
      cursor: pointer;
+     align-items: center;
+     justify-content: center;
+   }
+   
+   @media (min-width: 768px) {
+     button.hamburger-menu,
+     button[aria-label="Toggle menu"],
+     button.flex.items-center.justify-center.p-2.rounded-md {
+       display: none;
+     }
    }
    
    button.hamburger-menu svg,
@@ -205,6 +255,56 @@ SOFTWARE.
    button.flex.items-center.justify-center.p-2.rounded-md svg {
      width: 20px !important;
      height: 20px !important;
+   }
+   
+   /* Mobile menu overlay - hidden on desktop */
+   .mobile-menu-overlay {
+     display: block;
+   }
+   
+   @media (min-width: 768px) {
+     .mobile-menu-overlay {
+       display: none !important;
+       visibility: hidden !important;
+     }
+   }
+   
+   /* Responsive button sizes for desktop navigation */
+   @media (min-width: 768px) and (max-width: 1023px) {
+     .desktop-nav {
+       gap: 8px;
+     }
+     
+     .desktop-nav button,
+     .desktop-nav a {
+       padding: 0.375rem 0.75rem;
+       font-size: 0.875rem;
+     }
+   }
+   
+   /* Accessibility and focus styles for navigation */
+   .desktop-nav button:focus,
+   .desktop-nav a:focus,
+   button.hamburger-menu:focus,
+   button[aria-label="Toggle menu"]:focus,
+   button.flex.items-center.justify-center.p-2.rounded-md:focus {
+     outline: 2px solid #3b82f6;
+     outline-offset: 2px;
+   }
+   
+   html.dark .desktop-nav button:focus,
+   html.dark .desktop-nav a:focus,
+   html.dark button.hamburger-menu:focus,
+   html.dark button[aria-label="Toggle menu"]:focus,
+   html.dark button.flex.items-center.justify-center.p-2.rounded-md:focus {
+     outline-color: #60a5fa;
+   }
+   
+   /* Hide desktop navigation on mobile */
+   @media (max-width: 767px) {
+     .desktop-nav {
+       display: none !important;
+     }
    }
    
    /* Member grid for desktop */
@@ -239,28 +339,53 @@ SOFTWARE.
      border-color: rgba(139, 92, 246, 0.3);
    }
    
-   /* Avatar sizes for desktop */
-   .avatar-container {
+   /* Avatar sizing fixes for all containers */
+   .avatar-container,
+   .fronting-avatar,
+   .w-8.h-8.rounded-full,
+   .w-10.h-10.rounded-full,
+   .w-12.h-12.rounded-full,
+   .w-24.h-24.rounded-full {
      position: relative;
-     width: 4.5rem;
-     height: 4.5rem;
      border-radius: 50%;
      overflow: hidden;
      background-color: #f3f4f6;
      border: 2px solid #e5e7eb;
      flex-shrink: 0;
-     display: block;
      margin: 0 auto;
      box-sizing: border-box;
    }
    
-   /* Specific avatar container fixes */
-   .w-10.h-10.rounded-full,
-   .w-12.h-12.rounded-full,
-   .w-24.h-24.rounded-full {
-     position: relative !important;
-     overflow: hidden !important;
-     background-color: #f3f4f6;
+   /* Ensure all avatar images are properly contained */
+   .avatar-container img,
+   .fronting-avatar img,
+   .w-8.h-8.rounded-full img,
+   .w-10.h-10.rounded-full img,
+   .w-12.h-12.rounded-full img,
+   .w-24.h-24.rounded-full img {
+     width: 100% !important;
+     height: 100% !important;
+     object-fit: cover !important;
+     object-position: center center !important;
+     position: absolute !important;
+     top: 0 !important;
+     left: 0 !important;
+     right: 0 !important;
+     bottom: 0 !important;
+     margin: 0 !important;
+     padding: 0 !important;
+   }
+   
+   /* Explicit sizing for each avatar type */
+   .avatar-container,
+   .fronting-avatar {
+     width: 4.5rem !important;
+     height: 4.5rem !important;
+   }
+   
+   .w-8.h-8.rounded-full {
+     width: 2rem !important;
+     height: 2rem !important;
    }
    
    .w-10.h-10.rounded-full {
@@ -274,6 +399,11 @@ SOFTWARE.
    }
    
    .w-24.h-24.rounded-full {
+     width: 6rem !important;
+     height: 6rem !important;
+   }
+   
+   .member-details-avatar {
      width: 6rem !important;
      height: 6rem !important;
    }
@@ -297,9 +427,23 @@ SOFTWARE.
      font-size: 1.25rem;
    }
    
-   h1 {
-     font-size: 2.5rem;
-     margin-bottom: 1.5rem;
+   /* Space for fixed header with proper clearance for banners */
+   .pt-16 {
+     padding-top: 5rem;
+   }
+   
+   .h-16 {
+     height: 68px;
+   }
+   
+   @media (max-width: 640px) {
+     .pt-16 {
+       padding-top: 4rem;
+     }
+     
+     .h-16 {
+       height: 60px;
+     }
    }
    
    h2 {
@@ -524,18 +668,13 @@ SOFTWARE.
        font-size: 1.5rem;
      }
      
-     /* Show hamburger menu on mobile */
+     /* Show hamburger menu on mobile - override previous hide */
      button.hamburger-menu,
      button[aria-label="Toggle menu"],
      button.flex.items-center.justify-center.p-2.rounded-md {
        display: flex !important;
        align-items: center;
        justify-content: center;
-     }
-     
-     /* Hide desktop navigation on mobile */
-     .desktop-nav {
-       display: none;
      }
      
      /* Member grid for mobile */
@@ -713,13 +852,16 @@ SOFTWARE.
      border-color: rgba(139, 92, 246, 0.5);
    }
    
-   /* Welcome message with enhanced styling */
+   /* Welcome message with enhanced styling and proper positioning */
    .welcome-message {
      padding: 0.75rem 1rem;
      background: rgba(255, 255, 255, 0.8);
      border-radius: 0.5rem;
      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
      margin-bottom: 1rem;
+     position: relative;
+     z-index: 10;
+     margin-top: 1rem;
    }
    
    html.dark .welcome-message {
