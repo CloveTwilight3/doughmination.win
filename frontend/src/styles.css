@@ -95,12 +95,19 @@ SOFTWARE.
      letter-spacing: 0.5px;
    }
    
+   /* Ensure member names with pronouns use Caveat font */
+   .member-name,
+   .fronting-member-name,
+   .member-details-name {
+     font-family: 'Caveat', cursive !important;
+     font-weight: 600;
+   }
+   
    /* Keep specific elements with Inter font */
    .font-inter,
    .text-xs,
    .text-sm,
-   th, td,
-   .member-name {
+   th, td {
      font-family: 'Inter', sans-serif !important;
    }
    
@@ -109,9 +116,9 @@ SOFTWARE.
       These are the base styles for desktop and larger devices
       ============================================================================ */
    
-   /* Container and layout */
+   /* Container and layout - Ultra-wide screen support */
    #root {
-     max-width: 1280px;
+     max-width: none; /* Remove max-width for ultra-wide screens */
      margin: 0 auto;
      padding: 1rem;
      text-align: center;
@@ -123,7 +130,7 @@ SOFTWARE.
    
    .container {
      width: 100%;
-     max-width: 1280px;
+     max-width: none; /* Remove max-width for ultra-wide screens */
      padding-left: 2rem;
      padding-right: 2rem;
      margin-left: auto;
@@ -133,11 +140,26 @@ SOFTWARE.
    
    main.container {
      width: 100%;
-     max-width: 1280px;
+     max-width: none; /* Remove max-width for ultra-wide screens */
      padding-left: 2rem;
      padding-right: 2rem;
      overflow-x: hidden;
      flex: 1;
+   }
+   
+   /* ============================================================================
+      ULTRA-WIDE SCREEN SUPPORT
+      ============================================================================ */
+   @media (min-width: 2560px) {
+     .member-grid {
+       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+       gap: 2rem;
+     }
+     
+     .container {
+       padding-left: 4rem;
+       padding-right: 4rem;
+     }
    }
    
    /* Header for desktop */
@@ -418,13 +440,14 @@ SOFTWARE.
      height: 6rem;
    }
    
-   /* Text sizes for desktop */
-   .member-name {
-     font-size: 0.95rem;
-     margin-top: 0.75rem;
-     font-family: 'Caveat', cursive;
-     font-weight: 600;
+   /* Text sizes for desktop - Ensure all member names use Caveat font */
+   .member-name,
+   .fronting-member-name,
+   .member-details-name {
      font-size: 1.25rem;
+     margin-top: 0.75rem;
+     font-family: 'Caveat', cursive !important;
+     font-weight: 600;
    }
    
    /* Space for fixed header with proper clearance for banners */
