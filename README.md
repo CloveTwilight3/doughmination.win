@@ -1,16 +1,17 @@
 # Doughmination System Server
 
-A lightweight web application that interfaces with the PluralKit API to display system members, current fronters, and individual member profiles in a clean and simple interface. Features a light/dark mode toggle and minimal UI for clarity.
+A lightweight web application that interfaces with the PluralKit API to display system members, current fronters, and individual member profiles in a clean and simple interface. Features minimal UI for clarity.
 
 ## Features
 
-- 🌗 Light and dark mode support with auto-detection
 - 👥 Display current fronting members with automatic favicon and title updates
 - 👤 View individual member profiles with detailed information
 - 🔒 Admin dashboard for system management (password protected)
 - 📊 Fronting metrics and switch frequency statistics
 - 👥 User management with multiple accounts support
 - 📱 Responsive design for mobile and desktop
+
+Currently optimized for dark mode. Light mode support is planned once stability is ensured.
 
 ## Hosting
 
