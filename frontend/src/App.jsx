@@ -76,9 +76,12 @@ function App() {
   // Initialize theme (dark mode only)
   useTheme();
 
-  useKonamiCode(() => {
-    createDoughnutRain();
-  });
+  const handleKonamiCode = useCallback(() => {
+  console.log("Konami code detected! Activating doughnut rain...");
+  createDoughnutRain();
+}, []);
+
+useKonamiCode(handleKonamiCode);
 
   useSpecialDates();
 

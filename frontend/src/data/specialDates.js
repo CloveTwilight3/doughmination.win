@@ -17,14 +17,14 @@ export const specialDates = [
     effect: 'birthday'
   },
   { 
-    month: 3, 
+    month: 2, 
     day: 22, 
     id: 'ruby-birthday', 
     message: "🎂 Happy Birthday Ruby! 🎂", 
     effect: 'birthday' 
   },
   { 
-    month: 7, 
+    month: 6, 
     day: 8, 
     id: 'jett-birthday', 
     message: "🎂 Happy Birthday Jett! 🎂", 
