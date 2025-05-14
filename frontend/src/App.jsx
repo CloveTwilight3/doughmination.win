@@ -1,40 +1,4 @@
-/*
-MIT License
-
-Copyright (c) 2025 Clove Twilight
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
-/* ============================================================================
- * DOUGHMINATION SYSTEM SERVER - MAIN APP COMPONENT
- *
- * This is the root component of the application that handles:
- * - Routing between different views/pages
- * - User authentication state
- * - PluralKit API data fetching
- * - Navigation menu with hamburger button for all devices
- * - Member search functionality
- * - Mental state display
- * - Real-time updates via WebSocket
- * ============================================================================
- */
+// App.jsx with Privacy Policy, Cookies Policy, and Advertising Integration
 
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, Routes, Route, useNavigate, Navigate } from "react-router-dom";
@@ -51,7 +15,11 @@ import UserEdit from './UserEdit.jsx';
 import useKonamiCode from './hooks/useKonamiCode';
 import useSpecialDates from './hooks/useSpecialDates';
 import { createDoughnutRain } from './effects/doughnutRain';
-
+// Import new components
+import AdvertBanner from './AdvertBanner.jsx';
+import PrivacyPolicyPage from './PrivacyPolicyPage.jsx';
+import CookiesPolicyPage from './CookiesPolicyPage.jsx';
+import CookieSettings from './CookieSettings.jsx';
 
 function App() {
   /* ============================================================================
@@ -77,11 +45,11 @@ function App() {
   useTheme();
 
   const handleKonamiCode = useCallback(() => {
-  console.log("Konami code detected! Activating doughnut rain...");
-  createDoughnutRain();
-}, []);
+    console.log("Konami code detected! Activating doughnut rain...");
+    createDoughnutRain();
+  }, []);
 
-useKonamiCode(handleKonamiCode);
+  useKonamiCode(handleKonamiCode);
 
   useSpecialDates();
 
@@ -642,6 +610,26 @@ useKonamiCode(handleKonamiCode);
                     </Link>
                   </li>
                 )}
+                
+                {/* Add links to Privacy Policy and Cookies Policy in mobile menu */}
+                <li>
+                  <Link 
+                    to="/privacy-policy"
+                    className="block w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg text-sm text-center"
+                    onClick={toggleMenu}
+                  >
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to="/cookies-policy"
+                    className="block w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg text-sm text-center"
+                    onClick={toggleMenu}
+                  >
+                    Cookies Policy
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -653,201 +641,217 @@ useKonamiCode(handleKonamiCode);
 
       {/* ========== MAIN CONTENT AREA ========== */}
       <main className="container mx-auto px-4 pt-4">
-        {/* Welcome banner - only shown when logged in */}
-        <Welcome loggedIn={loggedIn} isAdmin={isAdmin} />
-        
-        {/* Mental State Banner */}
-        {mentalState && (
-          <div className={`mental-state-banner ${mentalState.level.replace(' ', '-')}`}>
-            <div className="flex items-center justify-center gap-3">
-              <span className="mental-state-icon">
-                {getMentalStateIcon(mentalState.level)}
-              </span>
-              <div>
-                <span className="mental-state-label">Current Status: </span>
-                <span className="mental-state-level">{getMentalStateLabel(mentalState.level)}</span>
-                {mentalState.notes && (
-                  <p className="mental-state-notes">{mentalState.notes}</p>
-                )}
-              </div>
-            </div>
-            <small className="mental-state-updated">
-              Last updated: {new Date(mentalState.updated_at).toLocaleString()}
-            </small>
-          </div>
-        )}
-        
-        <h1 className="text-2xl font-bold mt-8 mb-6 text-center text-black dark:text-white">
-          System Members: 
-        </h1> 
-        
-        {/* Currently Fronting Section */}
-        {fronting && fronting.members && fronting.members.length > 0 && (
-          <div className="mb-6 p-4 border-b dark:border-gray-700">
-            <h2 className="text-lg font-semibold mb-3 text-center">Currently Fronting:</h2>
-            <div className="fronting-member">
-              <div className="avatar-container fronting-avatar">
-                <img
-                  src={getCofrontAvatar(fronting.members[0]) || defaultAvatar}
-                  alt="Fronting member"
-                  loading="eager"
-                />
-              </div>
-              <span className="fronting-member-name">
-                {fronting.members[0]?.display_name || fronting.members[0]?.name || "Unknown"}
-                {/* Add Host label for Clove when fronting */}
-                {fronting.members[0] && 
-                (fronting.members[0].name === "Clove" || fronting.members[0].display_name === "Clove") && 
-                (
-                  <span className="host-badge ml-2">Host</span>
-                )}
-                {/* Add Cofront label */}
-                {fronting.members[0]?.is_cofront && (
-                  <span className="cofront-badge ml-2">Cofront</span>
-                )}
-                {/* Add Special label for system/sleeping */}
-                {fronting.members[0]?.is_special && (
-                  <span className="special-badge ml-2">
-                    {fronting.members[0]?.original_name === "system" ? "Unsure" : "Sleeping"}
+        <div className="flex">
+          {/* Sidebar Ad Banner - Only visible on desktop */}
+          <AdvertBanner 
+            adSlot="3456789012"
+            adFormat="auto"
+            position="sidebar"
+            responsive={true}
+          />
+          
+          <div className="flex-1">
+            {/* Welcome banner - only shown when logged in */}
+            <Welcome loggedIn={loggedIn} isAdmin={isAdmin} />
+            
+            {/* Mental State Banner */}
+            {mentalState && (
+              <div className={`mental-state-banner ${mentalState.level.replace(' ', '-')}`}>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="mental-state-icon">
+                    {getMentalStateIcon(mentalState.level)}
                   </span>
-                )}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* ========== ROUTING SETUP ========== */}
-        <Routes>
-          {/* Home Page - Member Grid with Search */}
-          <Route path="/" element={
-            <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-4 text-center">Members:</h2>
-              
-              {/* Search Bar */}
-              <div className="relative max-w-md mx-auto mb-6">
-                <div className="flex items-center border rounded-lg overflow-hidden bg-white dark:bg-gray-700 shadow-sm">
-                  <input
-                    type="text"
-                    placeholder="Search members..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="w-full p-3 bg-transparent outline-none text-black dark:text-white"
-                  />
-                  {searchQuery && (
-                    <button 
-                      onClick={clearSearch}
-                      className="flex-shrink-0 p-3 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  )}
-                  <div className="flex-shrink-0 p-3 text-gray-500 dark:text-gray-300">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                  <div>
+                    <span className="mental-state-label">Current Status: </span>
+                    <span className="mental-state-level">{getMentalStateLabel(mentalState.level)}</span>
+                    {mentalState.notes && (
+                      <p className="mental-state-notes">{mentalState.notes}</p>
+                    )}
                   </div>
                 </div>
+                <small className="mental-state-updated">
+                  Last updated: {new Date(mentalState.updated_at).toLocaleString()}
+                </small>
               </div>
-              
-              {filteredMembers.length > 0 ? (
-                <div className="grid member-grid gap-5">
-                  {filteredMembers
-                    .filter(member => !member.is_private && !member.is_cofront && !member.is_special) // Hide cofronts and special members
-                    .map((member) => (
-                      <div key={member.id} className="member-grid-item">
-                        <div className="h-full w-full p-2">
-                          <Link 
-                            to={`/${member.name.toLowerCase()}`} 
-                            className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 transform transition-all duration-300"
-                          >
-                            <div className="flex flex-col items-center justify-center h-full p-3">
-                              <div className="avatar-container">
-                                <img
-                                  src={getCofrontAvatar(member) || defaultAvatar}
-                                  alt={member.name}
-                                  loading="lazy"
-                                />
-                              </div>
-                              <span className="member-name">
-                                {member.display_name || member.name}
-                                {/* Add "Host" label for Clove */}
-                                {(member.name === "Clove" || member.display_name === "Clove") && (
-                                  <span className="host-badge">Host</span>
-                                )}
-                              </span>
-                            </div>
-                          </Link>
+            )}
+            
+            {/* ========== ROUTING SETUP ========== */}
+            <Routes>
+              {/* Home Page - Member Grid with Search */}
+              <Route path="/" element={
+                <div className="mt-6">
+                  <h1 className="text-2xl font-bold mt-8 mb-6 text-center text-black dark:text-white">
+                    System Members: 
+                  </h1> 
+                  
+                  {/* Currently Fronting Section */}
+                  {fronting && fronting.members && fronting.members.length > 0 && (
+                    <div className="mb-6 p-4 border-b dark:border-gray-700">
+                      <h2 className="text-lg font-semibold mb-3 text-center">Currently Fronting:</h2>
+                      <div className="fronting-member">
+                        <div className="avatar-container fronting-avatar">
+                          <img
+                            src={getCofrontAvatar(fronting.members[0]) || defaultAvatar}
+                            alt="Fronting member"
+                            loading="eager"
+                          />
                         </div>
+                        <span className="fronting-member-name">
+                          {fronting.members[0]?.display_name || fronting.members[0]?.name || "Unknown"}
+                          {/* Add Host label for Clove when fronting */}
+                          {fronting.members[0] && 
+                          (fronting.members[0].name === "Clove" || fronting.members[0].display_name === "Clove") && 
+                          (
+                            <span className="host-badge ml-2">Host</span>
+                          )}
+                          {/* Add Cofront label */}
+                          {fronting.members[0]?.is_cofront && (
+                            <span className="cofront-badge ml-2">Cofront</span>
+                          )}
+                          {/* Add Special label for system/sleeping */}
+                          {fronting.members[0]?.is_special && (
+                            <span className="special-badge ml-2">
+                              {fronting.members[0]?.original_name === "system" ? "Unsure" : "Sleeping"}
+                            </span>
+                          )}
+                        </span>
                       </div>
-                    ))}
+                    </div>
+                  )}
+                  
+                  <h2 className="text-lg font-semibold mb-4 text-center">Members:</h2>
+                  
+                  {/* Search Bar */}
+                  <div className="relative max-w-md mx-auto mb-6">
+                    <div className="flex items-center border rounded-lg overflow-hidden bg-white dark:bg-gray-700 shadow-sm">
+                      <input
+                        type="text"
+                        placeholder="Search members..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="w-full p-3 bg-transparent outline-none text-black dark:text-white"
+                      />
+                      {searchQuery && (
+                        <button 
+                          onClick={clearSearch}
+                          className="flex-shrink-0 p-3 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
+                      <div className="flex-shrink-0 p-3 text-gray-500 dark:text-gray-300">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {filteredMembers.length > 0 ? (
+                    <div className="grid member-grid gap-5">
+                      {filteredMembers
+                        .filter(member => !member.is_private && !member.is_cofront && !member.is_special) // Hide cofronts and special members
+                        .map((member) => (
+                          <div key={member.id} className="member-grid-item">
+                            <div className="h-full w-full p-2">
+                              <Link 
+                                to={`/${member.name.toLowerCase()}`} 
+                                className="block h-full border rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700 transform transition-all duration-300"
+                              >
+                                <div className="flex flex-col items-center justify-center h-full p-3">
+                                  <div className="avatar-container">
+                                    <img
+                                      src={getCofrontAvatar(member) || defaultAvatar}
+                                      alt={member.name}
+                                      loading="lazy"
+                                    />
+                                  </div>
+                                  <span className="member-name">
+                                    {member.display_name || member.name}
+                                    {/* Add "Host" label for Clove */}
+                                    {(member.name === "Clove" || member.display_name === "Clove") && (
+                                      <span className="host-badge">Host</span>
+                                    )}
+                                  </span>
+                                </div>
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  ) : searchQuery ? (
+                    <p className="text-center mt-8">No members found matching "{searchQuery}"</p>
+                  ) : (
+                    <p className="text-center mt-8">No members found. Please check your connection.</p>
+                  )}
                 </div>
-              ) : searchQuery ? (
-                <p className="text-center mt-8">No members found matching "{searchQuery}"</p>
-              ) : (
-                <p className="text-center mt-8">No members found. Please check your connection.</p>
-              )}
-            </div>
-          } />
-          
-          {/* Member Detail Page */}
-          <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
-          
-          {/* Authentication */}
-          <Route path="/admin/login" element={<Login onLogin={() => {
-            setLoggedIn(true);
-            // After login, check if user is admin
-            fetch("/api/is_admin", {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-              }
-            })
-            .then(res => res.json())
-            .then(data => {
-              setIsAdmin(!!data.isAdmin);
-              if (data.isAdmin) {
-                navigate('/admin/dashboard');
-              } else {
-                navigate('/');
-              }
-            })
-            .catch(err => {
-              console.error("Error checking admin status after login:", err);
-              navigate('/');
-            });
-          }} />} />
-          
-          {/* User Profile Routes (protected, but no admin required) */}
-          <Route path="/admin/user" element={
-            <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
-              <UserProfile />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/user/edit" element={
-            <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
-              <UserEdit />
-            </ProtectedRoute>
-          } />
-          
-          {/* Admin Dashboard (protected, admin required) */}
-          <Route path="/admin/dashboard" element={
-            <ProtectedRoute adminRequired={true} isAdmin={isAdmin} isLoggedIn={loggedIn}>
-              <AdminDashboard fronting={fronting} />
-            </ProtectedRoute>
-          } />
-          
-          {/* Metrics Page (protected, but no admin required) */}
-          <Route path="/admin/metrics" element={
-            <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
-              <Metrics />
-            </ProtectedRoute>
-          } />
-          
-          {/* Catch all for invalid routes */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+              } />
+              
+              {/* Member Detail Page */}
+              <Route path="/:member_id" element={<MemberDetails members={members} defaultAvatar={defaultAvatar} />} />
+              
+              {/* Privacy and Cookies Policy Pages */}
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/cookies-policy" element={<CookiesPolicyPage />} />
+              
+              {/* Authentication */}
+              <Route path="/admin/login" element={<Login onLogin={() => {
+                setLoggedIn(true);
+                // After login, check if user is admin
+                fetch("/api/is_admin", {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                  }
+                })
+                .then(res => res.json())
+                .then(data => {
+                  setIsAdmin(!!data.isAdmin);
+                  if (data.isAdmin) {
+                    navigate('/admin/dashboard');
+                  } else {
+                    navigate('/');
+                  }
+                })
+                .catch(err => {
+                  console.error("Error checking admin status after login:", err);
+                  navigate('/');
+                });
+              }} />} />
+              
+              {/* User Profile Routes (protected, but no admin required) */}
+              <Route path="/admin/user" element={
+                <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
+                  <UserProfile />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/admin/user/edit" element={
+                <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
+                  <UserEdit />
+                </ProtectedRoute>
+              } />
+              
+              {/* Admin Dashboard (protected, admin required) */}
+              <Route path="/admin/dashboard" element={
+                <ProtectedRoute adminRequired={true} isAdmin={isAdmin} isLoggedIn={loggedIn}>
+                  <AdminDashboard fronting={fronting} />
+                </ProtectedRoute>
+              } />
+              
+              {/* Metrics Page (protected, but no admin required) */}
+              <Route path="/admin/metrics" element={
+                <ProtectedRoute adminRequired={false} isAdmin={isAdmin} isLoggedIn={loggedIn}>
+                  <Metrics />
+                </ProtectedRoute>
+              } />
+              
+              {/* Catch all for invalid routes */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </div>
       </main>
       
       {/* ========== FOOTER ========== */}
@@ -859,6 +863,18 @@ useKonamiCode(handleKonamiCode);
             </svg>
             View Source Code on GitHub
           </a>
+          
+          {/* Legal Links and Cookie Settings */}
+          <div className="flex flex-wrap gap-4 justify-center mt-2">
+            <Link to="/privacy-policy" className="text-blue-500 dark:text-blue-400 hover:underline text-sm">
+              Privacy Policy
+            </Link>
+            <Link to="/cookies-policy" className="text-blue-500 dark:text-blue-400 hover:underline text-sm">
+              Cookies Policy
+            </Link>
+            <CookieSettings />
+          </div>
+          
           <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             &copy; Clove Twilight 2025
           </div>
