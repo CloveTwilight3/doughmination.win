@@ -74,15 +74,26 @@ const AdvertBanner = ({
   
   // Function to initialize ads
   const initializeAds = () => {
-    if (window.adsbygoogle && !adLoaded) {
-      try {
+  if (window.adsbygoogle && !adLoaded) {
+    try {
+      // Find this specific ad slot
+      const adElement = document.querySelector(`ins[data-ad-slot="${adSlot}"]`);
+      
+      // Check if this ad is already initialized or has zero width
+      if (adElement && !adElement.dataset.adInitialized && adElement.offsetWidth > 0) {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
+        adElement.dataset.adInitialized = 'true';
         setAdLoaded(true);
-      } catch (e) {
-        console.error('Error initializing AdSense:', e);
+      } else if (adElement && adElement.offsetWidth === 0) {
+        console.log(`Ad container has zero width, delaying initialization for ad slot ${adSlot}`);
+        // Try again after a slight delay to allow layout to complete
+        setTimeout(initializeAds, 500);
       }
+    } catch (e) {
+      console.error('Error initializing AdSense:', e);
     }
-  };
+  }
+};
   
   // Get position-specific classes
   const getPositionClasses = () => {
