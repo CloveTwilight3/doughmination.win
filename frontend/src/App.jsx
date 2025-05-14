@@ -48,6 +48,10 @@ import Welcome from './Welcome.jsx';
 import Metrics from './Metrics.jsx';
 import UserProfile from './UserProfile.jsx';
 import UserEdit from './UserEdit.jsx';
+import useKonamiCode from './hooks/useKonamiCode';
+import useSpecialDates from './hooks/useSpecialDates';
+import { createDoughnutRain } from './effects/doughnutRain';
+
 
 function App() {
   /* ============================================================================
@@ -71,6 +75,12 @@ function App() {
 
   // Initialize theme (dark mode only)
   useTheme();
+
+  useKonamiCode(() => {
+    createDoughnutRain();
+  });
+
+  useSpecialDates();
 
   // WebSocket message handler
   const handleWebSocketMessage = useCallback(async (message) => {
