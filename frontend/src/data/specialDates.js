@@ -33,16 +33,16 @@ export const specialDates = [
   
   // Seasonal effects
   { 
-    month: 4, 
-    day: 14, 
+    month: 9, 
+    day: 31, 
     id: 'halloween', 
     message: "👻 Happy Halloween! 👻", 
     effect: 'halloween', 
     duration: 1 
   },  // Halloween
   { 
-    month: 11, 
-    day: 25, 
+    month: 4, 
+    day: 14, 
     id: 'christmas', 
     message: "🎄 Merry Christmas! 🎄", 
     effect: 'christmas', 
