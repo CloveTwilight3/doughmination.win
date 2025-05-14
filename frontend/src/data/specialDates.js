@@ -11,7 +11,7 @@ export const specialDates = [
   },
   {
     month: 4,
-    day: 13,
+    day: 14,
     id: "sage-birthday",
     message: "🎂 Happy Birthday Sage! 🎂",
     effect: 'birthday'
@@ -41,8 +41,8 @@ export const specialDates = [
     duration: 1 
   },  // Halloween
   { 
-    month: 4, 
-    day: 14, 
+    month: 11, 
+    day: 25, 
     id: 'christmas', 
     message: "🎄 Merry Christmas! 🎄", 
     effect: 'christmas', 
