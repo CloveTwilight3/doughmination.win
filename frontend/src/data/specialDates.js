@@ -1,15 +1,16 @@
 // Special dates and effects configuration
 export const specialDates = [
   // System member birthdays - replace with your actual dates
+  // 0 - Jan and 11 - Dec
   { 
-    month: 9, 
+    month: 8, 
     day: 15, 
     id: 'clove-birthday', 
     message: "🎂 Happy Birthday Clove! 🎂", 
     effect: 'birthday' 
   },
   {
-    month: 5,
+    month: 4,
     day: 14,
     id: "sage-birthday",
     message: "🎂 Happy Birthday Sage! 🎂",
