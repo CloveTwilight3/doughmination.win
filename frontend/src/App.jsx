@@ -644,7 +644,7 @@ function App() {
         <div className="flex">
           {/* Sidebar Ad Banner - Only visible on desktop */}
           <AdvertBanner 
-            adSlot="3456789012"
+            adSlot="7362645348"
             adFormat="auto"
             position="sidebar"
             responsive={true}

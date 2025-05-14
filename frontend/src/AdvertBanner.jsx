@@ -12,7 +12,7 @@ import { areCookiesAccepted, saveCookiePreferences } from './cookieService';
  * @param {boolean} props.responsive - Whether the ad should be responsive
  */
 const AdvertBanner = ({ 
-  adSlot = "1234567890", // Replace with your actual ad slot
+  adSlot = "7362645348", // Replace with your actual ad slot
   adFormat = "auto",
   position = "top",
   responsive = true
