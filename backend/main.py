@@ -53,7 +53,7 @@ app = FastAPI()
 initialize_admin_user()
 
 # Default fallback avatar URL
-DEFAULT_AVATAR = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/75bff394-4f86-45a8-a923-e26223aa74cb/de901o7-d61b3bfb-f1b1-453b-8268-9200130bbc65.png"
+DEFAULT_AVATAR = "https://alextlm.co.uk/system.png"
 
 # File size limit middleware
 class FileSizeLimitMiddleware(BaseHTTPMiddleware):
