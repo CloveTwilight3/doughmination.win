@@ -144,8 +144,7 @@ const PrivacyPolicyPage = () => {
         <h2 className="text-xl font-semibold mt-6 mb-4">Contact Us</h2>
         <p>If you have any questions about this Privacy Policy, please contact us at:</p>
         <ul className="list-disc ml-6 mb-4">
-          <li>Email: privacy@doughmination.com</li>
-          <li>Address: 123 System Street, Oxford, England, UK</li>
+          <li>Email: admin@clovetwilight3.co.uk</li>
         </ul>
       </div>
       
