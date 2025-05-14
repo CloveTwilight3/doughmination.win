@@ -1,9 +1,8 @@
-// AdvertBanner.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { areCookiesAccepted, saveCookiePreferences } from './cookieService';
 
 /**
- * AdvertBanner component that displays Google AdSense advertisements and cookie consent
+ * AdvertBanner component that displays Google AdSense advertisements and handles cookie consent
  * 
  * @param {Object} props - Component props
  * @param {string} props.adSlot - The AdSense ad slot ID
@@ -12,7 +11,7 @@ import { areCookiesAccepted, saveCookiePreferences } from './cookieService';
  * @param {boolean} props.responsive - Whether the ad should be responsive
  */
 const AdvertBanner = ({ 
-  adSlot = "7362645348", // Replace with your actual ad slot
+  adSlot = "7362645348", // Use your actual ad slot from Google
   adFormat = "auto",
   position = "top",
   responsive = true
@@ -20,80 +19,49 @@ const AdvertBanner = ({
   // State to manage cookie consent
   const [cookiesAccepted, setCookiesAccepted] = useState(false);
   const [showCookieNotice, setShowCookieNotice] = useState(true);
-  const [adLoaded, setAdLoaded] = useState(false);
+  const insRef = useRef(null);
+  const initialized = useRef(false);
   
   // Initialize state based on saved preferences
   useEffect(() => {
     const accepted = areCookiesAccepted();
     setCookiesAccepted(accepted);
     setShowCookieNotice(!accepted);
-    
-    // Load Google AdSense script if cookies accepted
-    if (accepted) {
-      loadAdSenseScript();
-    }
   }, []);
   
-  // When cookiesAccepted changes, handle ad loading
+  // Initialize ads when component mounts and cookies are accepted
   useEffect(() => {
-    if (cookiesAccepted && !adLoaded) {
-      // Small delay to ensure script is loaded first
-      const timer = setTimeout(() => {
-        initializeAds();
-      }, 1000);
-      
-      return () => clearTimeout(timer);
+    // Only try to initialize if:
+    // 1. Cookies are accepted
+    // 2. The ins element exists
+    // 3. We haven't already initialized this ad
+    // 4. AdSense is loaded
+    if (cookiesAccepted && insRef.current && !initialized.current && window.adsbygoogle) {
+      try {
+        // Wait a moment to ensure the element is properly in the DOM
+        setTimeout(() => {
+          // Check if element has width before initializing
+          if (insRef.current.offsetWidth > 0) {
+            // Push the ad
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+            initialized.current = true;
+            console.log(`AdSense ad initialized for slot: ${adSlot}`);
+          } else {
+            console.log(`Ad container has zero width, not initializing ad slot ${adSlot}`);
+          }
+        }, 200);
+      } catch (e) {
+        console.error('Error initializing AdSense:', e);
+      }
     }
-  }, [cookiesAccepted, adLoaded]);
+  }, [cookiesAccepted, adSlot]);
   
   // Function to handle cookie acceptance
   const handleAcceptCookies = () => {
     saveCookiePreferences(true);
     setCookiesAccepted(true);
     setShowCookieNotice(false);
-    loadAdSenseScript();
   };
-  
-  // Function to load AdSense script
-  const loadAdSenseScript = () => {
-    // Only add script if it doesn't already exist
-    if (!document.querySelector('script[src*="adsbygoogle.js"]')) {
-      const script = document.createElement('script');
-      script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2820378422214826';
-      script.async = true;
-      script.crossOrigin = 'anonymous';
-      script.onload = () => {
-        console.log('AdSense script loaded');
-        initializeAds();
-      };
-      document.head.appendChild(script);
-    } else {
-      initializeAds();
-    }
-  };
-  
-  // Function to initialize ads
-  const initializeAds = () => {
-  if (window.adsbygoogle && !adLoaded) {
-    try {
-      // Find this specific ad slot
-      const adElement = document.querySelector(`ins[data-ad-slot="${adSlot}"]`);
-      
-      // Check if this ad is already initialized or has zero width
-      if (adElement && !adElement.dataset.adInitialized && adElement.offsetWidth > 0) {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        adElement.dataset.adInitialized = 'true';
-        setAdLoaded(true);
-      } else if (adElement && adElement.offsetWidth === 0) {
-        console.log(`Ad container has zero width, delaying initialization for ad slot ${adSlot}`);
-        // Try again after a slight delay to allow layout to complete
-        setTimeout(initializeAds, 500);
-      }
-    } catch (e) {
-      console.error('Error initializing AdSense:', e);
-    }
-  }
-};
   
   // Get position-specific classes
   const getPositionClasses = () => {
@@ -113,12 +81,16 @@ const AdvertBanner = ({
     <>
       {/* Ad Banner - displays only if cookies are accepted */}
       {cookiesAccepted && (
-        <div className={`${getPositionClasses()} bg-gray-100 dark:bg-gray-800 overflow-hidden rounded shadow-sm`}>
+        <div 
+          className={`${getPositionClasses()} bg-gray-100 dark:bg-gray-800 overflow-hidden rounded shadow-sm`}
+          style={{ minHeight: '100px', minWidth: '200px' }}
+        >
           <div className="py-1 px-2 text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Advertisement</p>
             
             {/* AdSense ad unit */}
             <ins 
+              ref={insRef}
               className="adsbygoogle"
               style={{ 
                 display: 'block',
@@ -130,7 +102,7 @@ const AdvertBanner = ({
               data-ad-slot={adSlot}
               data-ad-format={adFormat}
               data-full-width-responsive={responsive ? "true" : "false"}
-            ></ins>
+            />
           </div>
         </div>
       )}
