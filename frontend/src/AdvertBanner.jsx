@@ -109,7 +109,7 @@ const AdvertBanner = ({
 
       {/* Cookie Notice - shown only if cookies haven't been accepted */}
       {showCookieNotice && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-md p-3 z-50 border-t border-gray-200 dark:border-gray-700">
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-md p-3 z-50 border-t border-gray-200 dark:border-gray-700 cookie-consent-banner">
           <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mb-2 sm:mb-0">
               This website uses cookies to enhance your experience and display advertisements.

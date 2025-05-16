@@ -1,0 +1,160 @@
+/*
+ * Layout Fixes CSS
+ * This file contains fixes for layout issues, particularly for overlapping UI elements
+ */
+
+/* ============================================================================
+   SPECIAL DATE BANNER ADJUSTMENTS
+   Convert from fixed position to normal flow to prevent overlapping
+   ============================================================================ */
+
+/* Override the fixed positioning for special date banners */
+.special-date-banner {
+  position: static !important; /* Override fixed position */
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 1rem auto !important;
+  width: 100% !important;
+  max-width: 90% !important;
+  box-sizing: border-box !important;
+  z-index: 10 !important;
+  animation: none !important; /* Remove pulse animation that relies on transform */
+}
+
+/* Add a new pulse animation that doesn't use transform */
+@keyframes pulse-opacity {
+  0% { opacity: 0.9; }
+  50% { opacity: 1; }
+  100% { opacity: 0.9; }
+}
+
+/* Apply the new animation to birthday banners */
+.birthday-banner {
+  animation: pulse-opacity 2s infinite !important;
+}
+
+/* Container for special date banners */
+#special-date-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0.5rem 0;
+  order: 1; /* Control the order in flexbox layouts */
+}
+
+/* ============================================================================
+   COOKIE CONSENT BANNER ADJUSTMENTS
+   Ensure cookie consent stays at the bottom without overlapping
+   ============================================================================ */
+
+/* Cookie consent banner at the bottom */
+.fixed.bottom-0.left-0.right-0.bg-white.dark\:bg-gray-800 {
+  z-index: 50 !important; /* Ensure it's above other content */
+  bottom: 0 !important;
+  position: fixed !important;
+}
+
+/* ============================================================================
+   CONTENT WRAPPER ADJUSTMENTS
+   Make the content area a flex container for better control
+   ============================================================================ */
+
+/* Main content wrapper - ensure it's a flex container */
+.content-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+}
+
+/* Welcome banner positioning */
+.welcome-message {
+  order: 0; /* Place at the top */
+  margin-bottom: 0.75rem !important;
+}
+
+/* Mental state banner positioning */
+.mental-state-banner {
+  order: 2; /* Place after special date banner */
+  margin-top: 0.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Currently fronting section */
+.mb-6.p-4.border-b.dark\:border-gray-700 {
+  order: 3; /* Place after mental state banner */
+  margin-top: 0.5rem !important;
+}
+
+/* Members grid section */
+h2.text-lg.font-semibold.mb-4.text-center + .relative.max-w-md.mx-auto.mb-6,
+.grid.member-grid {
+  order: 4; /* Place after fronting section */
+}
+
+/* ============================================================================
+   WEBSOCKET STATUS OVERLAY ADJUSTMENTS
+   ============================================================================ */
+
+/* WebSocket connection indicator positioning */
+.fixed.top-16.right-4.z-45,
+.fixed.top-\[65px\].right-6.z-45,
+.fixed.top-\[65px\].right-8.z-45 {
+  z-index: 40 !important; /* Lower z-index than cookie banner */
+  top: auto !important;
+  bottom: 80px !important; /* Position above cookie banner */
+}
+
+/* ============================================================================
+   SPACING ADJUSTMENTS
+   ============================================================================ */
+
+/* Add extra padding at the bottom to account for cookie banner */
+body {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+}
+
+/* ============================================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  /* Smaller margins on mobile */
+  .special-date-banner {
+    max-width: 95% !important;
+    margin: 0.5rem auto !important;
+    padding: 8px 15px !important;
+    font-size: 1.25rem !important;
+  }
+  
+  /* Adjust spacing on mobile */
+  .welcome-message {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .mental-state-banner {
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  /* Add extra bottom padding on mobile */
+  body {
+    padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
+  }
+  
+  /* Adjust WebSocket indicator position on mobile */
+  .fixed.top-16.right-4.z-45,
+  .fixed.top-\[65px\].right-6.z-45,
+  .fixed.top-\[65px\].right-8.z-45 {
+    bottom: 130px !important;
+    right: 10px !important;
+  }
+}
+
+/* Ensure no overlap on ultra-wide screens */
+@media (min-width: 1920px) {
+  .special-date-banner {
+    max-width: 80% !important;
+  }
+}

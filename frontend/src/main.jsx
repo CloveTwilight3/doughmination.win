@@ -39,6 +39,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './styles.css';
+import './layout-fixes.css'; // Import our new layout fixes
 
 // Initialize the application by creating a root React component
 const rootElement = document.getElementById('root');
@@ -96,4 +97,38 @@ document.addEventListener('DOMContentLoaded', function() {
     childList: true, 
     subtree: true 
   });
+
+  // Apply additional layout fixes after DOM is loaded
+  setTimeout(() => {
+    // Make sure the content wrapper has the right structure
+    const contentWrapper = document.querySelector('.content-wrapper');
+    if (contentWrapper) {
+      contentWrapper.style.display = 'flex';
+      contentWrapper.style.flexDirection = 'column';
+      
+      // Move special date container to the right position if it exists
+      const specialDateContainer = document.getElementById('special-date-container');
+      if (specialDateContainer) {
+        specialDateContainer.style.order = '1';
+      }
+      
+      // Set order for welcome message
+      const welcomeMessage = document.querySelector('.welcome-message');
+      if (welcomeMessage) {
+        welcomeMessage.style.order = '0';
+      }
+      
+      // Set order for mental state banner
+      const mentalStateBanner = document.querySelector('.mental-state-banner');
+      if (mentalStateBanner) {
+        mentalStateBanner.style.order = '2';
+      }
+      
+      // Set order for fronting section
+      const frontingSection = document.querySelector('.mb-6.p-4.border-b.dark\\:border-gray-700');
+      if (frontingSection) {
+        frontingSection.style.order = '3';
+      }
+    }
+  }, 100);
 });
