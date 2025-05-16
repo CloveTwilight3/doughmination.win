@@ -34,6 +34,7 @@ function App() {
   const [loading, setLoading] = useState(true); // Initial data loading state
   const [menuOpen, setMenuOpen] = useState(false); // Menu toggle state for all devices
   const [mentalState, setMentalState] = useState(null); // Current mental state
+  const [cookieConsentShown, setCookieConsentShown] = useState(false); // Track cookie consent
   const navigate = useNavigate(); // React Router navigation hook
 
   // Default avatar for members without one
@@ -139,6 +140,13 @@ function App() {
       setShowConnectionStatus(true); // Always show when disconnected
     }
   }, [isConnected]);
+
+  // Check for cookie consent banner from AdvertBanner
+  useEffect(() => {
+    // Check if cookies are accepted or declined
+    const cookieConsent = localStorage.getItem('cookieConsent');
+    setCookieConsentShown(!!cookieConsent);
+  }, []);
 
   /* ============================================================================
    * DATA FETCHING AND INITIALIZATION
@@ -473,7 +481,7 @@ function App() {
    * ============================================================================
    */
   return (
-    <div className="max-w-6xl mx-auto text-black dark:text-white">
+    <div className="flex flex-col min-h-screen max-w-6xl mx-auto text-black dark:text-white">
       {/* WebSocket connection status indicator - Fixed positioning with auto-fade */}
       {(!isConnected || showConnectionStatus) && (
         <div className="fixed top-16 right-4 z-45 sm:top-[65px] sm:right-6 md:right-8">
@@ -656,7 +664,7 @@ function App() {
       <div className="h-16 sm:h-14"></div>
 
       {/* ========== MAIN CONTENT AREA ========== */}
-      <main className="container mx-auto px-4 pt-4">
+      <main className="container mx-auto px-4 pt-4 flex-grow">
         <div className="flex">
           {/* Sidebar Ad Banner - Only visible on desktop */}
           <AdvertBanner 
@@ -672,8 +680,10 @@ function App() {
               {/* Welcome banner - only shown when logged in */}
               {loggedIn && <Welcome loggedIn={loggedIn} isAdmin={isAdmin} />}
               
-              {/* Special Date Banner - Now rendered here with proper spacing, not fixed */}
-              <div id="special-date-container" className="special-date-container w-full"></div>
+              {/* Special Date Container - Properly contained for event banners */}
+              <div id="special-date-container" className="special-date-container w-full relative">
+                {/* Special date banners will be rendered here by useSpecialDates hook */}
+              </div>
               
               {/* Mental State Banner */}
               {mentalState && (
