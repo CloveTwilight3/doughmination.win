@@ -40,7 +40,7 @@ import { Link } from 'react-router-dom';
 import UserManagement from './UserManagement'; // Import user management component
 import MentalStateAdmin from './MentalStateAdmin'; // Import mental state management component
 
-export default function AdminDashboard({ fronting }) {
+export default function AdminDashboard({ fronting, onFrontingChanged }) {
   // State management
   const [newFront, setNewFront] = useState(""); // ID of the member to set as front
   const [members, setMembers] = useState([]); // All system members
@@ -114,10 +114,11 @@ export default function AdminDashboard({ fronting }) {
     .then((data) => {
       if (data.success) {
         setMessage({ type: "success", content: "Fronting member switched successfully." });
-        // Force refresh frontings after a brief delay
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        
+        // Instead of reloading the page, use the onFrontingChanged prop to update state
+        if (onFrontingChanged) {
+          onFrontingChanged(newFront);
+        }
       } else {
         setMessage({ 
           type: "error", 

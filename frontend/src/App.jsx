@@ -49,6 +49,23 @@ function App() {
     createDoughnutRain();
   }, []);
 
+  const handleFrontingChanged = (memberId) => {
+    // Fetch updated fronting data
+    fetch("/api/fronters")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch updated fronter data");
+        }
+        return response.json();
+      })
+      .then(data => {
+        setFronting(data || { members: [] });
+      })
+      .catch(error => {
+        console.error("Error fetching updated fronter:", error);
+      });
+    };
+
   useKonamiCode(handleKonamiCode);
 
   useSpecialDates();

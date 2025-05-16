@@ -21,7 +21,6 @@ export default function useKonamiCode(callback) {
       
       // Get the key that was pressed
       const key = e.key;
-      console.log('Key pressed:', key, 'Expected:', konamiCode[konamiIndex]);
       
       // Check if the key matches the next key in the Konami Code
       const requiredKey = konamiCode[konamiIndex];
@@ -29,13 +28,11 @@ export default function useKonamiCode(callback) {
       if (key.toLowerCase() === requiredKey.toLowerCase()) {
         // Move to the next key in the sequence
         konamiIndex++;
-        console.log('Matched! New index:', konamiIndex);
         
         // If the full sequence is completed
         if (konamiIndex === konamiCode.length) {
           // Reset the index for next time
           konamiIndex = 0;
-          console.log('KONAMI CODE ACTIVATED!');
           
           // Execute the callback function
           callback();
@@ -43,7 +40,6 @@ export default function useKonamiCode(callback) {
       } else {
         // If wrong key, reset the sequence
         konamiIndex = 0;
-        console.log('Sequence reset');
       }
     }
     
