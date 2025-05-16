@@ -109,27 +109,37 @@ const AdvertBanner = ({
 
       {/* Cookie Notice - shown only if cookies haven't been accepted */}
       {showCookieNotice && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-md p-3 z-50 border-t border-gray-200 dark:border-gray-700 cookie-consent-banner w-full">
-          <div className="w-full px-3 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mb-2 sm:mb-0">
-              This website uses cookies to enhance your experience and display advertisements.
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  saveCookiePreferences(false);
-                  setShowCookieNotice(false);
-                }}
-                className="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-300 text-xs sm:text-sm py-1 px-3 rounded"
-              >
-                Decline
-              </button>
-              <button
-                onClick={handleAcceptCookies}
-                className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs sm:text-sm py-1 px-3 rounded"
-              >
-                Accept
-              </button>
+        <div 
+          className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-md z-50 border-t border-gray-200 dark:border-gray-700 cookie-consent-banner"
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+            margin: 0,
+            padding: 0
+          }}
+        >
+          <div className="px-4 py-3 mx-auto" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mb-2 sm:mb-0">
+                This website uses cookies to enhance your experience and display advertisements.
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    saveCookiePreferences(false);
+                    setShowCookieNotice(false);
+                  }}
+                  className="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-300 text-xs sm:text-sm py-1 px-3 rounded"
+                >
+                  Decline
+                </button>
+                <button
+                  onClick={handleAcceptCookies}
+                  className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-xs sm:text-sm py-1 px-3 rounded"
+                >
+                  Accept
+                </button>
+              </div>
             </div>
           </div>
         </div>

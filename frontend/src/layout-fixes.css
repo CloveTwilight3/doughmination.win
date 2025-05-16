@@ -158,3 +158,44 @@ body {
     max-width: 80% !important;
   }
 }
+
+/* 
+ * This will fix any horizontal overflow issues with the cookie banner
+ */
+
+/* Prevent horizontal overflow on all elements */
+html, body, #root {
+  overflow-x: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix cookie consent banner overflow */
+.cookie-consent-banner {
+  width: 100% !important;
+  max-width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+/* Fix inner content of cookie banner */
+.cookie-consent-banner > div {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Ensure safe area insets are respected on iOS */
+@supports (padding: max(0px)) {
+  .cookie-consent-banner {
+    padding-left: max(0px, env(safe-area-inset-left)) !important;
+    padding-right: max(0px, env(safe-area-inset-right)) !important;
+    padding-bottom: max(0px, env(safe-area-inset-bottom)) !important;
+  }
+}
