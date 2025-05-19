@@ -42,7 +42,7 @@ COFRONTS = {
     "DeadJett": ["Deadlock", "Jett"],
     "NyaRub": ["Nyara", "Ruby"],
     "VipRub": ["Viper", "Ruby"],
-    "CyClove": ["Clove", "Cypher"]
+    "cyclove": ["Clove", "Cypher"]
 }
 
 # Special member display names
