@@ -41,7 +41,8 @@ HEADERS = {
 COFRONTS = {
     "DeadJett": ["Deadlock", "Jett"],
     "NyaRub": ["Nyara", "Ruby"],
-    "VipRub": ["Viper", "Ruby"]
+    "VipRub": ["Viper", "Ruby"],
+    "cyclove ": ["Clove", "Cypher"]
 }
 
 # Special member display names

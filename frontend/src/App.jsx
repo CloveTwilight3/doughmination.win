@@ -685,27 +685,6 @@ function App() {
                 {/* Special date banners will be rendered here by useSpecialDates hook */}
               </div>
               
-              {/* Mental State Banner */}
-              {mentalState && (
-                <div className={`mental-state-banner ${mentalState.level.replace(' ', '-')}`}>
-                  <div className="flex items-center justify-center gap-3">
-                    <span className="mental-state-icon">
-                      {getMentalStateIcon(mentalState.level)}
-                    </span>
-                    <div>
-                      <span className="mental-state-label">Current Status: </span>
-                      <span className="mental-state-level">{getMentalStateLabel(mentalState.level)}</span>
-                      {mentalState.notes && (
-                        <p className="mental-state-notes">{mentalState.notes}</p>
-                      )}
-                    </div>
-                  </div>
-                  <small className="mental-state-updated">
-                    Last updated: {new Date(mentalState.updated_at).toLocaleString()}
-                  </small>
-                </div>
-              )}
-              
               {/* Main content from routes */}
               <Routes>
                 {/* Home Page - Member Grid with Search */}
@@ -715,7 +694,28 @@ function App() {
                       System Members: 
                     </h1> 
                     
-                    {/* Currently Fronting Section */}
+                    {/* Mental State Banner - Moved BEFORE fronting section */}
+                    {mentalState && (
+                      <div className={`mental-state-banner ${mentalState.level.replace(' ', '-')}`}>
+                        <div className="flex items-center justify-center gap-3">
+                          <span className="mental-state-icon">
+                            {getMentalStateIcon(mentalState.level)}
+                          </span>
+                          <div>
+                            <span className="mental-state-label">Current Status: </span>
+                            <span className="mental-state-level">{getMentalStateLabel(mentalState.level)}</span>
+                            {mentalState.notes && (
+                              <p className="mental-state-notes">{mentalState.notes}</p>
+                            )}
+                          </div>
+                        </div>
+                        <small className="mental-state-updated">
+                          Last updated: {new Date(mentalState.updated_at).toLocaleString()}
+                        </small>
+                      </div>
+                    )}
+                    
+                    {/* Currently Fronting Section - Now AFTER mental state banner */}
                     {fronting && fronting.members && fronting.members.length > 0 && (
                       <div className="mb-6 p-4 border-b dark:border-gray-700">
                         <h2 className="text-lg font-semibold mb-3 text-center">Currently Fronting:</h2>

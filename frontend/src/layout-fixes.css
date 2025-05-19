@@ -83,7 +83,7 @@
 
 /* Currently fronting section */
 .mb-6.p-4.border-b.dark\:border-gray-700 {
-  order: 3; /* Place after mental state banner */
+  order: 4; /* Increase order to ensure it comes after mental state banner */
   margin-top: 0.5rem !important;
 }
 
