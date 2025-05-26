@@ -288,6 +288,38 @@ function App() {
     return member.component_avatars[0] || defaultAvatar;
   };
 
+  /**
+   * Expands cofront members into their individual component members for display
+   * This allows showing multiple avatars when a cofront is fronting
+   */
+  const expandFrontingMembers = (frontingMembers) => {
+    if (!frontingMembers || !Array.isArray(frontingMembers)) {
+      return [];
+    }
+
+    const expandedMembers = [];
+
+    frontingMembers.forEach(member => {
+      if (member.is_cofront && member.component_members && member.component_members.length > 0) {
+        // This is a cofront - expand it into individual component members
+        member.component_members.forEach(componentMember => {
+          expandedMembers.push({
+            ...componentMember,
+            // Mark that this member is part of a cofront for display purposes
+            _isFromCofront: true,
+            _cofrontName: member.name,
+            _cofrontDisplayName: member.display_name || member.name
+          });
+        });
+      } else {
+        // This is a regular member or special member - add as-is
+        expandedMembers.push(member);
+      }
+    });
+
+    return expandedMembers;
+  };
+
   /* ============================================================================
    * FRONTING MEMBER UPDATES
    * Updates favicon, title, and meta tags based on who's fronting
@@ -295,15 +327,20 @@ function App() {
    */
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
-      // Handle multiple fronting members
-      if (fronting.members.length === 1) {
+      // Expand cofronts for title generation
+      const expandedMembers = expandFrontingMembers(fronting.members);
+      
+      if (expandedMembers.length === 1) {
         // Single member fronting - existing behavior
-        const frontingMember = fronting.members[0];
+        const frontingMember = expandedMembers[0];
         const displayName = frontingMember.display_name || frontingMember.name || 'Unknown';
-        document.title = `Currently Fronting: ${displayName}`;
+        
+        // Show cofront info in title if applicable
+        const titleSuffix = frontingMember._isFromCofront ? ` (part of ${frontingMember._cofrontDisplayName})` : '';
+        document.title = `Currently Fronting: ${displayName}${titleSuffix}`;
         
         // Get appropriate avatar
-        const frontingAvatar = getCofrontAvatar(frontingMember) || defaultAvatar;
+        const frontingAvatar = frontingMember.avatar_url || defaultAvatar;
         
         // Update favicon
         const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
@@ -321,20 +358,23 @@ function App() {
         // Update meta tags for better link sharing
         updateMetaTags(frontingMember);
       } else {
-        // Multiple members fronting
-        const memberNames = fronting.members
+        // Multiple members fronting (including expanded cofronts)
+        const memberNames = expandedMembers
           .map(member => member.display_name || member.name || 'Unknown')
           .slice(0, 3) // Limit to first 3 names to avoid very long titles
           .join(', ');
         
-        const remainingCount = fronting.members.length - 3;
+        const remainingCount = expandedMembers.length - 3;
         const titleSuffix = remainingCount > 0 ? ` +${remainingCount} more` : '';
         
-        document.title = `Currently Fronting (${fronting.members.length}): ${memberNames}${titleSuffix}`;
+        // Check if there are cofronts involved
+        const cofrontInfo = fronting.members.some(m => m.is_cofront) ? ' (including cofronts)' : '';
+        
+        document.title = `Currently Fronting (${expandedMembers.length}): ${memberNames}${titleSuffix}${cofrontInfo}`;
         
         // Use the first member's avatar for favicon
-        const firstMember = fronting.members[0];
-        const frontingAvatar = getCofrontAvatar(firstMember) || defaultAvatar;
+        const firstMember = expandedMembers[0];
+        const frontingAvatar = firstMember.avatar_url || defaultAvatar;
         
         // Update favicon
         const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
@@ -350,7 +390,7 @@ function App() {
         document.head.appendChild(touchIcon);
         
         // Update meta tags for multiple members
-        updateMetaTags(firstMember, fronting.members.length);
+        updateMetaTags(firstMember, expandedMembers.length);
       }
     } else {
       document.title = "Doughmination System Server";
@@ -449,10 +489,11 @@ function App() {
     if (frontingMember) {
       // Custom meta data for current fronter(s)
       const displayName = frontingMember.display_name || frontingMember.name;
-      const avatarUrl = getCofrontAvatar(frontingMember) || defaultAvatar;
+      const avatarUrl = frontingMember.avatar_url || defaultAvatar;
       
       if (memberCount === 1) {
-        metaTitle.setAttribute('content', `Currently Fronting: ${displayName}`);
+        const titleSuffix = frontingMember._isFromCofront ? ` (part of ${frontingMember._cofrontDisplayName})` : '';
+        metaTitle.setAttribute('content', `Currently Fronting: ${displayName}${titleSuffix}`);
         metaDesc.setAttribute('content', `Learn more about ${displayName} and other system members`);
       } else {
         metaTitle.setAttribute('content', `Currently Co-Fronting (${memberCount}): ${displayName} and others`);
@@ -518,8 +559,7 @@ function App() {
   /* ============================================================================
    * COMPONENT RENDER
    * Main application layout and routing
-   * ============================================================================
-   */
+   * ============================================================================ */
   return (
     <div className="flex flex-col min-h-screen max-w-6xl mx-auto text-black dark:text-white">
       {/* WebSocket connection status indicator - Fixed positioning with auto-fade */}
@@ -755,44 +795,65 @@ function App() {
                       </div>
                     )}
                     
-                    {/* Currently Fronting Section - Updated for multiple members */}
+                    {/* Currently Fronting Section - Updated for multiple members with cofront expansion */}
                     {fronting && fronting.members && fronting.members.length > 0 && (
                       <div className="mb-6 p-4 border-b dark:border-gray-700">
-                        <h2 className="text-lg font-semibold mb-3 text-center">
-                          Currently Fronting{fronting.members.length > 1 ? ` (${fronting.members.length})` : ""}:
-                        </h2>
-                        <div className="fronting-members-container">
-                          {fronting.members.map((member, index) => (
-                            <div key={member.id || index} className="fronting-member">
-                              <div className="avatar-container fronting-avatar">
-                                <img
-                                  src={getCofrontAvatar(member) || defaultAvatar}
-                                  alt={member.display_name || member.name || "Unknown"}
-                                  loading="eager"
-                                />
+                        {(() => {
+                          // Expand cofronts into individual members for display
+                          const expandedMembers = expandFrontingMembers(fronting.members);
+                          
+                          return (
+                            <>
+                              <h2 className="text-lg font-semibold mb-3 text-center">
+                                Currently Fronting{expandedMembers.length > 1 ? ` (${expandedMembers.length})` : ""}:
+                              </h2>
+                              <div className="fronting-members-container">
+                                {expandedMembers.map((member, index) => (
+                                  <div key={member.id || `${member.name}-${index}`} className="fronting-member">
+                                    <div className="avatar-container fronting-avatar">
+                                      <img
+                                        src={member.avatar_url || defaultAvatar}
+                                        alt={member.display_name || member.name || "Unknown"}
+                                        loading="eager"
+                                      />
+                                    </div>
+                                    <span className="fronting-member-name">
+                                      {member.display_name || member.name || "Unknown"}
+                                      {/* Add Host label for Clove when fronting */}
+                                      {member && 
+                                      (member.name === "Clove" || member.display_name === "Clove") && 
+                                      (
+                                        <span className="host-badge ml-2">Host</span>
+                                      )}
+                                      {/* Add Cofront label if this member is from a cofront */}
+                                      {member._isFromCofront && (
+                                        <span className="cofront-badge ml-2">
+                                          {member._cofrontDisplayName}
+                                        </span>
+                                      )}
+                                      {/* Add Special label for system/sleeping */}
+                                      {member?.is_special && (
+                                        <span className="special-badge ml-2">
+                                          {member?.original_name === "system" ? "Unsure" : "Sleeping"}
+                                        </span>
+                                      )}
+                                    </span>
+                                  </div>
+                                ))}
                               </div>
-                              <span className="fronting-member-name">
-                                {member.display_name || member.name || "Unknown"}
-                                {/* Add Host label for Clove when fronting */}
-                                {member && 
-                                (member.name === "Clove" || member.display_name === "Clove") && 
-                                (
-                                  <span className="host-badge ml-2">Host</span>
-                                )}
-                                {/* Add Cofront label */}
-                                {member?.is_cofront && (
-                                  <span className="cofront-badge ml-2">Cofront</span>
-                                )}
-                                {/* Add Special label for system/sleeping */}
-                                {member?.is_special && (
-                                  <span className="special-badge ml-2">
-                                    {member?.original_name === "system" ? "Unsure" : "Sleeping"}
-                                  </span>
-                                )}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
+                              
+                              {/* Show original cofront info if there are any cofronts */}
+                              {fronting.members.some(m => m.is_cofront) && (
+                                <div className="mt-3 text-sm text-gray-600 dark:text-gray-400 text-center">
+                                  {fronting.members
+                                    .filter(m => m.is_cofront)
+                                    .map(cofront => `${cofront.display_name || cofront.name} (${cofront.component_members?.length || 0} members)`)
+                                    .join(', ')} currently co-fronting
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     )}
                     

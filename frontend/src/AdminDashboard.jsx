@@ -145,6 +145,38 @@ export default function AdminDashboard({ fronting, onFrontingChanged }) {
     return member.avatar_url || "https://clovetwilight3.co.uk/system.png";
   };
 
+  
+/**
+ * Expands cofront members into their individual component members for display
+ */
+const expandFrontingMembers = (frontingMembers) => {
+  if (!frontingMembers || !Array.isArray(frontingMembers)) {
+    return [];
+  }
+
+  const expandedMembers = [];
+
+  frontingMembers.forEach(member => {
+    if (member.is_cofront && member.component_members && member.component_members.length > 0) {
+      // This is a cofront - expand it into individual component members
+      member.component_members.forEach(componentMember => {
+        expandedMembers.push({
+          ...componentMember,
+          // Mark that this member is part of a cofront for display purposes
+          _isFromCofront: true,
+          _cofrontName: member.name,
+          _cofrontDisplayName: member.display_name || member.name
+        });
+      });
+    } else {
+      // This is a regular member or special member - add as-is
+      expandedMembers.push(member);
+    }
+  });
+
+  return expandedMembers;
+}; 
+
   // Show loading indicator when fetching initial data
   if (loading && members.length === 0) {
     return <div className="text-center p-8">Loading...</div>;
@@ -166,47 +198,57 @@ export default function AdminDashboard({ fronting, onFrontingChanged }) {
       )}
       
       <div className="space-y-6">
-        {/* Currently Fronting Section - Updated for multiple members */}
-        <div className="border-b pb-4 dark:border-gray-700">
-          <h2 className="text-xl font-semibold mb-2">
-            Currently Fronting{fronting?.members?.length > 1 ? ` (${fronting.members.length})` : ""}
-          </h2>
-          {fronting?.members && fronting.members.length > 0 ? (
-            <div className="admin-fronting-container">
-              {fronting.members.map((member, index) => (
-                <div key={member.id || index} className="admin-fronting-member">
-                  <div className="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0">
-                    <img 
-                      src={getMemberAvatar(member)}
-                      alt={member.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <span className="text-lg flex flex-wrap items-center">
-                      {member.display_name || member.name}
-                      {/* Add Host label for Clove */}
-                      {(member.name === "Clove" || member.display_name === "Clove") && (
-                        <span className="ml-2 host-badge">Host</span>
-                      )}
-                      {/* Add badges */}
-                      {member.is_cofront && (
-                        <span className="ml-2 cofront-badge">Cofront</span>
-                      )}
-                      {member.is_special && (
-                        <span className="ml-2 special-badge">
-                          {member.original_name === "system" ? "Unsure" : "Sleeping"}
-                        </span>
-                      )}
-                    </span>
-                  </div>
+        {/* Current Fronting Details - Updated to show expanded members */}
+{(() => {
+  const expandedMembers = expandFrontingMembers(fronting?.members || []);
+  
+  return expandedMembers.length > 0 && (
+    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+      <h3 className="text-lg font-semibold mb-3">Current Fronting Details</h3>
+      <div className="space-y-2">
+        {expandedMembers.map((member, index) => (
+          <div key={member.id || `${member.name}-${index}`} className="flex items-center justify-between py-2 px-3 bg-white dark:bg-gray-800 rounded-md">
+            <div className="flex items-center">
+              <div className="w-8 h-8 rounded-full overflow-hidden mr-3">
+                <img 
+                  src={member.avatar_url || "https://clovetwilight3.co.uk/system.png"}
+                  alt={member.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <div className="font-medium">{member.display_name || member.name}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  ID: {member.id}
+                  {member.pronouns && ` • ${member.pronouns}`}
+                  {member._isFromCofront && ` • From ${member._cofrontDisplayName}`}
                 </div>
-              ))}
+              </div>
             </div>
-          ) : (
-            <p>No one is currently fronting</p>
-          )}
+            <div className="flex gap-1">
+              {(member.name === "Clove" || member.display_name === "Clove") && (
+                <span className="host-badge text-xs">Host</span>
+              )}
+              {member._isFromCofront && (
+                <span className="cofront-badge text-xs">Cofront</span>
+              )}
+              {member.is_special && (
+                <span className="special-badge text-xs">
+                  {member.original_name === "system" ? "Unsure" : "Sleeping"}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      {fronting?.timestamp && (
+        <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+          Last switch: {new Date(fronting.timestamp).toLocaleString()}
         </div>
+      )}
+    </div>
+  );
+})()}
         
         {/* Switch Fronting Member Section */}
         <div>
