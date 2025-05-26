@@ -295,29 +295,63 @@ function App() {
    */
   useEffect(() => {
     if (fronting && fronting.members && fronting.members.length > 0) {
-      const frontingMember = fronting.members[0];
-      // Handle display name for special members, cofronts, and normal members
-      const displayName = frontingMember.display_name || frontingMember.name || 'Unknown';
-      document.title = `Currently Fronting: ${displayName}`;
-      
-      // Get appropriate avatar
-      const frontingAvatar = getCofrontAvatar(frontingMember) || defaultAvatar;
-      
-      // Update favicon
-      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-      link.type = 'image/x-icon';
-      link.rel = 'icon';
-      link.href = frontingAvatar;
-      document.head.appendChild(link);
-      
-      // Update apple-touch-icon for iOS
-      const touchIcon = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
-      touchIcon.rel = 'apple-touch-icon';
-      touchIcon.href = frontingAvatar;
-      document.head.appendChild(touchIcon);
-      
-      // Update meta tags for better link sharing
-      updateMetaTags(frontingMember);
+      // Handle multiple fronting members
+      if (fronting.members.length === 1) {
+        // Single member fronting - existing behavior
+        const frontingMember = fronting.members[0];
+        const displayName = frontingMember.display_name || frontingMember.name || 'Unknown';
+        document.title = `Currently Fronting: ${displayName}`;
+        
+        // Get appropriate avatar
+        const frontingAvatar = getCofrontAvatar(frontingMember) || defaultAvatar;
+        
+        // Update favicon
+        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'icon';
+        link.href = frontingAvatar;
+        document.head.appendChild(link);
+        
+        // Update apple-touch-icon for iOS
+        const touchIcon = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
+        touchIcon.rel = 'apple-touch-icon';
+        touchIcon.href = frontingAvatar;
+        document.head.appendChild(touchIcon);
+        
+        // Update meta tags for better link sharing
+        updateMetaTags(frontingMember);
+      } else {
+        // Multiple members fronting
+        const memberNames = fronting.members
+          .map(member => member.display_name || member.name || 'Unknown')
+          .slice(0, 3) // Limit to first 3 names to avoid very long titles
+          .join(', ');
+        
+        const remainingCount = fronting.members.length - 3;
+        const titleSuffix = remainingCount > 0 ? ` +${remainingCount} more` : '';
+        
+        document.title = `Currently Fronting (${fronting.members.length}): ${memberNames}${titleSuffix}`;
+        
+        // Use the first member's avatar for favicon
+        const firstMember = fronting.members[0];
+        const frontingAvatar = getCofrontAvatar(firstMember) || defaultAvatar;
+        
+        // Update favicon
+        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'icon';
+        link.href = frontingAvatar;
+        document.head.appendChild(link);
+        
+        // Update apple-touch-icon for iOS
+        const touchIcon = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
+        touchIcon.rel = 'apple-touch-icon';
+        touchIcon.href = frontingAvatar;
+        document.head.appendChild(touchIcon);
+        
+        // Update meta tags for multiple members
+        updateMetaTags(firstMember, fronting.members.length);
+      }
     } else {
       document.title = "Doughmination System Server";
       
@@ -387,7 +421,7 @@ function App() {
   };
   
   // Function to update meta tags for better link sharing
-  const updateMetaTags = (frontingMember = null) => {
+  const updateMetaTags = (frontingMember = null, memberCount = 1) => {
     // Update Open Graph title
     let metaTitle = document.querySelector('meta[property="og:title"]');
     if (!metaTitle) {
@@ -413,13 +447,19 @@ function App() {
     }
     
     if (frontingMember) {
-      // Custom meta data for current fronter
+      // Custom meta data for current fronter(s)
       const displayName = frontingMember.display_name || frontingMember.name;
       const avatarUrl = getCofrontAvatar(frontingMember) || defaultAvatar;
       
-      metaTitle.setAttribute('content', `Currently Fronting: ${displayName}`);
+      if (memberCount === 1) {
+        metaTitle.setAttribute('content', `Currently Fronting: ${displayName}`);
+        metaDesc.setAttribute('content', `Learn more about ${displayName} and other system members`);
+      } else {
+        metaTitle.setAttribute('content', `Currently Co-Fronting (${memberCount}): ${displayName} and others`);
+        metaDesc.setAttribute('content', `${memberCount} system members are currently fronting together`);
+      }
+      
       metaImage.setAttribute('content', avatarUrl);
-      metaDesc.setAttribute('content', `Learn more about ${displayName} and other system members`);
     } else {
       // Default meta data
       metaTitle.setAttribute('content', 'Doughmination System');
@@ -715,37 +755,43 @@ function App() {
                       </div>
                     )}
                     
-                    {/* Currently Fronting Section - Now AFTER mental state banner */}
+                    {/* Currently Fronting Section - Updated for multiple members */}
                     {fronting && fronting.members && fronting.members.length > 0 && (
                       <div className="mb-6 p-4 border-b dark:border-gray-700">
-                        <h2 className="text-lg font-semibold mb-3 text-center">Currently Fronting:</h2>
-                        <div className="fronting-member">
-                          <div className="avatar-container fronting-avatar">
-                            <img
-                              src={getCofrontAvatar(fronting.members[0]) || defaultAvatar}
-                              alt="Fronting member"
-                              loading="eager"
-                            />
-                          </div>
-                          <span className="fronting-member-name">
-                            {fronting.members[0]?.display_name || fronting.members[0]?.name || "Unknown"}
-                            {/* Add Host label for Clove when fronting */}
-                            {fronting.members[0] && 
-                            (fronting.members[0].name === "Clove" || fronting.members[0].display_name === "Clove") && 
-                            (
-                              <span className="host-badge ml-2">Host</span>
-                            )}
-                            {/* Add Cofront label */}
-                            {fronting.members[0]?.is_cofront && (
-                              <span className="cofront-badge ml-2">Cofront</span>
-                            )}
-                            {/* Add Special label for system/sleeping */}
-                            {fronting.members[0]?.is_special && (
-                              <span className="special-badge ml-2">
-                                {fronting.members[0]?.original_name === "system" ? "Unsure" : "Sleeping"}
+                        <h2 className="text-lg font-semibold mb-3 text-center">
+                          Currently Fronting{fronting.members.length > 1 ? ` (${fronting.members.length})` : ""}:
+                        </h2>
+                        <div className="fronting-members-container">
+                          {fronting.members.map((member, index) => (
+                            <div key={member.id || index} className="fronting-member">
+                              <div className="avatar-container fronting-avatar">
+                                <img
+                                  src={getCofrontAvatar(member) || defaultAvatar}
+                                  alt={member.display_name || member.name || "Unknown"}
+                                  loading="eager"
+                                />
+                              </div>
+                              <span className="fronting-member-name">
+                                {member.display_name || member.name || "Unknown"}
+                                {/* Add Host label for Clove when fronting */}
+                                {member && 
+                                (member.name === "Clove" || member.display_name === "Clove") && 
+                                (
+                                  <span className="host-badge ml-2">Host</span>
+                                )}
+                                {/* Add Cofront label */}
+                                {member?.is_cofront && (
+                                  <span className="cofront-badge ml-2">Cofront</span>
+                                )}
+                                {/* Add Special label for system/sleeping */}
+                                {member?.is_special && (
+                                  <span className="special-badge ml-2">
+                                    {member?.original_name === "system" ? "Unsure" : "Sleeping"}
+                                  </span>
+                                )}
                               </span>
-                            )}
-                          </span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}

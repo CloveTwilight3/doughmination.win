@@ -23,7 +23,7 @@ SOFTWARE.
 """
 
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 class User(BaseModel):
@@ -64,3 +64,32 @@ class SystemInfo(BaseModel):
     description: Optional[str]
     tag: Optional[str]
     mental_state: Optional[MentalState] = None
+
+# New models for cofront support
+
+class DynamicCofrontCreate(BaseModel):
+    """Model for creating a dynamic cofront"""
+    member_ids: List[str]
+    name: Optional[str] = None
+    set_as_current: bool = False
+
+class CofrontResponse(BaseModel):
+    """Model for cofront information"""
+    is_cofront: bool = True
+    component_members: List[Dict[str, Any]]
+    display_name: str
+    original_name: str
+    component_avatars: List[str]
+    member_count: int
+    is_dynamic: Optional[bool] = False
+
+class MultiSwitchRequest(BaseModel):
+    """Model for switching multiple fronters at once"""
+    member_ids: List[str]
+
+class MultiSwitchResponse(BaseModel):
+    """Response for multi-switch operation"""
+    status: str
+    message: str
+    fronters: List[Dict[str, Any]]
+    count: int

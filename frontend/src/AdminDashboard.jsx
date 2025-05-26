@@ -27,7 +27,7 @@ SOFTWARE.
  * 
  * This component provides an administrative interface for managing the PluralKit system.
  * It includes:
- * - Display of currently fronting member
+ * - Display of currently fronting members (supports multiple)
  * - Ability to switch fronting members
  * - User management interface (via the UserManagement component)
  * - Mental state management interface (via the MentalStateAdmin component)
@@ -150,9 +150,6 @@ export default function AdminDashboard({ fronting, onFrontingChanged }) {
     return <div className="text-center p-8">Loading...</div>;
   }
 
-  // Get the first currently fronting member (if any)
-  const currentFronting = fronting?.members?.[0];
-
   return (
     <div className="max-w-4xl mx-auto mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6 text-center">Admin Dashboard</h1>
@@ -169,30 +166,42 @@ export default function AdminDashboard({ fronting, onFrontingChanged }) {
       )}
       
       <div className="space-y-6">
-        {/* Currently Fronting Section */}
+        {/* Currently Fronting Section - Updated for multiple members */}
         <div className="border-b pb-4 dark:border-gray-700">
-          <h2 className="text-xl font-semibold mb-2">Currently Fronting</h2>
-          {currentFronting ? (
-            <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
-                <img 
-                  src={getMemberAvatar(currentFronting)}
-                  alt={currentFronting.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span className="text-lg flex items-center">
-                {currentFronting.display_name || currentFronting.name}
-                {/* Add badges */}
-                {currentFronting.is_cofront && (
-                  <span className="ml-2 cofront-badge">Cofront</span>
-                )}
-                {currentFronting.is_special && (
-                  <span className="ml-2 special-badge">
-                    {currentFronting.original_name === "system" ? "Unsure" : "Sleeping"}
-                  </span>
-                )}
-              </span>
+          <h2 className="text-xl font-semibold mb-2">
+            Currently Fronting{fronting?.members?.length > 1 ? ` (${fronting.members.length})` : ""}
+          </h2>
+          {fronting?.members && fronting.members.length > 0 ? (
+            <div className="admin-fronting-container">
+              {fronting.members.map((member, index) => (
+                <div key={member.id || index} className="admin-fronting-member">
+                  <div className="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0">
+                    <img 
+                      src={getMemberAvatar(member)}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-lg flex flex-wrap items-center">
+                      {member.display_name || member.name}
+                      {/* Add Host label for Clove */}
+                      {(member.name === "Clove" || member.display_name === "Clove") && (
+                        <span className="ml-2 host-badge">Host</span>
+                      )}
+                      {/* Add badges */}
+                      {member.is_cofront && (
+                        <span className="ml-2 cofront-badge">Cofront</span>
+                      )}
+                      {member.is_special && (
+                        <span className="ml-2 special-badge">
+                          {member.original_name === "system" ? "Unsure" : "Sleeping"}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <p>No one is currently fronting</p>
@@ -234,6 +243,149 @@ export default function AdminDashboard({ fronting, onFrontingChanged }) {
             </div>
           </div>
         </div>
+        
+        {/* Quick Actions Section */}
+        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-3">Quick Actions</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              onClick={() => {
+                if (window.confirm("Are you sure you want to clear all fronting members?")) {
+                  const token = localStorage.getItem("token");
+                  fetch("/api/switch", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ members: [] }),
+                  })
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.status === "success") {
+                      setMessage({ type: "success", content: "Cleared all fronting members." });
+                      if (onFrontingChanged) {
+                        onFrontingChanged(null);
+                      }
+                    }
+                  })
+                  .catch(err => {
+                    console.error("Error clearing front:", err);
+                    setMessage({ type: "error", content: "Error clearing fronting members." });
+                  });
+                }
+              }}
+              className="py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors"
+            >
+              Clear Front
+            </button>
+            
+            <button
+              onClick={async () => {
+                const token = localStorage.getItem("token");
+                try {
+                  const res = await fetch("/api/admin/refresh", {
+                    method: "POST",
+                    headers: {
+                      "Authorization": `Bearer ${token}`
+                    }
+                  });
+                  
+                  if (res.ok) {
+                    setMessage({ type: "success", content: "Refresh broadcast sent to all clients." });
+                  } else {
+                    throw new Error("Failed to send refresh");
+                  }
+                } catch (err) {
+                  console.error("Error sending refresh:", err);
+                  setMessage({ type: "error", content: "Error sending refresh broadcast." });
+                }
+              }}
+              className="py-2 px-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors"
+            >
+              Force Refresh All Clients
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            Use "Clear Front" to remove all fronting members. Use "Force Refresh" to update all connected browsers.
+          </p>
+        </div>
+        
+        {/* System Statistics */}
+        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-3">System Statistics</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-500">{members.length}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Total Members</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-500">
+                {fronting?.members?.length || 0}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Currently Fronting</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-500">
+                {members.filter(m => m.is_cofront).length}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Cofronts</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-amber-500">
+                {members.filter(m => m.is_special).length}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Special Members</div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Recent Fronting Activity */}
+        {fronting?.members && fronting.members.length > 0 && (
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-3">Current Fronting Details</h3>
+            <div className="space-y-2">
+              {fronting.members.map((member, index) => (
+                <div key={member.id || index} className="flex items-center justify-between py-2 px-3 bg-white dark:bg-gray-800 rounded-md">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-full overflow-hidden mr-3">
+                      <img 
+                        src={getMemberAvatar(member)}
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <div className="font-medium">{member.display_name || member.name}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        ID: {member.id}
+                        {member.pronouns && ` • ${member.pronouns}`}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    {(member.name === "Clove" || member.display_name === "Clove") && (
+                      <span className="host-badge text-xs">Host</span>
+                    )}
+                    {member.is_cofront && (
+                      <span className="cofront-badge text-xs">Cofront</span>
+                    )}
+                    {member.is_special && (
+                      <span className="special-badge text-xs">
+                        {member.original_name === "system" ? "Unsure" : "Sleeping"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {fronting.timestamp && (
+              <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                Last switch: {new Date(fronting.timestamp).toLocaleString()}
+              </div>
+            )}
+          </div>
+        )}
       </div>
       
       {/* Mental State Management Section */}

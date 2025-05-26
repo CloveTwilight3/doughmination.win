@@ -37,13 +37,23 @@ HEADERS = {
     "Authorization": TOKEN
 }
 
-# Cofront/fusion member definitions
+# Cofront/fusion member definitions - up to 5 members
+# Values can be lists of 2-5 member names
 COFRONTS = {
+    # Existing cofronts
     "DeadJett": ["Deadlock", "Jett"],
     "NyaRub": ["Nyara", "Ruby"],
     "VipRub": ["Viper", "Ruby"],
-    "cyclove": ["Clove", "Cypher"]
+    "cyclove": ["Clove", "Cypher"],
+    
+    # Examples of 3+ member cofronts (add your own as needed)
+    "TrioName": ["Member1", "Member2", "Member3"],
+    "QuadName": ["Member1", "Member2", "Member3", "Member4"],
+    "QuintName": ["Member1", "Member2", "Member3", "Member4", "Member5"]
 }
+
+# Max number of members allowed in a cofront (enforced in set_front function)
+MAX_FRONTERS = 5
 
 # Special member display names
 SPECIAL_DISPLAY_NAMES = {
@@ -108,8 +118,9 @@ async def get_members():
                         "component_members": component_members,
                         "display_name": " + ".join(display_names),
                         "original_name": member_name,
-                        # Keep the cofront's own avatar if it has one, otherwise we'll handle this in the frontend
-                        "component_avatars": [comp.get("avatar_url") for comp in component_members if comp.get("avatar_url")]
+                        # Store all component member details including avatars
+                        "component_avatars": [comp.get("avatar_url") for comp in component_members if comp.get("avatar_url")],
+                        "member_count": len(component_members)
                     }
                     processed_members.append(cofront_member)
                 else:
@@ -176,6 +187,10 @@ async def set_front(member_ids):
     Sets the current front to the provided list of member IDs.
     Pass an empty list to clear the front.
     """
+    # Enforce maximum number of fronters
+    if len(member_ids) > MAX_FRONTERS:
+        raise ValueError(f"Cannot have more than {MAX_FRONTERS} members fronting at once")
+    
     # Clear fronters cache since we're updating it
     cache_key = "fronters"
     set_in_cache(cache_key, None, 0)  # Invalidate cache
@@ -191,3 +206,52 @@ async def set_front(member_ids):
 
         # If there's a response body, return it, otherwise return None
         return resp.json() if resp.content else None
+
+async def create_dynamic_cofront(member_ids, name=None):
+    """
+    Create a dynamic cofront from a list of member IDs.
+    If name is not provided, a name will be generated based on the first letter of each member.
+    
+    This is a helper function and doesn't directly interact with PluralKit API.
+    The frontend would need additional routes to use this functionality.
+    """
+    if len(member_ids) < 2 or len(member_ids) > MAX_FRONTERS:
+        raise ValueError(f"Cofronts must have between 2 and {MAX_FRONTERS} members")
+    
+    # Get all members for reference
+    all_members = await get_members()
+    
+    # Find the members by their IDs
+    component_members = []
+    for member_id in member_ids:
+        for member in all_members:
+            if member.get("id") == member_id:
+                component_members.append(member)
+                break
+    
+    # Verify we found all members
+    if len(component_members) != len(member_ids):
+        raise ValueError("One or more member IDs not found")
+    
+    # Generate a name if not provided
+    if not name:
+        # Use first letter of each member name
+        name = "".join(member.get("name", "")[0] for member in component_members)
+    
+    # Combine display names
+    display_names = []
+    for comp in component_members:
+        display_names.append(comp.get("display_name", comp.get("name")))
+    
+    # Create cofront data structure
+    cofront_data = {
+        "is_cofront": True,
+        "component_members": component_members,
+        "display_name": " + ".join(display_names),
+        "original_name": name,
+        "component_avatars": [comp.get("avatar_url") for comp in component_members if comp.get("avatar_url")],
+        "member_count": len(component_members),
+        "is_dynamic": True  # Flag to indicate this is a dynamically created cofront
+    }
+    
+    return cofront_data

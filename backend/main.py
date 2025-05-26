@@ -22,11 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile, WebSocket, WebSocketDisconnect, Body
 from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from pluralkit import get_system, get_members, get_fronters, set_front
+from pluralkit import get_system, get_members, get_fronters, set_front, create_dynamic_cofront, MAX_FRONTERS
 from auth import router as auth_router, get_current_user, oauth2_scheme
 import os
 import shutil
@@ -39,9 +39,9 @@ from datetime import datetime, timezone
 from fastapi.security import SecurityScopes
 from jose import JWTError
 from dotenv import load_dotenv
-from models import UserCreate, UserResponse, UserUpdate, MentalState
+from models import UserCreate, UserResponse, UserUpdate, MentalState, DynamicCofrontCreate, CofrontResponse, MultiSwitchRequest, MultiSwitchResponse
 from users import get_users, create_user, delete_user, initialize_admin_user, update_user, get_user_by_id
-from typing import List, Optional, Set, Dict
+from typing import List, Optional, Set, Dict, Any
 from metrics import get_fronting_time_metrics, get_switch_frequency_metrics
 from pathlib import Path
 
@@ -162,6 +162,32 @@ class ConnectionManager:
         """Broadcast JSON data to all connections in a group"""
         message = json.dumps(data)
         await self.broadcast(message, group)
+            
+    async def broadcast_to_interested_clients(self, member_ids: List[str], message_type: str, data: dict):
+        """
+        Broadcast a message only to clients who are interested in specific members
+        This is useful for sending updates about specific cofronts
+        """
+        message = {
+            "type": message_type,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "data": data or {},
+            "related_members": member_ids
+        }
+        
+        json_message = json.dumps(message)
+        
+        # For now, we'll broadcast to all authenticated clients
+        # In the future, you could implement a subscription system
+        # where clients subscribe to updates about specific members
+        for connection in self.active_connections["authenticated"].copy():
+            try:
+                await connection.send_text(json_message)
+            except WebSocketDisconnect:
+                self.disconnect(connection, "authenticated")
+            except Exception as e:
+                print(f"Error broadcasting to client: {e}")
+                self.disconnect(connection, "authenticated")
 
 # Create a global connection manager instance
 manager = ConnectionManager()
@@ -216,6 +242,10 @@ async def broadcast_mental_state_update(mental_state_data: dict):
 async def broadcast_member_update(members_data: list):
     """Broadcast member list changes"""
     await broadcast_frontend_update("members_update", {"members": members_data})
+
+async def broadcast_cofront_update(cofront_data: dict):
+    """Broadcast when a new dynamic cofront is created or updated"""
+    await broadcast_frontend_update("cofront_update", cofront_data)
 
 # ============================================================================
 # API Endpoints (with WebSocket broadcast integration)
@@ -328,6 +358,13 @@ async def switch_front(request: Request, user = Depends(get_current_user)):
 
         if not isinstance(member_ids, list):
             raise HTTPException(status_code=400, detail="'members' must be a list of member IDs")
+            
+        # Enforce maximum number of fronters
+        if len(member_ids) > MAX_FRONTERS:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Cannot have more than {MAX_FRONTERS} members fronting at once"
+            )
 
         await set_front(member_ids)
         
@@ -364,6 +401,123 @@ async def switch_single_front(request: Request, user = Depends(get_current_user)
     except Exception as e:
         print("Error in /api/switch_front:", e)
         raise HTTPException(status_code=500, detail=f"Failed to switch front: {str(e)}")
+
+@app.post("/api/dynamic_cofront")
+async def create_custom_cofront(
+    data: Dict[str, Any] = Body(...),
+    user = Depends(get_current_user)
+):
+    """Create a dynamic cofront from selected members"""
+    try:
+        member_ids = data.get("member_ids", [])
+        custom_name = data.get("name")
+        
+        if not member_ids or len(member_ids) < 2:
+            raise HTTPException(status_code=400, detail="At least 2 members are required for a cofront")
+            
+        if len(member_ids) > MAX_FRONTERS:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Cannot have more than {MAX_FRONTERS} members in a cofront"
+            )
+        
+        # Create the dynamic cofront
+        cofront_data = await create_dynamic_cofront(member_ids, custom_name)
+        
+        # Set this cofront as the current fronter
+        if data.get("set_as_current", False):
+            # We'll use the member IDs directly here
+            await set_front(member_ids)
+            
+            # Broadcast the fronting update
+            fronters_data = await get_fronters()
+            await broadcast_fronting_update(fronters_data)
+        
+        # Broadcast the cofront creation/update
+        await broadcast_cofront_update({
+            "action": "created",
+            "cofront": cofront_data
+        })
+        
+        return {
+            "status": "success", 
+            "message": "Dynamic cofront created successfully",
+            "cofront": cofront_data
+        }
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/cofronts")
+async def get_available_cofronts(user = Depends(get_current_user)):
+    """Get all available predefined cofronts"""
+    try:
+        # Get all members
+        members = await get_members()
+        
+        # Filter to only get cofronts
+        cofronts = [m for m in members if m.get("is_cofront")]
+        
+        return {
+            "status": "success",
+            "cofronts": cofronts
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/multi_switch")
+async def switch_multiple_fronters(
+    data: Dict[str, Any] = Body(...),
+    user = Depends(get_current_user)
+):
+    """
+    Switch to multiple fronters at once
+    This is an alternative to /api/switch that provides more detailed feedback
+    """
+    try:
+        member_ids = data.get("member_ids", [])
+        
+        if not isinstance(member_ids, list):
+            raise HTTPException(status_code=400, detail="'member_ids' must be a list")
+            
+        # Enforce maximum number of fronters
+        if len(member_ids) > MAX_FRONTERS:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Cannot have more than {MAX_FRONTERS} members fronting at once"
+            )
+        
+        # Get the members to show their names in the response
+        all_members = await get_members()
+        switching_members = []
+        
+        for member_id in member_ids:
+            for member in all_members:
+                if member.get("id") == member_id:
+                    switching_members.append({
+                        "id": member.get("id"),
+                        "name": member.get("name"),
+                        "display_name": member.get("display_name", member.get("name"))
+                    })
+                    break
+        
+        # Switch the fronters
+        await set_front(member_ids)
+        
+        # Broadcast the fronting update
+        fronters_data = await get_fronters()
+        await broadcast_fronting_update(fronters_data)
+        
+        # Return detailed information about the switch
+        return {
+            "status": "success",
+            "message": "Fronters updated successfully",
+            "fronters": switching_members,
+            "count": len(switching_members)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Add admin check endpoint
 @app.get("/api/is_admin")
