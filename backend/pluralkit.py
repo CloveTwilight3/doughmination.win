@@ -43,14 +43,13 @@ COFRONTS = {
     # Existing cofronts
     "DeadJett": ["Deadlock", "Jett"],
     "NyaRub": ["Nyara", "Ruby"],
-    "VipRub": ["Viper", "Ruby"],
     "cyclove": ["Clove", "Cypher"],
     "gekclove": ["Gekko", "Clove"],
     
     # Examples of 3+ member cofronts (add your own as needed)
     "CloDeadJett": ["Clove", "Deadlock", "Jett"],
-    "QuadName": ["Member1", "Member2", "Member3", "Member4"],
-    "QuintName": ["Member1", "Member2", "Member3", "Member4", "Member5"]
+    "CyCloDeadJett": ["Cypher", "Clove", "Deadlock", "Jett"],
+    "CyCloDeadJettGek": ["Cypher", "Clove", "Deadlock", "Jett", "Gekko"]
 }
 
 # Max number of members allowed in a cofront (enforced in set_front function)
