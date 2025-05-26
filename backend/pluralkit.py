@@ -45,6 +45,7 @@ COFRONTS = {
     "NyaRub": ["Nyara", "Ruby"],
     "VipRub": ["Viper", "Ruby"],
     "cyclove": ["Clove", "Cypher"],
+    "gekclove": ["Gekko", "Clove"],
     
     # Examples of 3+ member cofronts (add your own as needed)
     "TrioName": ["Member1", "Member2", "Member3"],
