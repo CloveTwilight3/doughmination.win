@@ -48,7 +48,7 @@ COFRONTS = {
     "gekclove": ["Gekko", "Clove"],
     
     # Examples of 3+ member cofronts (add your own as needed)
-    "TrioName": ["Member1", "Member2", "Member3"],
+    "CloDeadJett": ["Clove", "Deadlock", "Jett"],
     "QuadName": ["Member1", "Member2", "Member3", "Member4"],
     "QuintName": ["Member1", "Member2", "Member3", "Member4", "Member5"]
 }
