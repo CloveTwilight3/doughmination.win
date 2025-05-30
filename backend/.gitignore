@@ -2,3 +2,4 @@
 gen-hash.py
 users.json
 venv/*
+__pycache__/*
