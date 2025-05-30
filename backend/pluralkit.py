@@ -45,7 +45,7 @@ COFRONTS = {
     "NyaRub": ["Nyara", "Ruby"],
     "cyclove": ["Clove", "Cypher"],
     "gekclove": ["Gekko", "Clove"],
-    "JettOmDead": ["Deadlock", "Omen", "Jett"],
+    "jettomdead": ["Deadlock", "Omen", "Jett"],
     "CloDeadJett": ["Clove", "Deadlock", "Jett"],
     "CyCloDeadJett": ["Cypher", "Clove", "Deadlock", "Jett"],
     "CyCloDeadJettGek": ["Cypher", "Clove", "Deadlock", "Jett", "Gekko"]
