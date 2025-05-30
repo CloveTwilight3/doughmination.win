@@ -41,12 +41,11 @@ HEADERS = {
 # Values can be lists of 2-5 member names
 COFRONTS = {
     # Existing cofronts
-    "DeadJett": ["Deadlock", "Jett"],
+    "JettDead": ["Deadlock", "Jett"],
     "NyaRub": ["Nyara", "Ruby"],
     "cyclove": ["Clove", "Cypher"],
     "gekclove": ["Gekko", "Clove"],
-    
-    # Examples of 3+ member cofronts (add your own as needed)
+    "JettOmDead": ["Deadlock", "Omen", "Jett"],
     "CloDeadJett": ["Clove", "Deadlock", "Jett"],
     "CyCloDeadJett": ["Cypher", "Clove", "Deadlock", "Jett"],
     "CyCloDeadJettGek": ["Cypher", "Clove", "Deadlock", "Jett", "Gekko"]
