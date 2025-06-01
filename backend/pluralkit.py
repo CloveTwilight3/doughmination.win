@@ -41,7 +41,7 @@ HEADERS = {
 # Values can be lists of 2-5 member names
 COFRONTS = {
     # Existing cofronts
-    "JettDead": ["Deadlock", "Jett"],
+    "jettdead": ["Deadlock", "Jett"],
     "NyaRub": ["Nyara", "Ruby"],
     "cyclove": ["Clove", "Cypher"],
     "gekclove": ["Gekko", "Clove"],
