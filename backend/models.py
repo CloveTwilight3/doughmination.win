@@ -65,6 +65,25 @@ class SystemInfo(BaseModel):
     tag: Optional[str]
     mental_state: Optional[MentalState] = None
 
+# Sub-system models
+class SubSystem(BaseModel):
+    """Model for sub-system definitions"""
+    name: str
+    label: str
+    color: Optional[str] = None
+    description: Optional[str] = None
+
+class MemberTag(BaseModel):
+    """Model for member tags/sub-system assignments"""
+    member_id: str
+    member_name: str
+    tags: List[str]  # List of sub-system labels
+
+class SubSystemFilter(BaseModel):
+    """Model for filtering members by sub-system"""
+    subsystem: Optional[str] = None  # Filter by specific sub-system label
+    include_untagged: bool = True  # Whether to include members without tags
+
 # New models for cofront support
 
 class DynamicCofrontCreate(BaseModel):

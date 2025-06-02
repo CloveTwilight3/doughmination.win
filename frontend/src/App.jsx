@@ -18,6 +18,9 @@ import AdvertBanner from './AdvertBanner.jsx';
 import PrivacyPolicyPage from './PrivacyPolicyPage.jsx';
 import CookiesPolicyPage from './CookiesPolicyPage.jsx';
 import CookieSettings from './CookieSettings.jsx';
+// Import new sub-system components
+import SubSystemFilter from './SubSystemFilter.jsx';
+import MemberTagDisplay from './MemberTagDisplay.jsx';
 
 function App() {
   /* ============================================================================
@@ -26,8 +29,9 @@ function App() {
    * ============================================================================
    */
   const [members, setMembers] = useState([]); // All system members
-  const [filteredMembers, setFilteredMembers] = useState([]); // Filtered members for search
+  const [filteredMembers, setFilteredMembers] = useState([]); // Filtered members for search and sub-system
   const [searchQuery, setSearchQuery] = useState(""); // Search query for members
+  const [currentSubSystemFilter, setCurrentSubSystemFilter] = useState(null); // Current sub-system filter
   const [fronting, setFronting] = useState({ members: [] }); // Currently fronting members
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token")); // Authentication state
   const [isAdmin, setIsAdmin] = useState(false); // Admin privileges state
@@ -102,7 +106,8 @@ function App() {
             return nameA.localeCompare(nameB);
           });
           setMembers(sortedMembers);
-          setFilteredMembers(sortedMembers);
+          // Re-apply current filters
+          applyFilters(sortedMembers, searchQuery, currentSubSystemFilter);
         }
         break;
         
@@ -115,7 +120,7 @@ function App() {
       default:
         console.log('Unknown message type:', message.type);
     }
-  }, []);
+  }, [searchQuery, currentSubSystemFilter]);
 
   // WebSocket error handler
   const handleWebSocketError = useCallback((error) => {
@@ -157,7 +162,7 @@ function App() {
     // Function to fetch public data (members and fronters)
     const fetchPublicData = async () => {
       try {
-        // Fetch members data
+        // Fetch members data (with tags included)
         const membersRes = await fetch("/api/members");
         if (membersRes.ok) {
           const data = await membersRes.json();
@@ -254,16 +259,17 @@ function App() {
   }, []);
 
   /* ============================================================================
-   * SEARCH FUNCTIONALITY
-   * Filter members based on search query
+   * FILTERING FUNCTIONALITY
+   * Apply search and sub-system filters to members
    * ============================================================================
    */
-  useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredMembers(members);
-    } else {
-      const query = searchQuery.toLowerCase();
-      const filtered = members.filter(member => {
+  const applyFilters = useCallback((membersList, search, subsystemFilter) => {
+    let filtered = [...membersList];
+
+    // Apply search filter
+    if (search.trim() !== "") {
+      const query = search.toLowerCase();
+      filtered = filtered.filter(member => {
         const name = member.name.toLowerCase();
         const displayName = (member.display_name || "").toLowerCase();
         const pronouns = (member.pronouns || "").toLowerCase();
@@ -271,9 +277,48 @@ function App() {
                displayName.includes(query) || 
                pronouns.includes(query);
       });
-      setFilteredMembers(filtered);
     }
-  }, [searchQuery, members]);
+
+    // Apply sub-system filter
+    if (subsystemFilter) {
+      filtered = filtered.filter(member => {
+        const tags = member.tags || [];
+        
+        if (subsystemFilter === 'untagged') {
+          return tags.length === 0;
+        }
+        
+        return tags.includes(subsystemFilter);
+      });
+    }
+
+    setFilteredMembers(filtered);
+  }, []);
+
+  // Apply filters when search query or sub-system filter changes
+  useEffect(() => {
+    applyFilters(members, searchQuery, currentSubSystemFilter);
+  }, [members, searchQuery, currentSubSystemFilter, applyFilters]);
+
+  /* ============================================================================
+   * EVENT HANDLERS
+   * ============================================================================
+   */
+  
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+  
+  // Clear search query
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
+  // Handle sub-system filter change
+  const handleSubSystemFilterChange = (filter) => {
+    setCurrentSubSystemFilter(filter);
+  };
 
   /**
    * Creates a combined avatar display for cofronts
@@ -448,16 +493,6 @@ function App() {
     } else {
       document.body.style.overflow = '';
     }
-  };
-  
-  // Handle search input change
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-  
-  // Clear search query
-  const clearSearch = () => {
-    setSearchQuery("");
   };
   
   // Function to update meta tags for better link sharing
@@ -819,12 +854,8 @@ function App() {
                                     </div>
                                     <span className="fronting-member-name">
                                       {member.display_name || member.name || "Unknown"}
-                                      {/* Add Host label for Clove when fronting */}
-                                      {member && 
-                                      (member.name === "Clove" || member.display_name === "Clove") && 
-                                      (
-                                        <span className="host-badge ml-2">Host</span>
-                                      )}
+                                      {/* Display member tags */}
+                                      <MemberTagDisplay tags={member.tags} className="mt-1" />
                                       {/* Add Cofront label if this member is from a cofront */}
                                       {member._isFromCofront && (
                                         <span className="cofront-badge ml-2">
@@ -858,6 +889,12 @@ function App() {
                     )}
                     
                     <h2 className="text-lg font-semibold mb-4 text-center">Members:</h2>
+                    
+                    {/* Sub-system Filter */}
+                    <SubSystemFilter 
+                      onFilterChange={handleSubSystemFilterChange}
+                      currentFilter={currentSubSystemFilter}
+                    />
                     
                     {/* Search Bar */}
                     <div className="relative max-w-md mx-auto mb-6">
@@ -908,19 +945,39 @@ function App() {
                                     </div>
                                     <span className="member-name">
                                       {member.display_name || member.name}
-                                      {/* Add "Host" label for Clove */}
-                                      {(member.name === "Clove" || member.display_name === "Clove") && (
-                                        <span className="host-badge">Host</span>
-                                      )}
                                     </span>
+                                    {/* Display member tags */}
+                                    <MemberTagDisplay tags={member.tags} className="mt-2" />
                                   </div>
                                 </Link>
                               </div>
                             </div>
                           ))}
                       </div>
-                    ) : searchQuery ? (
-                      <p className="text-center mt-8">No members found matching "{searchQuery}"</p>
+                    ) : searchQuery || currentSubSystemFilter ? (
+                      <div className="text-center mt-8">
+                        <p>No members found matching current filters.</p>
+                        {(searchQuery || currentSubSystemFilter) && (
+                          <div className="mt-4 space-x-2">
+                            {searchQuery && (
+                              <button 
+                                onClick={clearSearch}
+                                className="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600"
+                              >
+                                Clear search
+                              </button>
+                            )}
+                            {currentSubSystemFilter && (
+                              <button 
+                                onClick={() => setCurrentSubSystemFilter(null)}
+                                className="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600"
+                              >
+                                Clear filter
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <p className="text-center mt-8">No members found. Please check your connection.</p>
                     )}
@@ -974,7 +1031,7 @@ function App() {
                 {/* Admin Dashboard (protected, admin required) */}
                 <Route path="/admin/dashboard" element={
                   <ProtectedRoute adminRequired={true} isAdmin={isAdmin} isLoggedIn={loggedIn}>
-                    <AdminDashboard fronting={fronting} />
+                    <AdminDashboard fronting={fronting} onFrontingChanged={handleFrontingChanged} />
                   </ProtectedRoute>
                 } />
                 

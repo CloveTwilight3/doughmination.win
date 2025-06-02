@@ -31,6 +31,7 @@ SOFTWARE.
  * Features:
  * - Display member avatar
  * - Show name, description, pronouns, and other member details
+ * - Display member sub-system tags
  * - Loading states for data fetching
  * - Error handling for API failures
  * - Navigation back to the members list
@@ -38,6 +39,7 @@ SOFTWARE.
 
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import MemberTagDisplay from './MemberTagDisplay';
 
 const MemberDetails = ({ members, defaultAvatar }) => {
   // Get member_id from URL parameters
@@ -129,31 +131,74 @@ const MemberDetails = ({ members, defaultAvatar }) => {
             alt={memberData.is_private ? "Private Member" : memberData.name}
           />
         </div>
-        <h1 className="text-2xl font-bold mt-2 text-black dark:text-white">
+        <h1 className="text-2xl font-bold mt-2 text-black dark:text-white text-center">
           {memberData.is_private ? "PRIVATE" : (memberData.display_name || memberData.name)}
-          {/* Add Host label for Clove */}
-          {(memberData.name === "Clove" || memberData.display_name === "Clove") && (
-            <span className="host-badge ml-2">Host</span>
-          )}
         </h1>
+        
+        {/* Display member tags */}
+        {!memberData.is_private && memberData.tags && (
+          <div className="mt-3">
+            <MemberTagDisplay tags={memberData.tags} className="justify-center" />
+          </div>
+        )}
       </div>
       
       {/* Member details arranged in a grid - only show for non-private members */}
       {!memberData.is_private ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {/* Description section - only shown if there is a description */}
-          {memberData.description && (
+        <div className="space-y-5">
+          {/* Basic Information Section */}
+          {(memberData.pronouns || memberData.tags?.length > 0) && (
             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-              <h2 className="text-xl font-semibold mb-2 text-black dark:text-white">About</h2>
-              <p className="text-base text-black dark:text-white">{memberData.description}</p>
+              <h2 className="text-xl font-semibold mb-3 text-black dark:text-white">Information</h2>
+              
+              {memberData.pronouns && (
+                <div className="mb-3">
+                  <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Pronouns</h3>
+                  <p className="text-base text-black dark:text-white">{memberData.pronouns}</p>
+                </div>
+              )}
+              
+              {memberData.tags && memberData.tags.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Sub-systems</h3>
+                  <MemberTagDisplay tags={memberData.tags} />
+                </div>
+              )}
             </div>
           )}
           
-          {/* Pronouns section - only shown if there are pronouns */}
-          {memberData.pronouns && (
+          {/* Description section - only shown if there is a description */}
+          {memberData.description && (
             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-              <h2 className="text-xl font-semibold mb-2 text-black dark:text-white">Pronouns</h2>
-              <p className="text-base text-black dark:text-white">{memberData.pronouns}</p>
+              <h2 className="text-xl font-semibold mb-3 text-black dark:text-white">About</h2>
+              <p className="text-base text-black dark:text-white leading-relaxed">{memberData.description}</p>
+            </div>
+          )}
+          
+          {/* Additional details section if there are other fields */}
+          {(memberData.color || memberData.birthday) && (
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+              <h2 className="text-xl font-semibold mb-3 text-black dark:text-white">Details</h2>
+              
+              {memberData.color && (
+                <div className="mb-3">
+                  <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Color</h3>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-4 h-4 rounded border border-gray-300 dark:border-gray-600"
+                      style={{ backgroundColor: memberData.color }}
+                    ></div>
+                    <span className="text-base text-black dark:text-white">{memberData.color}</span>
+                  </div>
+                </div>
+              )}
+              
+              {memberData.birthday && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Birthday</h3>
+                  <p className="text-base text-black dark:text-white">{memberData.birthday}</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -169,7 +214,7 @@ const MemberDetails = ({ members, defaultAvatar }) => {
       
       {/* Back button to return to members list */}
       <div className="mt-6 text-center">
-        <Link to="/" className="px-4 py-2 bg-blue-500 text-white rounded-lg transition-colors text-base">
+        <Link to="/" className="px-4 py-2 bg-blue-500 text-white rounded-lg transition-colors text-base hover:bg-blue-600">
            ← Back to All Members
         </Link>
       </div>

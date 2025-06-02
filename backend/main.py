@@ -1,334 +1,212 @@
-"""
-MIT License
-
-Copyright (c) 2025 Clove Twilight
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
-
-from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile, WebSocket, WebSocketDisconnect, Body
-from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
-from pluralkit import get_system, get_members, get_fronters, set_front, create_dynamic_cofront, MAX_FRONTERS
-from auth import router as auth_router, get_current_user, oauth2_scheme
-import os
-import shutil
-import aiofiles
-import uuid
-import json
-import asyncio
-import weakref
-from datetime import datetime, timezone
-from fastapi.security import SecurityScopes
-from jose import JWTError
-from dotenv import load_dotenv
-from models import UserCreate, UserResponse, UserUpdate, MentalState, DynamicCofrontCreate, CofrontResponse, MultiSwitchRequest, MultiSwitchResponse
-from users import get_users, create_user, delete_user, initialize_admin_user, update_user, get_user_by_id
-from typing import List, Optional, Set, Dict, Any
-from metrics import get_fronting_time_metrics, get_switch_frequency_metrics
-from pathlib import Path
-
-load_dotenv()
-
-app = FastAPI()
-
-# Initialize the admin user if no users exist
-initialize_admin_user()
-
-# Default fallback avatar URL
-DEFAULT_AVATAR = "https://alextlm.co.uk/system.png"
-
-# File size limit middleware
-class FileSizeLimitMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        if request.method == 'POST' and '/avatar' in request.url.path:
-            try:
-                # 2MB in bytes
-                MAX_SIZE = 2 * 1024 * 1024
-                content_length = request.headers.get('content-length')
-                if content_length and int(content_length) > MAX_SIZE:
-                    return JSONResponse(
-                        status_code=413,
-                        content={"detail": "File size exceeds the limit of 2MB"}
-                    )
-            except:
-                pass
-        
-        response = await call_next(request)
-        return response
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8080",              # Local development
-        "http://127.0.0.1:8080",              # Alternative local address
-        "https://friends.clovetwilight3.co.uk", # Production domain
-        "http://friends.clovetwilight3.co.uk",  # HTTP version of production domain
-        "http://frontend",                    # Docker service name
-        "http://frontend:80",                 # Docker service with port
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Add the file size limit middleware
-app.add_middleware(FileSizeLimitMiddleware)
-
-# Include login route
-app.include_router(auth_router)
-
-# Create upload directory for avatars if it doesn't exist
-UPLOAD_DIR = Path("avatars")
-UPLOAD_DIR.mkdir(exist_ok=True)
-
-# Optional authentication function for public endpoints
-async def get_optional_user(token: str = Security(oauth2_scheme, scopes=[])):
+@app.get("/api/subsystems")
+async def list_subsystems():
+    """Get all available sub-systems"""
     try:
-        return await get_current_user(token)
-    except (HTTPException, JWTError):
-        return None
-
-# ============================================================================
-# WebSocket Connection Manager
-# ============================================================================
-
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: Dict[str, Set[WebSocket]] = {
-            "all": set(),  # All connected clients
-            "authenticated": set()  # Authenticated users
+        subsystems = get_subsystems()
+        return {
+            "status": "success",
+            "subsystems": [subsystem.dict() for subsystem in subsystems]
         }
-        # Use weakref to prevent memory leaks
-        self._weak_connections = weakref.WeakSet()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch sub-systems: {str(e)}")
 
-    async def connect(self, websocket: WebSocket, group: str = "all"):
-        await websocket.accept()
-        self.active_connections[group].add(websocket)
-        self._weak_connections.add(websocket)
-        print(f"Client connected to group: {group}. Total connections: {len(self.active_connections[group])}")
-
-    def disconnect(self, websocket: WebSocket, group: str = "all"):
-        self.active_connections[group].discard(websocket)
-        # Clean up from all groups when disconnecting
-        for group_set in self.active_connections.values():
-            group_set.discard(websocket)
-        print(f"Client disconnected from group: {group}. Remaining connections: {len(self.active_connections[group])}")
-
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        try:
-            await websocket.send_text(message)
-        except Exception as e:
-            print(f"Error sending personal message: {e}")
-            # Remove the connection if it's broken
-            self.disconnect(websocket)
-
-    async def broadcast(self, message: str, group: str = "all"):
-        """Broadcast message to all connections in a group"""
-        disconnected = set()
+@app.get("/api/members/by-subsystem")
+async def members_by_subsystem():
+    """Get members grouped by their sub-systems"""
+    try:
+        # Get all members without filtering
+        all_members = await get_members()
         
-        for connection in self.active_connections[group].copy():
-            try:
-                await connection.send_text(message)
-            except WebSocketDisconnect:
-                disconnected.add(connection)
-            except Exception as e:
-                print(f"Error broadcasting to client: {e}")
-                disconnected.add(connection)
+        # Group by sub-system
+        grouped_members = get_members_by_subsystem(all_members)
         
-        # Clean up disconnected clients
-        for conn in disconnected:
-            self.disconnect(conn, group)
-
-    async def broadcast_json(self, data: dict, group: str = "all"):
-        """Broadcast JSON data to all connections in a group"""
-        message = json.dumps(data)
-        await self.broadcast(message, group)
-            
-    async def broadcast_to_interested_clients(self, member_ids: List[str], message_type: str, data: dict):
-        """
-        Broadcast a message only to clients who are interested in specific members
-        This is useful for sending updates about specific cofronts
-        """
-        message = {
-            "type": message_type,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "data": data or {},
-            "related_members": member_ids
+        return {
+            "status": "success",
+            "subsystems": grouped_members
         }
-        
-        json_message = json.dumps(message)
-        
-        # For now, we'll broadcast to all authenticated clients
-        # In the future, you could implement a subscription system
-        # where clients subscribe to updates about specific members
-        for connection in self.active_connections["authenticated"].copy():
-            try:
-                await connection.send_text(json_message)
-            except WebSocketDisconnect:
-                self.disconnect(connection, "authenticated")
-            except Exception as e:
-                print(f"Error broadcasting to client: {e}")
-                self.disconnect(connection, "authenticated")
-
-# Create a global connection manager instance
-manager = ConnectionManager()
-
-# ============================================================================
-# WebSocket Endpoint
-# ============================================================================
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    # Accept the WebSocket connection
-    await manager.connect(websocket)
-    
-    try:
-        while True:
-            # Keep the connection alive
-            data = await websocket.receive_text()
-            
-            # You can handle different message types if needed
-            if data == "ping":
-                await websocket.send_text("pong")
-            else:
-                # Handle other message types here if needed
-                pass
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
     except Exception as e:
-        print(f"WebSocket error: {e}")
-        manager.disconnect(websocket)
+        raise HTTPException(status_code=500, detail=f"Failed to group members by sub-system: {str(e)}")
 
-# ============================================================================
-# WebSocket Broadcast Helpers
-# ============================================================================
-
-async def broadcast_frontend_update(data_type: str, data: dict = None):
-    """Broadcast an update to all connected clients"""
-    message = {
-        "type": data_type,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "data": data or {}
-    }
-    await manager.broadcast_json(message)
-
-async def broadcast_fronting_update(fronters_data: dict):
-    """Broadcast fronting member changes"""
-    await broadcast_frontend_update("fronting_update", fronters_data)
-
-async def broadcast_mental_state_update(mental_state_data: dict):
-    """Broadcast mental state changes"""
-    await broadcast_frontend_update("mental_state_update", mental_state_data)
-
-async def broadcast_member_update(members_data: list):
-    """Broadcast member list changes"""
-    await broadcast_frontend_update("members_update", {"members": members_data})
-
-async def broadcast_cofront_update(cofront_data: dict):
-    """Broadcast when a new dynamic cofront is created or updated"""
-    await broadcast_frontend_update("cofront_update", cofront_data)
-
-# ============================================================================
-# API Endpoints (with WebSocket broadcast integration)
-# ============================================================================
-
-@app.get("/api/mental-state")
-async def get_mental_state():
-    """Get current mental state from database"""
+@app.get("/api/members/filtered")
+async def members_filtered(
+    subsystem: Optional[str] = None,
+    include_untagged: bool = True
+):
+    """Get members filtered by sub-system"""
     try:
-        # Check if mental_state.json exists
-        if os.path.exists("mental_state.json"):
-            with open("mental_state.json", "r") as f:
-                state_data = json.load(f)
-                # Convert the string back to datetime
-                state_data["updated_at"] = datetime.fromisoformat(state_data["updated_at"])
-                return MentalState(**state_data)
-        else:
-            # Default state
-            return MentalState(
-                level="safe",
-                updated_at=datetime.now(timezone.utc),
-                notes=None
-            )
+        # Validate subsystem parameter
+        if subsystem:
+            subsystems = get_subsystems()
+            valid_labels = [s.label for s in subsystems] + ["host", "untagged"]
+            if subsystem not in valid_labels:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Invalid subsystem. Valid options: {', '.join(valid_labels)}"
+                )
+        
+        # Get filtered members
+        members = await get_members(subsystem, include_untagged)
+        
+        return {
+            "status": "success",
+            "members": members,
+            "filter": {
+                "subsystem": subsystem,
+                "include_untagged": include_untagged
+            }
+        }
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
-        print(f"Error loading mental state: {e}")
-        return MentalState(
-            level="safe",
-            updated_at=datetime.now(timezone.utc),
-            notes=None
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to fetch filtered members: {str(e)}")
 
-@app.post("/api/mental-state")
-async def update_mental_state(state: MentalState, user = Depends(get_current_user)):
-    """Update mental state (admin only)"""
+@app.get("/api/member-tags")
+async def list_member_tags(user = Depends(get_current_user)):
+    """Get all member tag assignments (admin only)"""
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Admin privileges required")
     
     try:
-        state_data = state.dict()
-        state_data["updated_at"] = state_data["updated_at"].isoformat()
-        
-        with open("mental_state.json", "w") as f:
-            json.dump(state_data, f, indent=2)
-        
-        # Broadcast the mental state update
-        await broadcast_mental_state_update(state_data)
-        
-        return {"success": True, "message": "Mental state updated"}
+        member_tags = get_member_tags()
+        return {
+            "status": "success",
+            "member_tags": member_tags
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to update mental state: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch member tags: {str(e)}")
 
-@app.get("/api/system")
-async def system_info():
+@app.post("/api/member-tags/{member_identifier}")
+async def update_member_tag_list(
+    member_identifier: str,
+    tags: List[str] = Body(...),
+    user = Depends(get_current_user)
+):
+    """Update the complete tag list for a member (admin only)"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
     try:
-        # Get system data
-        system_data = await get_system()
+        # Validate all tags
+        for tag in tags:
+            if not validate_subsystem_tag(tag):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid tag '{tag}'. Must be one of: pets, valorant, vocaloids, host"
+                )
         
-        # Get mental state
-        mental_state_data = None
-        if os.path.exists("mental_state.json"):
-            with open("mental_state.json", "r") as f:
-                state_data = json.load(f)
-                # Convert the string back to datetime for the response
-                state_data["updated_at"] = datetime.fromisoformat(state_data["updated_at"])
-                mental_state_data = MentalState(**state_data)
+        # Update the member's tags
+        success = update_member_tags(member_identifier, tags)
+        
+        if success:
+            # Clear member cache to reflect changes
+            from cache import set_in_cache
+            set_in_cache("members_raw", None, 0)
+            
+            return {
+                "status": "success",
+                "message": f"Updated tags for {member_identifier}",
+                "tags": tags
+            }
         else:
-            mental_state_data = MentalState(
-                level="safe",
-                updated_at=datetime.now(timezone.utc),
-                notes=None
+            raise HTTPException(status_code=500, detail="Failed to update member tags")
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update member tags: {str(e)}")
+
+@app.post("/api/member-tags/{member_identifier}/add")
+async def add_single_member_tag(
+    member_identifier: str,
+    tag: str = Body(..., embed=True),
+    user = Depends(get_current_user)
+):
+    """Add a single tag to a member (admin only)"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        # Validate tag
+        if not validate_subsystem_tag(tag):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid tag '{tag}'. Must be one of: pets, valorant, vocaloids, host"
             )
         
-        # Add mental state to system data
-        system_data["mental_state"] = mental_state_data.dict()
+        # Add the tag
+        success = add_member_tag(member_identifier, tag)
         
-        return system_data
+        if success:
+            # Clear member cache to reflect changes
+            from cache import set_in_cache
+            set_in_cache("members_raw", None, 0)
+            
+            return {
+                "status": "success",
+                "message": f"Added tag '{tag}' to {member_identifier}"
+            }
+        else:
+            return {
+                "status": "info",
+                "message": f"Tag '{tag}' already exists for {member_identifier}"
+            }
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch system info: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to add member tag: {str(e)}")
+
+@app.delete("/api/member-tags/{member_identifier}/{tag}")
+async def remove_single_member_tag(
+    member_identifier: str,
+    tag: str,
+    user = Depends(get_current_user)
+):
+    """Remove a single tag from a member (admin only)"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        # Remove the tag
+        success = remove_member_tag(member_identifier, tag)
+        
+        if success:
+            # Clear member cache to reflect changes
+            from cache import set_in_cache
+            set_in_cache("members_raw", None, 0)
+            
+            return {
+                "status": "success",
+                "message": f"Removed tag '{tag}' from {member_identifier}"
+            }
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Tag '{tag}' not found for {member_identifier}"
+            )
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to remove member tag: {str(e)}")
 
 @app.get("/api/members")
-async def members():
+async def members(
+    subsystem: Optional[str] = None,
+    include_untagged: bool = True
+):
+    """Get members, optionally filtered by sub-system"""
     try:
-        return await get_members()
+        if subsystem:
+            # Validate subsystem parameter
+            subsystems = get_subsystems()
+            valid_labels = [s.label for s in subsystems] + ["host", "untagged"]
+            if subsystem not in valid_labels:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Invalid subsystem. Valid options: {', '.join(valid_labels)}"
+                )
+        
+        return await get_members(subsystem, include_untagged)
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch members: {str(e)}")
 
@@ -746,4 +624,554 @@ async def admin_refresh(user = Depends(get_current_user)):
         
         return {"success": True, "message": "Refresh broadcast sent"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to broadcast refresh: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to broadcast refresh: {str(e)}")"""
+MIT License
+
+Copyright (c) 2025 Clove Twilight
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
+from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile, WebSocket, WebSocketDisconnect, Body
+from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from pluralkit import get_system, get_members, get_fronters, set_front, create_dynamic_cofront, MAX_FRONTERS
+from auth import router as auth_router, get_current_user, oauth2_scheme
+from subsystems import (
+    get_subsystems, get_member_tags, get_members_by_subsystem, 
+    update_member_tags, add_member_tag, remove_member_tag,
+    validate_subsystem_tag, initialize_default_subsystems
+)
+import os
+import shutil
+import aiofiles
+import uuid
+import json
+import asyncio
+import weakref
+from datetime import datetime, timezone
+from fastapi.security import SecurityScopes
+from jose import JWTError
+from dotenv import load_dotenv
+from models import UserCreate, UserResponse, UserUpdate, MentalState, DynamicCofrontCreate, CofrontResponse, MultiSwitchRequest, MultiSwitchResponse, SubSystem, MemberTag, SubSystemFilter
+from users import get_users, create_user, delete_user, initialize_admin_user, update_user, get_user_by_id
+from typing import List, Optional, Set, Dict, Any
+from metrics import get_fronting_time_metrics, get_switch_frequency_metrics
+from pathlib import Path
+
+load_dotenv()
+
+app = FastAPI()
+
+# Initialize the admin user if no users exist
+initialize_admin_user()
+
+# Initialize sub-systems
+initialize_default_subsystems()
+
+# Default fallback avatar URL
+DEFAULT_AVATAR = "https://alextlm.co.uk/system.png"
+
+# File size limit middleware
+class FileSizeLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.method == 'POST' and '/avatar' in request.url.path:
+            try:
+                # 2MB in bytes
+                MAX_SIZE = 2 * 1024 * 1024
+                content_length = request.headers.get('content-length')
+                if content_length and int(content_length) > MAX_SIZE:
+                    return JSONResponse(
+                        status_code=413,
+                        content={"detail": "File size exceeds the limit of 2MB"}
+                    )
+            except:
+                pass
+        
+        response = await call_next(request)
+        return response
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8080",              # Local development
+        "http://127.0.0.1:8080",              # Alternative local address
+        "https://friends.clovetwilight3.co.uk", # Production domain
+        "http://friends.clovetwilight3.co.uk",  # HTTP version of production domain
+        "http://frontend",                    # Docker service name
+        "http://frontend:80",                 # Docker service with port
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Add the file size limit middleware
+app.add_middleware(FileSizeLimitMiddleware)
+
+# Include login route
+app.include_router(auth_router)
+
+# Create upload directory for avatars if it doesn't exist
+UPLOAD_DIR = Path("avatars")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+# Optional authentication function for public endpoints
+async def get_optional_user(token: str = Security(oauth2_scheme, scopes=[])):
+    try:
+        return await get_current_user(token)
+    except (HTTPException, JWTError):
+        return None
+
+# ============================================================================
+# WebSocket Connection Manager
+# ============================================================================
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Dict[str, Set[WebSocket]] = {
+            "all": set(),  # All connected clients
+            "authenticated": set()  # Authenticated users
+        }
+        # Use weakref to prevent memory leaks
+        self._weak_connections = weakref.WeakSet()
+
+    async def connect(self, websocket: WebSocket, group: str = "all"):
+        await websocket.accept()
+        self.active_connections[group].add(websocket)
+        self._weak_connections.add(websocket)
+        print(f"Client connected to group: {group}. Total connections: {len(self.active_connections[group])}")
+
+    def disconnect(self, websocket: WebSocket, group: str = "all"):
+        self.active_connections[group].discard(websocket)
+        # Clean up from all groups when disconnecting
+        for group_set in self.active_connections.values():
+            group_set.discard(websocket)
+        print(f"Client disconnected from group: {group}. Remaining connections: {len(self.active_connections[group])}")
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        try:
+            await websocket.send_text(message)
+        except Exception as e:
+            print(f"Error sending personal message: {e}")
+            # Remove the connection if it's broken
+            self.disconnect(websocket)
+
+    async def broadcast(self, message: str, group: str = "all"):
+        """Broadcast message to all connections in a group"""
+        disconnected = set()
+        
+        for connection in self.active_connections[group].copy():
+            try:
+                await connection.send_text(message)
+            except WebSocketDisconnect:
+                disconnected.add(connection)
+            except Exception as e:
+                print(f"Error broadcasting to client: {e}")
+                disconnected.add(connection)
+        
+        # Clean up disconnected clients
+        for conn in disconnected:
+            self.disconnect(conn, group)
+
+    async def broadcast_json(self, data: dict, group: str = "all"):
+        """Broadcast JSON data to all connections in a group"""
+        message = json.dumps(data)
+        await self.broadcast(message, group)
+            
+    async def broadcast_to_interested_clients(self, member_ids: List[str], message_type: str, data: dict):
+        """
+        Broadcast a message only to clients who are interested in specific members
+        This is useful for sending updates about specific cofronts
+        """
+        message = {
+            "type": message_type,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "data": data or {},
+            "related_members": member_ids
+        }
+        
+        json_message = json.dumps(message)
+        
+        # For now, we'll broadcast to all authenticated clients
+        # In the future, you could implement a subscription system
+        # where clients subscribe to updates about specific members
+        for connection in self.active_connections["authenticated"].copy():
+            try:
+                await connection.send_text(json_message)
+            except WebSocketDisconnect:
+                self.disconnect(connection, "authenticated")
+            except Exception as e:
+                print(f"Error broadcasting to client: {e}")
+                self.disconnect(connection, "authenticated")
+
+# Create a global connection manager instance
+manager = ConnectionManager()
+
+# ============================================================================
+# WebSocket Endpoint
+# ============================================================================
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    # Accept the WebSocket connection
+    await manager.connect(websocket)
+    
+    try:
+        while True:
+            # Keep the connection alive
+            data = await websocket.receive_text()
+            
+            # You can handle different message types if needed
+            if data == "ping":
+                await websocket.send_text("pong")
+            else:
+                # Handle other message types here if needed
+                pass
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+        manager.disconnect(websocket)
+
+# ============================================================================
+# WebSocket Broadcast Helpers
+# ============================================================================
+
+async def broadcast_frontend_update(data_type: str, data: dict = None):
+    """Broadcast an update to all connected clients"""
+    message = {
+        "type": data_type,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "data": data or {}
+    }
+    await manager.broadcast_json(message)
+
+async def broadcast_fronting_update(fronters_data: dict):
+    """Broadcast fronting member changes"""
+    await broadcast_frontend_update("fronting_update", fronters_data)
+
+async def broadcast_mental_state_update(mental_state_data: dict):
+    """Broadcast mental state changes"""
+    await broadcast_frontend_update("mental_state_update", mental_state_data)
+
+async def broadcast_member_update(members_data: list):
+    """Broadcast member list changes"""
+    await broadcast_frontend_update("members_update", {"members": members_data})
+
+async def broadcast_cofront_update(cofront_data: dict):
+    """Broadcast when a new dynamic cofront is created or updated"""
+    await broadcast_frontend_update("cofront_update", cofront_data)
+
+# ============================================================================
+# API Endpoints (with WebSocket broadcast integration)
+# ============================================================================
+
+@app.get("/api/mental-state")
+async def get_mental_state():
+    """Get current mental state from database"""
+    try:
+        # Check if mental_state.json exists
+        if os.path.exists("mental_state.json"):
+            with open("mental_state.json", "r") as f:
+                state_data = json.load(f)
+                # Convert the string back to datetime
+                state_data["updated_at"] = datetime.fromisoformat(state_data["updated_at"])
+                return MentalState(**state_data)
+        else:
+            # Default state
+            return MentalState(
+                level="safe",
+                updated_at=datetime.now(timezone.utc),
+                notes=None
+            )
+    except Exception as e:
+        print(f"Error loading mental state: {e}")
+        return MentalState(
+            level="safe",
+            updated_at=datetime.now(timezone.utc),
+            notes=None
+        )
+
+@app.post("/api/mental-state")
+async def update_mental_state(state: MentalState, user = Depends(get_current_user)):
+    """Update mental state (admin only)"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        state_data = state.dict()
+        state_data["updated_at"] = state_data["updated_at"].isoformat()
+        
+        with open("mental_state.json", "w") as f:
+            json.dump(state_data, f, indent=2)
+        
+        # Broadcast the mental state update
+        await broadcast_mental_state_update(state_data)
+        
+        return {"success": True, "message": "Mental state updated"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update mental state: {str(e)}")
+
+@app.get("/api/system")
+async def system_info():
+    try:
+        # Get system data
+        system_data = await get_system()
+        
+        # Get mental state
+        mental_state_data = None
+        if os.path.exists("mental_state.json"):
+            with open("mental_state.json", "r") as f:
+                state_data = json.load(f)
+                # Convert the string back to datetime for the response
+                state_data["updated_at"] = datetime.fromisoformat(state_data["updated_at"])
+                mental_state_data = MentalState(**state_data)
+        else:
+            mental_state_data = MentalState(
+                level="safe",
+                updated_at=datetime.now(timezone.utc),
+                notes=None
+            )
+        
+        # Add mental state to system data
+        system_data["mental_state"] = mental_state_data.dict()
+        
+        return system_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch system info: {str(e)}")
+
+# ============================================================================
+# Sub-system API Endpoints
+# ============================================================================
+
+@app.get("/api/subsystems")
+async def list_subsystems():
+    """Get all available sub-systems"""
+    try:
+        subsystems = get_subsystems()
+        return {
+            "status": "success",
+            "subsystems": [subsystem.dict() for subsystem in subsystems]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch sub-systems: {str(e)}")
+
+@app.get("/api/members/by-subsystem")
+async def members_by_subsystem():
+    """Get members grouped by their sub-systems"""
+    try:
+        # Get all members without filtering
+        all_members = await get_members()
+        
+        # Group by sub-system
+        grouped_members = get_members_by_subsystem(all_members)
+        
+        return {
+            "status": "success",
+            "subsystems": grouped_members
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to group members by sub-system: {str(e)}")
+
+@app.get("/api/members/filtered")
+async def members_filtered(
+    subsystem: Optional[str] = None,
+    include_untagged: bool = True
+):
+    """Get members filtered by sub-system"""
+    try:
+        # Validate subsystem parameter
+        if subsystem:
+            subsystems = get_subsystems()
+            valid_labels = [s.label for s in subsystems] + ["host", "untagged"]
+            if subsystem not in valid_labels:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Invalid subsystem. Valid options: {', '.join(valid_labels)}"
+                )
+        
+        # Get filtered members
+        members = await get_members(subsystem, include_untagged)
+        
+        return {
+            "status": "success",
+            "members": members,
+            "filter": {
+                "subsystem": subsystem,
+                "include_untagged": include_untagged
+            }
+        }
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch filtered members: {str(e)}")
+
+@app.get("/api/member-tags")
+async def list_member_tags(user = Depends(get_current_user)):
+    """Get all member tag assignments (admin only)"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        member_tags = get_member_tags()
+        return {
+            "status": "success",
+            "member_tags": member_tags
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch member tags: {str(e)}")
+
+@app.post("/api/member-tags/{member_identifier}")
+async def update_member_tag_list(
+    member_identifier: str,
+    tags: List[str] = Body(...),
+    user = Depends(get_current_user)
+):
+    """Update the complete tag list for a member (admin only)"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        # Validate all tags
+        for tag in tags:
+            if not validate_subsystem_tag(tag):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid tag '{tag}'. Must be one of: pets, valorant, vocaloids, host"
+                )
+        
+        # Update the member's tags
+        success = update_member_tags(member_identifier, tags)
+        
+        if success:
+            # Clear member cache to reflect changes
+            from cache import set_in_cache
+            set_in_cache("members_raw", None, 0)
+            
+            return {
+                "status": "success",
+                "message": f"Updated tags for {member_identifier}",
+                "tags": tags
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to update member tags")
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update member tags: {str(e)}")
+
+@app.post("/api/member-tags/{member_identifier}/add")
+async def add_single_member_tag(
+    member_identifier: str,
+    tag: str = Body(..., embed=True),
+    user = Depends(get_current_user)
+):
+    """Add a single tag to a member (admin only)"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        # Validate tag
+        if not validate_subsystem_tag(tag):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid tag '{tag}'. Must be one of: pets, valorant, vocaloids, host"
+            )
+        
+        # Add the tag
+        success = add_member_tag(member_identifier, tag)
+        
+        if success:
+            # Clear member cache to reflect changes
+            from cache import set_in_cache
+            set_in_cache("members_raw", None, 0)
+            
+            return {
+                "status": "success",
+                "message": f"Added tag '{tag}' to {member_identifier}"
+            }
+        else:
+            return {
+                "status": "info",
+                "message": f"Tag '{tag}' already exists for {member_identifier}"
+            }
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to add member tag: {str(e)}")
+
+@app.delete("/api/member-tags/{member_identifier}/{tag}")
+async def remove_single_member_tag(
+    member_identifier: str,
+    tag: str,
+    user = Depends(get_current_user)
+):
+    """Remove a single tag from a member (admin only)"""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    
+    try:
+        # Remove the tag
+        success = remove_member_tag(member_identifier, tag)
+        
+        if success:
+            # Clear member cache to reflect changes
+            from cache import set_in_cache
+            set_in_cache("members_raw", None, 0)
+            
+            return {
+                "status": "success",
+                "message": f"Removed tag '{tag}' from {member_identifier}"
+            }
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Tag '{tag}' not found for {member_identifier}"
+            )
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to remove member tag: {str(e)}")
+
+# Update the existing /api/members endpoint to support filtering
+@app.get("/api/members")
+async def members(
+    subsystem: Optional[str] = None,
+    include_untagged: bool = True
+):
+    """Get members, optionally filtered by sub-system"""
+    try:
+        if subsystem:
+            # Validate subsystem parameter
+            subsystems = get_subsystems()
+            valid_labels = [s.label for s in subsystems] + ["host", "untagged"]
+            if subsystem not in valid_labels:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Invalid subsystem. Valid options: {', '.join(valid_labels)}"
+                )
+        
+        return await get_members(subsystem, include_untagged)
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch members: {str(e)}")

@@ -26,6 +26,7 @@ import httpx
 import os
 from dotenv import load_dotenv
 from cache import get_from_cache, set_in_cache
+from subsystems import enrich_members_with_tags, filter_members_by_subsystem
 
 load_dotenv()
 
@@ -78,71 +79,89 @@ async def get_member_by_name(members_data, name):
             return member
     return None
 
-async def get_members():
-    cache_key = "members"
+async def get_members(subsystem_filter: str = None, include_untagged: bool = True):
+    cache_key = f"members_{subsystem_filter}_{include_untagged}"
     if (cached := get_from_cache(cache_key)):
         return cached
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{BASE_URL}/systems/@me/members", headers=HEADERS)
-        resp.raise_for_status()
-        data = resp.json()
+    
+    # First get all members from PluralKit
+    base_cache_key = "members_raw"
+    if not (cached_raw := get_from_cache(base_cache_key)):
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(f"{BASE_URL}/systems/@me/members", headers=HEADERS)
+            resp.raise_for_status()
+            cached_raw = resp.json()
+            set_in_cache(base_cache_key, cached_raw, CACHE_TTL)
+    
+    data = cached_raw
+    
+    # Process cofront members and special members
+    processed_members = []
+    for member in data:
+        member_name = member.get("name")
         
-        # Process cofront members and special members
-        processed_members = []
-        for member in data:
-            member_name = member.get("name")
+        # Handle cofronts
+        if member_name in COFRONTS:
+            component_names = COFRONTS[member_name]
+            component_members = []
             
-            # Handle cofronts
-            if member_name in COFRONTS:
-                component_names = COFRONTS[member_name]
-                component_members = []
-                
-                # Find the component members
-                for component_name in component_names:
-                    component_member = await get_member_by_name(data, component_name)
-                    if component_member:
-                        component_members.append(component_member)
-                
-                # Create cofront display data
-                if component_members:
-                    # Combine display names
-                    display_names = []
-                    for comp in component_members:
-                        display_names.append(comp.get("display_name", comp.get("name")))
-                    
-                    # Create cofront member data
-                    cofront_member = {
-                        **member,  # Keep original member data
-                        "is_cofront": True,
-                        "component_members": component_members,
-                        "display_name": " + ".join(display_names),
-                        "original_name": member_name,
-                        # Store all component member details including avatars
-                        "component_avatars": [comp.get("avatar_url") for comp in component_members if comp.get("avatar_url")],
-                        "member_count": len(component_members)
-                    }
-                    processed_members.append(cofront_member)
-                else:
-                    # If we can't find component members, add as normal member
-                    processed_members.append(member)
+            # Find the component members
+            for component_name in component_names:
+                component_member = await get_member_by_name(data, component_name)
+                if component_member:
+                    component_members.append(component_member)
             
-            # Handle special display names (system -> Unsure, sleeping -> I am sleeping)
-            elif member_name in SPECIAL_DISPLAY_NAMES:
-                # Update the display name but keep everything else the same
-                special_member = {
-                    **member,
-                    "display_name": SPECIAL_DISPLAY_NAMES[member_name],
-                    "is_special": True,  # Mark as special for identification
-                    "original_name": member_name
+            # Create cofront display data
+            if component_members:
+                # Combine display names
+                display_names = []
+                for comp in component_members:
+                    display_names.append(comp.get("display_name", comp.get("name")))
+                
+                # Create cofront member data
+                cofront_member = {
+                    **member,  # Keep original member data
+                    "is_cofront": True,
+                    "component_members": component_members,
+                    "display_name": " + ".join(display_names),
+                    "original_name": member_name,
+                    # Store all component member details including avatars
+                    "component_avatars": [comp.get("avatar_url") for comp in component_members if comp.get("avatar_url")],
+                    "member_count": len(component_members)
                 }
-                processed_members.append(special_member)
-            
-            # Handle normal members
+                processed_members.append(cofront_member)
             else:
+                # If we can't find component members, add as normal member
                 processed_members.append(member)
-                    
-        set_in_cache(cache_key, processed_members, CACHE_TTL)
-        return processed_members
+        
+        # Handle special display names (system -> Unsure, sleeping -> I am sleeping)
+        elif member_name in SPECIAL_DISPLAY_NAMES:
+            # Update the display name but keep everything else the same
+            special_member = {
+                **member,
+                "display_name": SPECIAL_DISPLAY_NAMES[member_name],
+                "is_special": True,  # Mark as special for identification
+                "original_name": member_name
+            }
+            processed_members.append(special_member)
+        
+        # Handle normal members
+        else:
+            processed_members.append(member)
+    
+    # Enrich all members with tag information
+    processed_members = enrich_members_with_tags(processed_members)
+    
+    # Apply sub-system filtering if requested
+    if subsystem_filter:
+        processed_members = filter_members_by_subsystem(
+            processed_members, 
+            subsystem_filter, 
+            include_untagged
+        )
+    
+    set_in_cache(cache_key, processed_members, CACHE_TTL)
+    return processed_members
 
 async def get_fronters():
     cache_key = "fronters"
@@ -155,7 +174,7 @@ async def get_fronters():
         
         # Process special members and cofronts in fronters
         if "members" in data:
-            # Get all members for reference
+            # Get all members for reference (without filtering)
             all_members = await get_members()
             
             processed_fronters = []
@@ -170,11 +189,12 @@ async def get_fronters():
                         break
                 
                 if processed_member:
-                    # Use the processed member data (which includes cofront and special display name handling)
+                    # Use the processed member data (which includes cofront, special display name, and tag handling)
                     processed_fronters.append(processed_member)
                 else:
-                    # Fallback to original member data
-                    processed_fronters.append(member)
+                    # Fallback to original member data but still enrich with tags
+                    enriched_member = enrich_members_with_tags([member])[0]
+                    processed_fronters.append(enriched_member)
             
             data["members"] = processed_fronters
         
@@ -217,7 +237,7 @@ async def create_dynamic_cofront(member_ids, name=None):
     if len(member_ids) < 2 or len(member_ids) > MAX_FRONTERS:
         raise ValueError(f"Cofronts must have between 2 and {MAX_FRONTERS} members")
     
-    # Get all members for reference
+    # Get all members for reference (without filtering)
     all_members = await get_members()
     
     # Find the members by their IDs

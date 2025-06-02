@@ -31,6 +31,7 @@ SOFTWARE.
  * - Ability to switch fronting members
  * - User management interface (via the UserManagement component)
  * - Mental state management interface (via the MentalStateAdmin component)
+ * - Member tag management interface (via the MemberTagManagement component)
  * 
  * The component handles API communication for fetching members and updating fronting status.
  */
@@ -39,6 +40,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserManagement from './UserManagement'; // Import user management component
 import MentalStateAdmin from './MentalStateAdmin'; // Import mental state management component
+import MemberTagManagement from './MemberTagManagement'; // Import member tag management component
+import MemberTagDisplay from './MemberTagDisplay'; // Import tag display component
 
 export default function AdminDashboard({ fronting, onFrontingChanged }) {
   // State management
@@ -223,12 +226,11 @@ const expandFrontingMembers = (frontingMembers) => {
                   {member.pronouns && ` • ${member.pronouns}`}
                   {member._isFromCofront && ` • From ${member._cofrontDisplayName}`}
                 </div>
+                {/* Display member tags */}
+                <MemberTagDisplay tags={member.tags} className="mt-1" />
               </div>
             </div>
             <div className="flex gap-1">
-              {(member.name === "Clove" || member.display_name === "Clove") && (
-                <span className="host-badge text-xs">Host</span>
-              )}
               {member._isFromCofront && (
                 <span className="cofront-badge text-xs">Cofront</span>
               )}
@@ -380,58 +382,45 @@ const expandFrontingMembers = (frontingMembers) => {
               <div className="text-sm text-gray-600 dark:text-gray-400">Special Members</div>
             </div>
           </div>
-        </div>
-        
-        {/* Recent Fronting Activity */}
-        {fronting?.members && fronting.members.length > 0 && (
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-3">Current Fronting Details</h3>
-            <div className="space-y-2">
-              {fronting.members.map((member, index) => (
-                <div key={member.id || index} className="flex items-center justify-between py-2 px-3 bg-white dark:bg-gray-800 rounded-md">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full overflow-hidden mr-3">
-                      <img 
-                        src={getMemberAvatar(member)}
-                        alt={member.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <div className="font-medium">{member.display_name || member.name}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        ID: {member.id}
-                        {member.pronouns && ` • ${member.pronouns}`}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                    {(member.name === "Clove" || member.display_name === "Clove") && (
-                      <span className="host-badge text-xs">Host</span>
-                    )}
-                    {member.is_cofront && (
-                      <span className="cofront-badge text-xs">Cofront</span>
-                    )}
-                    {member.is_special && (
-                      <span className="special-badge text-xs">
-                        {member.original_name === "system" ? "Unsure" : "Sleeping"}
-                      </span>
-                    )}
-                  </div>
+          
+          {/* Sub-system breakdown */}
+          <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
+            <h4 className="text-md font-medium mb-2">Sub-system Breakdown</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+              <div className="text-center">
+                <div className="text-lg font-bold text-purple-400">
+                  {members.filter(m => m.tags?.includes('host')).length}
                 </div>
-              ))}
-            </div>
-            {fronting.timestamp && (
-              <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                Last switch: {new Date(fronting.timestamp).toLocaleString()}
+                <div className="text-xs text-gray-600 dark:text-gray-400">🏠 Host</div>
               </div>
-            )}
+              <div className="text-center">
+                <div className="text-lg font-bold text-red-400">
+                  {members.filter(m => m.tags?.includes('valorant')).length}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">🔫 Valorant</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-pink-400">
+                  {members.filter(m => m.tags?.includes('pets')).length}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">🐾 Pets</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-cyan-400">
+                  {members.filter(m => m.tags?.includes('vocaloids')).length}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">🎤 Vocaloids</div>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
       </div>
       
       {/* Mental State Management Section */}
       <MentalStateAdmin />
+      
+      {/* Member Tag Management Section */}
+      <MemberTagManagement />
       
       {/* User Management Section */}
       <UserManagement />
