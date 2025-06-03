@@ -67,7 +67,7 @@ DEFAULT_MEMBER_TAGS = {
     "Neon": ["valorant"],
     "Nyara": ["pets"],
     "Omen": ["valorant"],
-    "Puppers": ["valorant"],
+    "Puppers": ["pets"],
     "Raze": ["valorant"],
     "Reyna": ["valorant"],
     "Rin": ["vocaloids"],
