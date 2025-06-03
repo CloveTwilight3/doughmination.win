@@ -74,7 +74,7 @@ DEFAULT_MEMBER_TAGS = {
     "Roxy": ["pets"],
     "Sage": ["valorant"],
     "Skye": ["valorant"],
-    "Sparkles": ["pets"]
+    "Sparkles": ["pets"],
     "Teto": ["vocaloids"]
 }
 
