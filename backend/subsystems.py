@@ -56,19 +56,26 @@ DEFAULT_SUBSYSTEMS = [
 DEFAULT_MEMBER_TAGS = {
     # Clove gets both host and valorant tags
     "Clove": ["host", "valorant"],
-    
-    # Other Valorant agents
-    "Deadlock": ["valorant"],
-    "Jett": ["valorant"],
     "Cypher": ["valorant"],
+    "Deadjett": ["valorant"],
+    "Deadlock": ["valorant"],
+    "Fade": ["valorant"],
     "Gekko": ["valorant"],
+    "Jett": ["valorant"],
+    "KJ" : ["valorant"],
+    "Miku": ["vocaloids"],
+    "Neon": ["valorant"],
+    "Nyara": ["pets"],
     "Omen": ["valorant"],
-    
-    # If you have pet members, add them here
-    # "PetMemberName": ["pets"],
-    
-    # If you have vocaloid members, add them here
-    # "VocaloidMemberName": ["vocaloids"],
+    "Puppers": ["valorant"],
+    "Raze": ["valorant"],
+    "Reyna": ["valorant"],
+    "Rin": ["vocaloids"],
+    "Roxy": ["pets"],
+    "Sage": ["valorant"],
+    "Skye": ["valorant"],
+    "Sparkles": ["pets"]
+    "Teto": ["vocaloids"]
 }
 
 def get_subsystems() -> List[SubSystem]:
