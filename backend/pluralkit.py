@@ -49,7 +49,8 @@ COFRONTS = {
     "jettomdead": ["Deadlock", "Omen", "Jett"],
     "CloDeadJett": ["Clove", "Deadlock", "Jett"],
     "CyCloDeadJett": ["Cypher", "Clove", "Deadlock", "Jett"],
-    "CyCloDeadJettGek": ["Cypher", "Clove", "Deadlock", "Jett", "Gekko"]
+    "CyCloDeadJettGek": ["Cypher", "Clove", "Deadlock", "Jett", "Gekko"],
+    "CyCloveGekRen": ["Ren", "Cypher", "Clove", "Gekko"]
 }
 
 # Max number of members allowed in a cofront (enforced in set_front function)
