@@ -16,19 +16,26 @@ export const specialDates = [
     message: "🎂 Happy Birthday Sage! 🎂",
     effect: 'birthday'
   },
+  {
+    month: 5,
+    day: 14,
+    id: "daisy-birthday"
+    message: "🎂 Happy Birthday Daisy! 🎂",
+    effect: 'birthday'
+  },
   { 
     month: 2, 
     day: 22, 
     id: 'ruby-birthday', 
     message: "🎂 Happy Birthday Ruby! 🎂", 
-    effect: 'birthday' 
+    effect: 'birthday'
   },
   { 
     month: 6, 
     day: 8, 
     id: 'jett-birthday', 
     message: "🎂 Happy Birthday Jett! 🎂", 
-    effect: 'birthday' 
+    effect: 'birthday'
   },
   
   // Seasonal effects
@@ -38,7 +45,7 @@ export const specialDates = [
     id: 'halloween', 
     message: "👻 Happy Halloween! 👻", 
     effect: 'halloween', 
-    duration: 1 
+    duration: 1
   },  // Halloween
   { 
     month: 11, 
@@ -46,7 +53,7 @@ export const specialDates = [
     id: 'christmas', 
     message: "🎄 Merry Christmas! 🎄", 
     effect: 'christmas', 
-    duration: 7 
+    duration: 7
   }, // Christmas
   { 
     month: 0, 
@@ -54,7 +61,7 @@ export const specialDates = [
     id: 'new-year', 
     message: "🎆 Happy New Year! 🎆", 
     effect: 'new-year', 
-    duration: 2 
+    duration: 2
   },  // New Year
   { 
     month: 5, 
@@ -62,6 +69,6 @@ export const specialDates = [
     id: 'pride', 
     message: "🏳️‍🌈 Happy Pride Month! 🏳️‍🌈", 
     effect: 'pride', 
-    duration: 30 
+    duration: 30
   },  // Pride Month
 ];
