@@ -19,7 +19,7 @@ export const specialDates = [
   {
     month: 5,
     day: 14,
-    id: "daisy-birthday"
+    id: "daisy-birthday",
     message: "🎂 Happy Birthday Daisy! 🎂",
     effect: 'birthday'
   },
