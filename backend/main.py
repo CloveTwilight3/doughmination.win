@@ -132,6 +132,80 @@ async def get_optional_user(token: str = Security(oauth2_scheme, scopes=[])):
     except (HTTPException, JWTError):
         return None
 
+
+# ============================================================================
+# STATIC FILE SERVING SETUP
+# ============================================================================
+
+# Check if we have a built frontend to serve
+if FRONTEND_BUILD_DIR.exists() and (FRONTEND_BUILD_DIR / "index.html").exists():
+    # Copy frontend build to static directory
+    if STATIC_DIR.exists():
+        shutil.rmtree(STATIC_DIR)
+    shutil.copytree(FRONTEND_BUILD_DIR, STATIC_DIR)
+
+# Mount static files for the frontend
+if STATIC_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
+
+# ============================================================================
+# STATIC FILE ENDPOINTS
+# ============================================================================
+
+@app.get("/robots.txt")
+async def robots_txt():
+    """Serve robots.txt"""
+    robots_content = """User-agent: *
+Allow: /
+
+# Block common exploit attempts
+Disallow: /vendor/
+Disallow: /.env
+Disallow: /HNAP1/
+Disallow: /onvif/
+Disallow: /PSIA/
+Disallow: /index.php
+Disallow: /eval-stdin.php
+
+Sitemap: https://friends.clovetwilight3.co.uk/sitemap.xml
+"""
+    return Response(content=robots_content, media_type="text/plain")
+
+@app.get("/sitemap.xml")
+async def sitemap_xml():
+    """Serve sitemap.xml"""
+    sitemap_content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://friends.clovetwilight3.co.uk/</loc>
+    <lastmod>2025-06-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://friends.clovetwilight3.co.uk/privacy</loc>
+    <lastmod>2025-06-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://friends.clovetwilight3.co.uk/cookies</loc>
+    <lastmod>2025-06-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"""
+    return Response(content=sitemap_content, media_type="application/xml")
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Serve favicon"""
+    favicon_path = STATIC_DIR / "favicon.ico"
+    if favicon_path.exists():
+        return FileResponse(favicon_path)
+    # Return a default favicon or 404
+    raise HTTPException(status_code=404, detail="Favicon not found")
+
 # ============================================================================
 # WEBSOCKET CONNECTION MANAGER
 # ============================================================================
