@@ -11,7 +11,7 @@ import Metrics from './Metrics.jsx';
 import UserProfile from './UserProfile.jsx';
 import UserEdit from './UserEdit.jsx';
 import useKonamiCode from './hooks/useKonamiCode';
-// import useSpecialDates from './hooks/useSpecialDates';
+import useSpecialDates from './hooks/useSpecialDates';
 import { createDoughnutRain } from './effects/doughnutRain';
 // Import components
 import AdvertBanner from './AdvertBanner.jsx';
