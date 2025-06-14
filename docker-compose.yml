@@ -3,6 +3,7 @@ services:
     build:
       context: .  # Changed from ./backend to root
       dockerfile: ./backend/Dockerfile  # Specify path to Dockerfile
+    network_mode: "host"
     ports:
       - "8000:8000"
     volumes:
@@ -16,6 +17,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    network_mode: "host"
     ports:
       - "8080:8080"
     volumes:
