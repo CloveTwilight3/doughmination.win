@@ -43,7 +43,7 @@ import './layout-fixes.css'; // Import our new layout fixes
 
 // Initialize the application by creating a root React component
 const rootElement = document.getElementById('root');
-const root = ReactDOM.createRoot(rootElement);
+const root = createRoot(rootElement);
 
 // Render the application with routing enabled via BrowserRouter
 root.render(
