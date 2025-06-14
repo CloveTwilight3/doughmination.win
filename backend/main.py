@@ -37,8 +37,9 @@ from pathlib import Path
 from typing import List, Optional, Set, Dict, Any
 
 from fastapi import FastAPI, HTTPException, Request, Depends, Security, status, File, UploadFile, WebSocket, WebSocketDisconnect, Body
-from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
+from fastapi.responses import JSONResponse, FileResponse, RedirectResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.security import SecurityScopes
 from jose import JWTError
@@ -125,6 +126,10 @@ app.include_router(auth_router)
 UPLOAD_DIR = Path("avatars")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+# Define paths for static file serving
+FRONTEND_BUILD_DIR = Path("static")  # Files are copied here by Docker
+STATIC_DIR = Path("static")
+
 # Optional authentication function for public endpoints
 async def get_optional_user(token: str = Security(oauth2_scheme, scopes=[])):
     try:
@@ -140,9 +145,9 @@ async def get_optional_user(token: str = Security(oauth2_scheme, scopes=[])):
 # Check if we have a built frontend to serve
 if FRONTEND_BUILD_DIR.exists() and (FRONTEND_BUILD_DIR / "index.html").exists():
     # Copy frontend build to static directory
-    if STATIC_DIR.exists():
+    if STATIC_DIR.exists() and STATIC_DIR != FRONTEND_BUILD_DIR:
         shutil.rmtree(STATIC_DIR)
-    shutil.copytree(FRONTEND_BUILD_DIR, STATIC_DIR)
+        shutil.copytree(FRONTEND_BUILD_DIR, STATIC_DIR)
 
 # Mount static files for the frontend
 if STATIC_DIR.exists():
