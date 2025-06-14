@@ -850,7 +850,7 @@ function App() {
                                         src={member.avatar_url || defaultAvatar}
                                         alt={member.display_name}
                                         loading="lazy"
-                                        onError={{e} => {
+                                        onError={(e) => {
                                           e.target.src=defaultAvatar;
                                           }}
                                           style={{
