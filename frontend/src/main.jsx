@@ -37,23 +37,12 @@ SOFTWARE.
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-// import App from './App.jsx';
+import App from './App.jsx';
 import './styles.css';
 import './layout-fixes.css'; // Import our new layout fixes
 
-
-const TestApp = () => <div>Hello World - React is working!</div>;
-
-// Then change this
-root.render(
-  <BrowserRouter>
-    <TestApp />
-  </BrowserRouter>
-);
-
-
 // Initialize the application by creating a root React component
-/* const rootElement = document.getElementById('root');
+const rootElement = document.getElementById('root');
 const root = ReactDOM.createRoot(rootElement);
 
 // Render the application with routing enabled via BrowserRouter
@@ -142,4 +131,4 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }, 100);
-});*/
+});
