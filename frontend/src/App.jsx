@@ -599,7 +599,7 @@ function App() {
     <div className="flex flex-col min-h-screen max-w-6xl mx-auto text-black dark:text-white">
       {/* WebSocket connection status indicator - Fixed positioning with auto-fade */}
       {(!isConnected || showConnectionStatus) && (
-        <div className="fixed top-16 right-4 z-45 sm:top-[65px] sm:right-6 md:right-8">
+        <div className="fixed top-16 right-4 z-30 sm:top-[65px] sm:right-6 md:right-8">
           <div 
             className={`px-2 py-1 rounded text-xs transition-all duration-500 backdrop-filter backdrop-blur-sm transform
               ${isConnected 
@@ -779,7 +779,7 @@ function App() {
       <div className="h-16 sm:h-14"></div>
 
       {/* ========== MAIN CONTENT AREA ========== */}
-      <main className="container mx-auto px-4 pt-4 flex-grow">
+      <main className="container mx-auto px-2 sm:px-4 pt-4 flex-grow">
         <div className="flex">
           {/* Sidebar Ad Banner - Only visible on desktop */}
           <AdvertBanner 
@@ -791,7 +791,7 @@ function App() {
           
           <div className="flex-1">
             {/* Content Container - wrapping all core content with proper spacing */}
-            <div className="content-wrapper flex flex-col gap-4">
+            <div className="content-wrapper flex flex-col gap-2 sm:gap-4">
               {/* Welcome banner - only shown when logged in */}
               {loggedIn && <Welcome loggedIn={loggedIn} isAdmin={isAdmin} />}
               
