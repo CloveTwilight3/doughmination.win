@@ -848,8 +848,17 @@ function App() {
                                     <div className="avatar-container fronting-avatar">
                                       <img
                                         src={member.avatar_url || defaultAvatar}
-                                        alt={member.display_name || member.name || "Unknown"}
-                                        loading="eager"
+                                        alt={member.display_name}
+                                        loading="lazy"
+                                        onError={{e} => {
+                                          e.target.src=defaultAvatar;
+                                          }}
+                                          style={{
+                                            maxWidth: '100%',
+                                            height: 'auto',
+                                            aspectRatio: '1/1',
+                                            objectFit: 'cover'
+                                            }}
                                       />
                                     </div>
                                     <span className="fronting-member-name">
