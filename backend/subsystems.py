@@ -49,6 +49,12 @@ DEFAULT_SUBSYSTEMS = [
         "label": "vocaloids",
         "color": "#39C5BB",  # Teal/cyan
         "description": "Vocaloid characters and music-related members"
+    },
+    {
+        "name": "Jessa",
+        "label": "jessa",
+        "color": "#D6B2D7", # Cute Purple
+        "description": "Front's introjected from Jessas System"
     }
 ]
 
@@ -61,8 +67,11 @@ DEFAULT_MEMBER_TAGS = {
     "Deadlock": ["valorant"],
     "Fade": ["valorant"],
     "Gekko": ["valorant"],
+    "Jennifer": ["jessa"],
+    "Jessa": ["jessa"],
     "Jett": ["valorant"],
-    "KJ" : ["valorant"],
+    "KJ": ["valorant"],
+    "Lucy": ["jessa"], 
     "Miku": ["vocaloids"],
     "Neon": ["valorant"],
     "Nyara": ["pets"],
@@ -71,6 +80,7 @@ DEFAULT_MEMBER_TAGS = {
     "Raze": ["valorant"],
     "Reyna": ["valorant"],
     "Rin": ["vocaloids"],
+    "Rosie": ["jessa"],
     "Roxy": ["pets"],
     "Sage": ["valorant"],
     "Skye": ["valorant"],
