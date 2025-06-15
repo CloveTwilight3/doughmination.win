@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Pets",
+    "label": "pets",
+    "color": "#FF69B4",
+    "description": "Pet-like members or animal personas"
+  },
+  {
+    "name": "Valorant",
+    "label": "valorant",
+    "color": "#FF4655",
+    "description": "Members from the Valorant universe"
+  },
+  {
+    "name": "Vocaloids",
+    "label": "vocaloids",
+    "color": "#39C5BB",
+    "description": "Vocaloid characters and music-related members"
+  }
+]
