@@ -3,3 +3,5 @@ gen-hash.py
 users.json
 venv/
 __pycache__/
+subsystems.json
+member-tags.json
