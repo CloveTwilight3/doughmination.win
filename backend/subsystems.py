@@ -65,6 +65,7 @@ DEFAULT_MEMBER_TAGS = {
     "Cypher": ["valorant"],
     "Deadjett": ["valorant"],
     "Deadlock": ["valorant"],
+    "Dixie": ["jessa"],
     "Fade": ["valorant"],
     "Gekko": ["valorant"],
     "Jennifer": ["jessa"],
