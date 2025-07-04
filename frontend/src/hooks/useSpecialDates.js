@@ -14,29 +14,33 @@ export default function useSpecialDates() {
     
     let hasActiveDateFound = false;
     
-    // Check for matching dates
-    for (const specialDate of specialDates) {
-      if (month === specialDate.month && 
-          (day === specialDate.day || (specialDate.duration && day >= specialDate.day && day < specialDate.day + specialDate.duration))) {
-        
-        // Mark that we found an active date
-        hasActiveDateFound = true;
-        
-        // Apply the effect based on the type
-        applySpecialEffect(specialDate);
-      }
-    }
-    
-    // Function to apply the special effect
-    function applySpecialEffect(dateInfo) {
-      // Find the special date container - this is a properly positioned container in App.jsx
+    // Function to apply special effects - wrapped to handle timing
+    const applyEffectsWhenReady = () => {
       const specialDateContainer = document.getElementById('special-date-container');
       
       if (!specialDateContainer) {
-        console.error('Special date container not found');
+        // If container doesn't exist yet, try again after a short delay
+        console.log('Special date container not found, retrying...');
+        setTimeout(applyEffectsWhenReady, 100);
         return;
       }
       
+      // Check for matching dates
+      for (const specialDate of specialDates) {
+        if (month === specialDate.month && 
+            (day === specialDate.day || (specialDate.duration && day >= specialDate.day && day < specialDate.day + specialDate.duration))) {
+          
+          // Mark that we found an active date
+          hasActiveDateFound = true;
+          
+          // Apply the effect based on the type
+          applySpecialEffect(specialDate, specialDateContainer);
+        }
+      }
+    };
+    
+    // Function to apply the special effect
+    function applySpecialEffect(dateInfo, container) {
       // Create banner notification
       const banner = document.createElement('div');
       banner.id = `special-date-${dateInfo.id}`;
@@ -84,7 +88,7 @@ export default function useSpecialDates() {
       
       // Add the banner if it doesn't already exist
       if (!document.getElementById(banner.id)) {
-        specialDateContainer.appendChild(banner);
+        container.appendChild(banner);
         
         // Make the banner closable
         banner.addEventListener('click', () => {
@@ -92,6 +96,9 @@ export default function useSpecialDates() {
         });
       }
     }
+    
+    // Start the process
+    applyEffectsWhenReady();
     
     // Cleanup function
     return () => {
