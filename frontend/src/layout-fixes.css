@@ -5,24 +5,30 @@
 
 /* ============================================================================
    SPECIAL DATE BANNER ADJUSTMENTS
-   Convert from fixed position to normal flow to prevent overlapping
+   Keep banners at the top of the page with fixed positioning
    ============================================================================ */
 
-/* Override the fixed positioning for special date banners */
+/* Special date banners - positioned at top */
 .special-date-banner {
-  position: static !important; /* Override fixed position */
-  top: auto !important;
-  left: auto !important;
-  transform: none !important;
-  margin: 1rem auto !important;
-  width: 100% !important;
+  position: fixed !important;
+  top: 70px !important; /* Below the header */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  font-family: 'Caveat', cursive !important;
+  font-size: 1.5rem !important;
+  z-index: 1000 !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+  cursor: pointer !important;
+  text-align: center !important;
+  width: auto !important;
   max-width: 90% !important;
   box-sizing: border-box !important;
-  z-index: 10 !important;
-  animation: none !important; /* Remove pulse animation that relies on transform */
+  margin: 0 !important;
 }
 
-/* Add a new pulse animation that doesn't use transform */
+/* Add a new pulse animation that doesn't use transform conflicts */
 @keyframes pulse-opacity {
   0% { opacity: 0.9; }
   50% { opacity: 1; }
@@ -34,14 +40,23 @@
   animation: pulse-opacity 2s infinite !important;
 }
 
-/* Container for special date banners */
+/* Container for special date banners - doesn't take up space in flow */
 #special-date-container {
+  position: relative;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0.5rem 0;
-  order: 1; /* Control the order in flexbox layouts */
+  height: 0; /* Don't take up space in normal document flow */
+  overflow: visible;
+  order: -1; /* Ensure it comes first in flex layouts */
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .special-date-banner {
+    top: 60px !important; /* Account for smaller mobile header */
+    max-width: 95% !important;
+    padding: 8px 15px !important;
+    font-size: 1.25rem !important;
+  }
 }
 
 /* ============================================================================
