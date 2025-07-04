@@ -795,7 +795,7 @@ function App() {
               {/* Welcome banner - only shown when logged in */}
               {loggedIn && <Welcome loggedIn={loggedIn} isAdmin={isAdmin} />}
               
-              {/* Special Date Container - Properly contained for event banners */}
+                {/* Special Date Container - Properly contained for event banners */}
               <div id="special-date-container" className="special-date-container w-full relative">
                 {/* Special date banners will be rendered here by useSpecialDates hook */}
               </div>
