@@ -10,6 +10,13 @@ export const specialDates = [
     effect: 'birthday' 
   },
   {
+    month: 6,
+    day: 4,
+    id: 'spectra-birthday',
+    message: "🎂 Happy Birthday Spectra! 🎂",
+    effect: 'birthday',
+  },
+  {
     month: 4,
     day: 14,
     id: "sage-birthday",
