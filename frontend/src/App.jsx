@@ -777,6 +777,11 @@ function App() {
 
       {/* Space for fixed header */}
       <div className="h-16 sm:h-14"></div>
+      
+      {/* Special Date Container - MOVED TO TOP */}
+      <div id="special-date-container" className="special-date-container w-full relative">
+        {/* Special date banners will be rendered here by useSpecialDates hook */}
+      </div>
 
       {/* ========== MAIN CONTENT AREA ========== */}
       <main className="container mx-auto px-2 sm:px-4 pt-4 flex-grow">
@@ -794,11 +799,6 @@ function App() {
             <div className="content-wrapper flex flex-col gap-2 sm:gap-4">
               {/* Welcome banner - only shown when logged in */}
               {loggedIn && <Welcome loggedIn={loggedIn} isAdmin={isAdmin} />}
-              
-                {/* Special Date Container - Properly contained for event banners */}
-              <div id="special-date-container" className="special-date-container w-full relative">
-                {/* Special date banners will be rendered here by useSpecialDates hook */}
-              </div>
               
               {/* Main content from routes */}
               <Routes>
