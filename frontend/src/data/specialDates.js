@@ -44,6 +44,13 @@ export const specialDates = [
     message: "🎂 Happy Birthday Jett! 🎂", 
     effect: 'birthday'
   },
+  {
+    month: 4,
+    day: 6,
+    id: 'emilylinkin-birthday',
+    message: "🎂 Happy Birthday Emily! 🎂",
+    effect: 'birthday'
+  },
   
   // Seasonal effects
   { 
