@@ -106,8 +106,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:8080",              # Local development
         "http://127.0.0.1:8080",              # Alternative local address
-        "https://friends.clovetwilight3.co.uk", # Production domain
-        "http://friends.clovetwilight3.co.uk",  # HTTP version of production domain
+        "https://plural.clovetwilight3.co.uk", # Production domain
+        "http://plural.clovetwilight3.co.uk",  # HTTP version of production domain
         "http://frontend",                    # Docker service name
         "http://frontend:80",                 # Docker service with port
     ],
@@ -172,7 +172,7 @@ Disallow: /PSIA/
 Disallow: /index.php
 Disallow: /eval-stdin.php
 
-Sitemap: https://friends.clovetwilight3.co.uk/sitemap.xml
+Sitemap: https://plural.clovetwilight3.co.uk/sitemap.xml
 """
     return Response(content=robots_content, media_type="text/plain")
 
@@ -182,19 +182,19 @@ async def sitemap_xml():
     sitemap_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://friends.clovetwilight3.co.uk/</loc>
+    <loc>https://plural.clovetwilight3.co.uk/</loc>
     <lastmod>2025-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://friends.clovetwilight3.co.uk/privacy</loc>
+    <loc>https://plural.clovetwilight3.co.uk/privacy</loc>
     <lastmod>2025-06-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://friends.clovetwilight3.co.uk/cookies</loc>
+    <loc>https://plural.clovetwilight3.co.uk/cookies</loc>
     <lastmod>2025-06-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
