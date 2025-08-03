@@ -15,7 +15,7 @@ Currently optimized for dark mode. Light mode support is planned once stability 
 
 ## Hosting
 
-The site is hosted at [https://friends.clovetwilight3.co.uk](https://friends.clovetwilight3.co.uk)
+The site is hosted at [https://plural.clovetwilight3.co.uk](https://plural.clovetwilight3.co.uk)
 
 ## This is for:
 
