@@ -7,7 +7,7 @@ export default defineConfig({
     host: '0.0.0.0',  // Listen on all network interfaces
     port: 8080,       // The port the UI runs on
     // Add this line to allow your domain
-    allowedHosts: ['localhost', '127.0.0.1', 'friends.clovetwilight3.co.uk'],
+    allowedHosts: ['localhost', '127.0.0.1', 'plural.clovetwilight3.co.uk'],
     proxy: {
       // Proxy API requests to backend during development
       '/api': {
