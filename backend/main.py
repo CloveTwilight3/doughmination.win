@@ -104,6 +104,7 @@ class FileSizeLimitMiddleware(BaseHTTPMiddleware):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://*.clovetwilight3.co.uk",
         "http://localhost:8080",              # Local development
         "http://127.0.0.1:8080",              # Alternative local address
         "https://plural.clovetwilight3.co.uk", # Production domain
