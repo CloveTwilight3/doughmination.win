@@ -34,9 +34,38 @@ SOFTWARE.
 
 /* ============================================================================
    FONT IMPORTS
-   Google Fonts import for Caveat font
-   ============================================================================ */
-   @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+   Comic Code font declarations */
+@font-face {
+    font-family: 'Comic Code';
+    src: url('https://plural.clovetwilight3.co.uk/fonts/ComicCode-Regular_2022-05-24-151938_hsmz.woff2') format('woff2'),
+         url('https://plural.clovetwilight3.co.uk/fonts/ComicCode-Regular_2022-05-24-151938_hsmz.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Comic Code';
+    src: url('https://plural.clovetwilight3.co.uk/fonts/ComicCode-Italic_2022-05-24-151939_rdtu.woff2') format('woff2'),
+         url('https://plural.clovetwilight3.co.uk/fonts/ComicCode-Italic_2022-05-24-151939_rdtu.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Comic Code';
+    src: url('https://plural.clovetwilight3.co.uk/fonts/ComicCode-Medium_2022-05-24-151941_ugqm.woff2') format('woff2'),
+         url('https://plural.clovetwilight3.co.uk/fonts/ComicCode-Medium_2022-05-24-151941_ugqm.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Comic Code';
+    src: url('https://plural.clovetwilight3.co.uk/fonts/ComicCode-Bold_2022-05-24-152309_zqkm.woff2') format('woff2'),
+         url('https://plural.clovetwilight3.co.uk/fonts/ComicCode-Bold_2022-05-24-152309_zqkm.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
 
    /* ============================================================================
       TAILWIND DIRECTIVES
@@ -64,7 +93,7 @@ SOFTWARE.
    
    /* Dark mode theme - Purple to black gradient */
    body {
-     font-family: 'Inter', sans-serif;
+     font-family: 'Comic Code', sans-serif;
      background: linear-gradient(135deg, #8b5cf6 0%, #1e1b4b 35%, #000000 100%);
      background-attachment: fixed;
      background-repeat: no-repeat;
@@ -200,7 +229,7 @@ SOFTWARE.
    .member-name,
    .fronting-member-name,
    .member-details-name {
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
      font-weight: 600;
    }
    
@@ -209,7 +238,7 @@ SOFTWARE.
    .text-xs,
    .text-sm,
    th, td {
-     font-family: 'Inter', sans-serif !important;
+     font-family: 'Comic Code', sans-serif !important;
    }
    
    /* ============================================================================
@@ -241,7 +270,7 @@ SOFTWARE.
    /* Fronting member name styling */
    .fronting-member-name {
      margin-top: 0.75rem;
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code', cursive !important;
      font-weight: 600;
      font-size: 1.5rem;
      line-height: 1.2;
@@ -386,13 +415,13 @@ SOFTWARE.
      align-items: center;
    }
    
-   /* Header title with Caveat font */
+   /* Header title font */
    header.fixed .header-title,
    header.fixed a,
    header.fixed .container > a,
    .github-footer,
    .github-button {
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
      font-size: 1.75rem;
      font-weight: 600;
      color: inherit;
@@ -420,7 +449,7 @@ SOFTWARE.
    .desktop-nav a {
      border-radius: 0.375rem;
      transition: all 0.2s ease;
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
      font-weight: 600;
      min-height: 40px;
      display: inline-flex;
@@ -639,7 +668,7 @@ SOFTWARE.
    .fronting-member-name,
    .member-details-name {
      margin-top: 0.75rem;
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
      font-weight: 600;
    }
    
@@ -717,7 +746,7 @@ SOFTWARE.
      vertical-align: middle;
      box-shadow: 0 2px 4px rgba(139, 92, 246, 0.5);
      letter-spacing: 0.5px;
-     font-family: 'Inter', sans-serif;
+     font-family: 'Comic Code', sans-serif;
    }
    
    /* Cofront badge - Indigo theme */
@@ -734,7 +763,7 @@ SOFTWARE.
      vertical-align: middle;
      box-shadow: 0 2px 4px rgba(99, 102, 241, 0.5);
      letter-spacing: 0.5px;
-     font-family: 'Inter', sans-serif;
+     font-family: 'Comic Code', sans-serif;
    }
    
    /* Special badge - Amber theme */
@@ -751,7 +780,7 @@ SOFTWARE.
      vertical-align: middle;
      box-shadow: 0 2px 4px rgba(245, 158, 11, 0.5);
      letter-spacing: 0.5px;
-     font-family: 'Inter', sans-serif;
+     font-family: 'Comic Code', sans-serif;
    }
    
    /* Admin badge - Emerald theme */
@@ -768,7 +797,7 @@ SOFTWARE.
      vertical-align: middle;
      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.5);
      letter-spacing: 0.5px;
-     font-family: 'Inter', sans-serif;
+     font-family: 'Comic Code', sans-serif;
    }
    
    /* Private badge - Red theme */
@@ -785,7 +814,7 @@ SOFTWARE.
      vertical-align: middle;
      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.5);
      letter-spacing: 0.5px;
-     font-family: 'Inter', sans-serif;
+     font-family: 'Comic Code', sans-serif;
    }
    
    /* ============================================================================
@@ -1163,7 +1192,7 @@ SOFTWARE.
      position: relative;
      z-index: 10;
      margin-top: 1rem;
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
      font-weight: 600;
      color: #fff;
    }
@@ -1173,7 +1202,7 @@ SOFTWARE.
    .welcome-message p,
    .welcome-message div,
    .welcome-message span {
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
      font-weight: 600;
    }
    
@@ -1184,7 +1213,7 @@ SOFTWARE.
      border-radius: 0.5rem;
      border: 2px solid;
      position: relative;
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
      font-weight: 600;
    }
    
@@ -1198,7 +1227,7 @@ SOFTWARE.
    .mental-state-banner div,
    .mental-state-banner span,
    .mental-state-banner small {
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
      font-weight: 600;
    }
    
@@ -1257,7 +1286,7 @@ SOFTWARE.
      text-align: center;
      border-top: 1px solid rgba(139, 92, 246, 0.3);
      width: 100%;
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
    }
    
    .github-button {
@@ -1270,11 +1299,11 @@ SOFTWARE.
      font-weight: 600;
      transition: all 0.2s ease;
      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
    }
    
    .github-footer .text-sm {
-     font-family: 'Caveat', cursive !important;
+     font-family: 'Comic Code' !important;
      color: #9ca3af;
    }
    
@@ -1381,7 +1410,7 @@ SOFTWARE.
       ============================================================================ */
    
    .fancy-text {
-     font-family: 'Caveat', cursive;
+     font-family: 'Comic Code';
      font-weight: 600;
      font-size: 1.2em;
    }
@@ -1450,7 +1479,7 @@ SOFTWARE.
   transform: translateX(-50%);
   padding: 10px 20px;
   border-radius: 8px;
-  font-family: 'Caveat', cursive;
+  font-family: 'Comic Code';
   font-size: 1.5rem;
   z-index: 1000;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
