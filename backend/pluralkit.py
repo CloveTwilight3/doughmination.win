@@ -58,6 +58,7 @@ MAX_FRONTERS = 5
 
 # Special member display names
 SPECIAL_DISPLAY_NAMES = {
+    "answer": "Answer Machine",
     "system": "Unsure",
     "sleeping": "I am sleeping"
 }
