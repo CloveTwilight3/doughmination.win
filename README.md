@@ -79,4 +79,11 @@ Feel free to use, modify, and share it as long as the license notice is preserve
 
 ---
 
+# Contributors
+<a href="https://github.com/CloveTwilight3/clovetwilight3/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=CloveTwilight3/plural.clovetwilight3.co.uk" />
+</a>
+
+---
+
 Made with ✨ by and for the Doughmination System.
