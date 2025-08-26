@@ -104,13 +104,14 @@ class FileSizeLimitMiddleware(BaseHTTPMiddleware):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://*.clovetwilight3.co.uk",
         "http://localhost:8080",              # Local development
         "http://127.0.0.1:8080",              # Alternative local address
-        "https://plural.clovetwilight3.co.uk", # Production domain
-        "http://plural.clovetwilight3.co.uk",  # HTTP version of production domain
+        "https://www.doughmination.win", # Production domain
+        "http://www.doughmination.win",  # HTTP version of production domain
         "http://frontend",                    # Docker service name
         "http://frontend:80",                 # Docker service with port
+        "http://doughmination.win",
+        "https://doughmination.win"
     ],
     allow_credentials=True,
     allow_methods=["*"],
