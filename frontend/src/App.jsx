@@ -42,7 +42,7 @@ function App() {
   const navigate = useNavigate(); // React Router navigation hook
 
   // Default avatar for members without one
-  const defaultAvatar = "https://alextlm.co.uk/system.png";
+  const defaultAvatar = "https://clovetwilight3.co.uk/avatar.jpg";
 
   // Initialize theme (dark mode only)
   useTheme();
