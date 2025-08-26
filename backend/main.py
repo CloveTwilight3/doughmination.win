@@ -75,7 +75,7 @@ initialize_admin_user()
 initialize_default_subsystems()
 
 # Default fallback avatar URL
-DEFAULT_AVATAR = "https://alextlm.co.uk/system.png"
+DEFAULT_AVATAR = "https://clovetwilight3.co.uk/avatar.jpg"
 
 # ============================================================================
 # MIDDLEWARE SETUP
