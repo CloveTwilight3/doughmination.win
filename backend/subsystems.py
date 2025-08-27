@@ -56,7 +56,7 @@ DEFAULT_MEMBER_TAGS = {
     "romance": ["saja"],
     "Rumi": ["huntrix"],
     "Zoey": ["huntrix"],
-    "Mira": ["huntrix]
+    "Mira": ["huntrix"]
 }
 
 def get_subsystems() -> List[SubSystem]:
