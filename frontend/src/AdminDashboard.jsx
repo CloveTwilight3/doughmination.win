@@ -145,7 +145,7 @@ export default function AdminDashboard({ fronting, onFrontingChanged }) {
     if (member.is_cofront && member.component_avatars && member.component_avatars.length > 0) {
       return member.component_avatars[0];
     }
-    return member.avatar_url || "https://clovetwilight3.co.uk/system.png";
+    return member.avatar_url || "https://doughmination.win/common/fallback_avatar.png";
   };
 
   
