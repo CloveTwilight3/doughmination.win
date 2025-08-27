@@ -4,5 +4,5 @@ users.json
 venv/
 __pycache__/
 subsystems.json
-member-tags.json
+member_tags.json
 avatars/
