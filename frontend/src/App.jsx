@@ -621,6 +621,14 @@ function App() {
           
           {/* Desktop Navigation - Always visible on larger screens */}
           <div className="desktop-nav hidden md:flex items-center gap-3">
+            <a
+              href="https://clovetwilight3.co.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Clove's Homepage
+            </a>
             {loggedIn && (
               <Link 
                 to="/admin/metrics"
@@ -691,6 +699,18 @@ function App() {
               onClick={(e) => e.stopPropagation()}
             >
               <ul className="flex flex-col p-4 gap-3">
+                <li>
+                <a
+                  href="https://clovetwilight3.co.uk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full px-4 py-3 bg-blue-500 text-white rounded-lg text-sm text-center"
+                  onClick={toggleMenu}
+                  >
+                  Clove's Homepage
+                  </a>
+                </li>
+                
                 {loggedIn && (
                   <li>
                     <Link 
