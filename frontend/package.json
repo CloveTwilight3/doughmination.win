@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@hcaptcha/react-hcaptcha": "^1.12.0",
+    "@hcaptcha/react-hcaptcha": "^1.12.1",
     "react": "^19.0.0",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.5.0"
