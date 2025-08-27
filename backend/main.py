@@ -174,7 +174,7 @@ Disallow: /PSIA/
 Disallow: /index.php
 Disallow: /eval-stdin.php
 
-Sitemap: https://plural.clovetwilight3.co.uk/sitemap.xml
+Sitemap: https://www.doughmination.win/sitemap.xml
 """
     return Response(content=robots_content, media_type="text/plain")
 
@@ -184,19 +184,19 @@ async def sitemap_xml():
     sitemap_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://plural.clovetwilight3.co.uk/</loc>
+    <loc>https://www.doughmination.win/</loc>
     <lastmod>2025-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://plural.clovetwilight3.co.uk/privacy</loc>
+    <loc>https://www.doughmination.win/privacy</loc>
     <lastmod>2025-06-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://plural.clovetwilight3.co.uk/cookies</loc>
+    <loc>https://www.doughmination.win/cookies</loc>
     <lastmod>2025-06-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
