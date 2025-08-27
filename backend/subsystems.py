@@ -33,60 +33,25 @@ MEMBER_TAGS_FILE = "member_tags.json"
 # Default sub-systems configuration
 DEFAULT_SUBSYSTEMS = [
     {
-        "name": "Pets", 
-        "label": "pets",
+        "name": "HUNTR/X", 
+        "label": "huntrix",
         "color": "#FF69B4",  # Hot pink
-        "description": "Pet-like members or animal personas"
+        "description": "All huntrix members"
     },
     {
-        "name": "Valorant", 
-        "label": "valorant",
+        "name": "Saja Boys", 
+        "label": "saja",
         "color": "#FF4655",  # Valorant red
-        "description": "Members from the Valorant universe"
-    },
-    {
-        "name": "Vocaloids", 
-        "label": "vocaloids",
-        "color": "#39C5BB",  # Teal/cyan
-        "description": "Vocaloid characters and music-related members"
-    },
-    {
-        "name": "Jessa",
-        "label": "jessa",
-        "color": "#D6B2D7", # Cute Purple
-        "description": "Front's introjected from Jessas System"
+        "description": "All the saja boys"
     }
 ]
 
 # Default member tag assignments
 DEFAULT_MEMBER_TAGS = {
-    # Clove gets both host and valorant tags
-    "Clove": ["host", "valorant"],
-    "Cypher": ["valorant"],
-    "Deadjett": ["valorant"],
-    "Deadlock": ["valorant"],
-    "Dixie": ["jessa"],
-    "Fade": ["valorant"],
-    "Gekko": ["valorant"],
-    "Jennifer": ["jessa"],
-    "Jessa": ["jessa"],
-    "Jett": ["valorant"],
-    "KJ": ["valorant"],
-    "Lucy": ["jessa"], 
-    "Miku": ["vocaloids"],
-    "Neon": ["valorant"],
-    "Nyara": ["pets"],
-    "Omen": ["valorant"],
-    "Puppers": ["pets"],
-    "Raze": ["valorant"],
-    "Reyna": ["valorant"],
-    "Rin": ["vocaloids"],
-    "Rosie": ["jessa"],
-    "Roxy": ["pets"],
-    "Sage": ["valorant"],
-    "Skye": ["valorant"],
-    "Sparkles": ["pets"],
-    "Teto": ["vocaloids"]
+
+    "Clove": ["host"],
+    "baby": ["saja"],
+    "Rumi": ["huntrix"]
 }
 
 def get_subsystems() -> List[SubSystem]:
