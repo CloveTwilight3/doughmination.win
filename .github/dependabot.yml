@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "daily"
+      time: "05:00"
+    
+  - package-ecosystem: "pip" 
+    directory: "/backend"
+    schedule:
+      interval: "monthly"  # Less frequent for backend
