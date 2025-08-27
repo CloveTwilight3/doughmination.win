@@ -30,7 +30,7 @@ const Welcome = ({ loggedIn, isAdmin }) => {
   const [imageError, setImageError] = useState(false);
   
   // Default avatar for fallback
-  const defaultAvatar = "https://www.alextlm.co.uk/system.png";
+  const defaultAvatar = "https://doughmination.win/common/fallback_avatar.png";
   
   useEffect(() => {
     if (loggedIn) {
