@@ -42,15 +42,7 @@ HEADERS = {
 # Values can be lists of 2-5 member names
 COFRONTS = {
     # Existing cofronts
-    "jettdead": ["Deadlock", "Jett"],
-    "NyaRub": ["Nyara", "Ruby"],
-    "cyclove": ["Clove", "Cypher"],
-    "gekclove": ["Gekko", "Clove"],
-    "jettomdead": ["Deadlock", "Omen", "Jett"],
-    "CloDeadJett": ["Clove", "Deadlock", "Jett"],
-    "CyCloDeadJett": ["Cypher", "Clove", "Deadlock", "Jett"],
-    "CyCloDeadJettGek": ["Cypher", "Clove", "Deadlock", "Jett", "Gekko"],
-    "CyCloveGekRen": ["Ren", "Cypher", "Clove", "Gekko"]
+    "huntrix": ["Rumi", "Zoey", "Mira"]
 }
 
 # Max number of members allowed in a cofront (enforced in set_front function)
