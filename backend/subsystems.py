@@ -48,10 +48,15 @@ DEFAULT_SUBSYSTEMS = [
 
 # Default member tag assignments
 DEFAULT_MEMBER_TAGS = {
-
     "Clove": ["host"],
     "baby": ["saja"],
-    "Rumi": ["huntrix"]
+    "abby": ["saja"],
+    "jinu": ["saja"],
+    "mystery": ["saja"],
+    "romance": ["saja"],
+    "Rumi": ["huntrix"],
+    "Zoey": ["huntrix"],
+    "Mira": ["huntrix]
 }
 
 def get_subsystems() -> List[SubSystem]:
