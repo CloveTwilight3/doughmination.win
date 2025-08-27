@@ -42,11 +42,12 @@ HEADERS = {
 # Values can be lists of 2-5 member names
 COFRONTS = {
     # Existing cofronts
-    "huntrix": ["Rumi", "Zoey", "Mira"]
+    "huntrix": ["Rumi", "Zoey", "Mira"],
+    "saja": ["baby", "jinu", "mystery", "romance", "abby"]
 }
 
 # Max number of members allowed in a cofront (enforced in set_front function)
-MAX_FRONTERS = 5
+MAX_FRONTERS = 6
 
 # Special member display names
 SPECIAL_DISPLAY_NAMES = {
