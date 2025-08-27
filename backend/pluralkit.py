@@ -107,10 +107,11 @@ async def get_members(subsystem_filter: str = None, include_untagged: bool = Tru
             
             # Create cofront display data
             if component_members:
-                # Combine display names
+                # Combine display names - FIX: Handle None values
                 display_names = []
                 for comp in component_members:
-                    display_names.append(comp.get("display_name", comp.get("name")))
+                    display_name = comp.get("display_name") or comp.get("name") or "Unknown"
+                    display_names.append(display_name)
                 
                 # Create cofront member data
                 cofront_member = {
@@ -246,15 +247,21 @@ async def create_dynamic_cofront(member_ids, name=None):
     if len(component_members) != len(member_ids):
         raise ValueError("One or more member IDs not found")
     
-    # Generate a name if not provided
+    # Generate a name if not provided - FIX: Handle None values
     if not name:
-        # Use first letter of each member name
-        name = "".join(member.get("name", "")[0] for member in component_members)
+        # Use first letter of each member name, but handle None/empty names
+        name_parts = []
+        for member in component_members:
+            member_name = member.get("name") or "Unknown"
+            if member_name:
+                name_parts.append(member_name[0])
+        name = "".join(name_parts) or "Cofront"
     
-    # Combine display names
+    # Combine display names - FIX: Handle None values
     display_names = []
     for comp in component_members:
-        display_names.append(comp.get("display_name", comp.get("name")))
+        display_name = comp.get("display_name") or comp.get("name") or "Unknown"
+        display_names.append(display_name)
     
     # Create cofront data structure
     cofront_data = {
