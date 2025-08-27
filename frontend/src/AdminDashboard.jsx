@@ -214,7 +214,7 @@ const expandFrontingMembers = (frontingMembers) => {
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full overflow-hidden mr-3">
                 <img 
-                  src={member.avatar_url || "https://clovetwilight3.co.uk/system.png"}
+                  src={member.avatar_url || "https://doughmination.win/common/fallback_avatar.png"}
                   alt={member.name}
                   className="w-full h-full object-cover"
                 />
