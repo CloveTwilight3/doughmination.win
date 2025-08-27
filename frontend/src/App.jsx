@@ -42,7 +42,7 @@ function App() {
   const navigate = useNavigate(); // React Router navigation hook
 
   // Default avatar for members without one
-  const defaultAvatar = "https://clovetwilight3.co.uk/avatar.jpg";
+  const defaultAvatar = "https://www.doughmination.win/common/fallback_avatar.png";
 
   // Initialize theme (dark mode only)
   useTheme();
