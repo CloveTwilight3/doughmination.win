@@ -148,9 +148,8 @@ const SubSystemFilter = ({ onFilterChange, currentFilter }) => {
 // Helper function to get icons for sub-systems
 const getSubSystemIcon = (label) => {
   const icons = {
-    'pets': '🐾',
-    'valorant': '🔫',
-    'vocaloids': '🎤',
+    'saja': '🔫',
+    'huntrix': '🎤',
   };
   return icons[label] || '📁';
 };
