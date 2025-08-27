@@ -75,7 +75,7 @@ initialize_admin_user()
 initialize_default_subsystems()
 
 # Default fallback avatar URL
-DEFAULT_AVATAR = "https://www.doughmination.win/common/fallback_avatar.png"
+DEFAULT_AVATAR = "https://doughmination.win/common/fallback_avatar.png"
 
 # ============================================================================
 # MIDDLEWARE SETUP
