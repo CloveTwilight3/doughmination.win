@@ -90,7 +90,7 @@ server {
 
         # Allow requests from my subdomains
         set $cors_origin "";
-        if ($http_origin ~* "^https://([a-z0-9-]+\.)?(clovetwilight3\.co\.uk|themidnightcyan\.win|doughmination\.win)$") {
+        if ($http_origin ~* "^https?:\/\/(localhost(:[0-9]+)?|127\.0\.0\.1(:[0-9]+)?|([a-z0-9-]+\.)?(clovetwilight3\.co\.uk|themidnightcyan\.win|doughmination\.win))$") {
             set $cors_origin $http_origin;
         }
 
