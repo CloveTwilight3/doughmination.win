@@ -622,12 +622,18 @@ function App() {
           {/* Desktop Navigation - Always visible on larger screens */}
           <div className="desktop-nav hidden md:flex items-center gap-3">
             <a
-              href="https://clovetwilight3.co.uk"
-              target="_blank"
+              href="https://www.clovetwilight3.co.uk"
               rel="noopener noreferrer"
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
-              Clove's Homepage
+              Clove
+            </a>
+            <a
+              href="https://www.themidnightcyan.win"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Athena
             </a>
             {loggedIn && (
               <Link 
