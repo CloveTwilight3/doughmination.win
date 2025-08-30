@@ -26,7 +26,6 @@ SOFTWARE.
    DOUGHMINATION SYSTEM SERVER - DARK MODE ONLY STYLESHEET
    
    - Dark mode only theme
-   - Caveat font integration for beautiful branding
    - Improved badge designs
    - Proper responsive behavior across all devices
    - Multiple fronting member support
@@ -100,6 +99,7 @@ SOFTWARE.
      min-height: 100vh;
      color: #fff;
      transition: background-color 0.3s ease, color 0.3s ease;
+     cursor: url('assets/main.png'), auto;
    }
    
    /* Headings use Caveat font for personality */
@@ -477,7 +477,7 @@ SOFTWARE.
      background-color: rgba(0, 0, 0, 0.7);
      border: 1px solid rgba(255, 255, 255, 0.2);
      transition: all 0.2s ease;
-     cursor: pointer;
+     cursor: url('assets/link.png'), pointer;
      align-items: center;
      justify-content: center;
      color: #fff;
@@ -1163,7 +1163,7 @@ SOFTWARE.
    /* Disabled button state */
    button:disabled {
      opacity: 0.6;
-     cursor: not-allowed;
+     cursor: url('assets/no.png'), not-allowed;
      transform: none !important;
      box-shadow: none !important;
    }
@@ -1483,7 +1483,7 @@ SOFTWARE.
   font-size: 1.5rem;
   z-index: 1000;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  cursor: pointer;
+  cursor: url('assets/link.png'), pointer;
   text-align: center;
 }
 
