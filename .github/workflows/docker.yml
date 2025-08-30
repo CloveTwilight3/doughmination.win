@@ -22,7 +22,7 @@ jobs:
     - name: Build and push backend
       uses: docker/build-push-action@v5
       with:
-        context: .
+        context: ./backend  # Use backend folder as context
         file: ./backend/Dockerfile
         push: true
         tags: clovetwilight3/doughmination-backend:latest
