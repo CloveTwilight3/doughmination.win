@@ -11,11 +11,10 @@ A lightweight web application that interfaces with the PluralKit API to display 
 - 👥 User management with multiple accounts support
 - 📱 Responsive design for mobile and desktop
 
-Currently optimized for dark mode. Light mode support is planned once stability is ensured.
 
 ## Hosting
 
-The site is hosted at [https://plural.clovetwilight3.co.uk](https://plural.clovetwilight3.co.uk)
+The site is hosted at [https://www.doughmination.win](https://www.doughmination.win)
 
 ## This is for:
 
@@ -25,6 +24,8 @@ The site is hosted at [https://plural.clovetwilight3.co.uk](https://plural.clove
 - Switching between dark and light themes depending on vibes
 - Managing front switching through the Admin interface
 - Tracking fronting time and switch metrics
+
+*Note: this will be moving to /plu/ral in future images*
 
 ## Technical Stack
 
@@ -38,6 +39,22 @@ The site is hosted at [https://plural.clovetwilight3.co.uk](https://plural.clove
 - Tailwind CSS for styling
 
 ## Installation & Setup
+
+1. Use the [compose.yml](https://github.com/CloveTwilight3/doughmination.win/blob/main/compose.yml) from this repo, and copy it into a docker-compose.yml or compose.yml file in your vps.
+2. Update the variables to be the accurate info. JWT_SECRET can be a keyboard smash, it doesn't matter.
+3. Run the following commands:
+```bash
+docker compose pull
+docker compose up -d
+```
+4. To check the logs, you can run:
+```bash
+docker compose logs -f # To watch them as they run
+docker compose logs backend # To watch the backend
+docker compose logs frontend # To watch the frontend
+```
+
+## Self-Hosting/Development
 
 ### Backend
 ```bash
@@ -74,7 +91,7 @@ This is a personalized project. It's open-source in case others who are familiar
 If you know what you're doing and want to tweak it for your own system, feel free to fork it!
 
 ## License
-This project is licensed under the [MIT License.](https://github.com/CloveTwilight3/plural-web?tab=MIT-1-ov-file)
+This project is licensed under the [MIT License.](https://github.com/CloveTwilight3/doughmination.win?tab=MIT-1-ov-file)
 Feel free to use, modify, and share it as long as the license notice is preserved.
 
 ---
