@@ -186,10 +186,12 @@ a.px-3.py-2,
 /* Footer */
 .github-button {
   font-size: 1.5rem;
+  cursor: url('assets/link.png'), pointer;
 }
 
 .github-footer .text-sm {
   font-size: 1.25rem;
+  cursor: url('assets/link.png'), pointer;
 }
 
 /* STANDARDIZED BUTTON SIZES */
@@ -198,6 +200,7 @@ a.px-3.py-2,
 .desktop-nav a {
   padding: 0.75rem 1.25rem;
   min-height: 3rem;
+  cursor: url('assets/link.png'), pointer;
 }
 
 /* General buttons */
@@ -206,6 +209,7 @@ a.px-3.py-2,
 .px-3.py-2 {
   padding: 0.75rem 1.25rem;
   min-height: 3rem;
+  cursor: url('assets/link.png'), pointer;
 }
 
 /* Hamburger menu button */
@@ -217,12 +221,14 @@ button.flex.items-center.justify-center.p-2.rounded-md {
   min-width: 3rem;
   min-height: 3rem;
   padding: 0.5rem;
+  cursor: url('assets/link.png'), pointer;
 }
 
 /* Footer button */
 .github-button {
   padding: 1rem 2rem;
   min-height: 3.5rem;
+  cursor: url('assets/link.png'), pointer;
 }
 
 /* Search bar input */
@@ -238,6 +244,7 @@ button.flex.items-center.justify-center.p-2.rounded-md {
 .member-details-name {
   font-family: 'Comic Code' !important;
   font-weight: 600;
+  cursor: url('assets/main.png'), auto;
 }
 
 /* Keep specific elements with Inter font */
@@ -263,6 +270,7 @@ td {
   align-items: flex-start;
   width: 100%;
   max-width: 100%;
+  cursor: url('assets/link.png'), pointer;
 }
 
 /* Individual fronting member */
