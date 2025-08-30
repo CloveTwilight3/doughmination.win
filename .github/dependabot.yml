@@ -5,8 +5,9 @@ updates:
     schedule:
       interval: "daily"
       time: "05:00"
-    
-  - package-ecosystem: "pip" 
+   
+  - package-ecosystem: "pip"
     directory: "/backend"
     schedule:
-      interval: "monthly"  # Less frequent for backend
+      interval: "daily"
+      time: "06:00"
