@@ -3,7 +3,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN mkdir -p avatars data
-RUN touch users.json
+RUN echo '[]' > users.json
 RUN chmod 666 users.json
 RUN chmod 777 avatars
 COPY . .
