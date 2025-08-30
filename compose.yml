@@ -1,29 +1,28 @@
 services:
   backend:
-    build:
-      context: .  # Changed from ./backend to root
-      dockerfile: ./backend/Dockerfile  # Specify path to Dockerfile
+    image: clovetwilight3/doughmination-backend:latest
     ports:
       - "8000:8000"
+    environment:
+      SYSTEM_TOKEN: your_pluralkit_token
+      JWT_SECRET: your_secure_random_string
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: your_secure_password
+      ADMIN_DISPLAY_NAME: Administrator
+      CACHE_TTL: 30
     volumes:
-      - ./backend:/app
       - backend_data:/app/data
-    env_file:
-      - ./backend/.env
+      - backend_avatars:/app/avatars
     restart: unless-stopped
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: clovetwilight3/doughmination-frontend:latest
     ports:
       - "8080:8080"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     depends_on:
       - backend
     restart: unless-stopped
 
 volumes:
   backend_data:
+  backend_avatars:
