@@ -41,7 +41,7 @@ DEFAULT_SUBSYSTEMS = [
     {
         "name": "Saja Boys", 
         "label": "saja",
-        "color": "#FF4655",  # Valorant red
+        "color": "#FF4655",  # Hot red
         "description": "All the saja boys"
     }
 ]
@@ -56,7 +56,8 @@ DEFAULT_MEMBER_TAGS = {
     "romance": ["saja"],
     "Rumi": ["huntrix"],
     "Zoey": ["huntrix"],
-    "Mira": ["huntrix"]
+    "Mira": ["huntrix"],
+    "Bobby": ["huntrix"]
 }
 
 def get_subsystems() -> List[SubSystem]:
