@@ -26,6 +26,7 @@ jobs:
         file: ./backend/Dockerfile
         push: true
         tags: clovetwilight3/doughmination-backend:latest
+        no-cache: true
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -46,3 +47,4 @@ jobs:
         file: ./frontend/Dockerfile
         push: true
         tags: clovetwilight3/doughmination-frontend:latest
+        no-cache: true
